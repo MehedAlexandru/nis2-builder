@@ -1,0 +1,99 @@
+{
+  "app": {
+    "name": "NIS2 Compass",
+    "tagline": "NIS2 readiness, without the guesswork.",
+    "description": "Classify your entity, build the required documentation and audit your network — guided end to end."
+  },
+  "nav": {
+    "primaryLabel": "Primary",
+    "home": "Home",
+    "design": "Design system",
+    "signIn": "Sign in"
+  },
+  "actions": {
+    "startClassification": "Start classification",
+    "exploreDesign": "Explore the design system",
+    "comingSoon": "Coming in a later phase",
+    "backHome": "Back to home"
+  },
+  "common": {
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "phase": "Phase 0",
+    "inProgress": "In progress",
+    "skipToContent": "Skip to content"
+  },
+  "severity": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "critical": "Critical"
+  },
+  "landing": {
+    "eyebrow": "NIS2 readiness for EU SMEs",
+    "title": "Know your NIS2 obligations. Then meet them.",
+    "subtitle": "NIS2 Compass helps you determine whether the directive applies, assemble the required documentation, and audit your IT environment — with Romanian and English guidance from day one.",
+    "modulesTitle": "One workspace, three connected modules",
+    "modules": {
+      "classification": {
+        "title": "Entity classification",
+        "description": "A data-driven questionnaire applies the NIS2 size and sector rules, shows the legal basis, and explains the supervision regime."
+      },
+      "documents": {
+        "title": "Documentation centre",
+        "description": "Guided templates for the Art. 21 measures, versioned revisions, approvals and professional DOCX/PDF exports."
+      },
+      "audit": {
+        "title": "Security audit",
+        "description": "Map your network, assess every device, track findings and export an audit report that maps back to NIS2 requirements."
+      }
+    },
+    "statusTitle": "Phase 0 is live",
+    "statusBody": "The monorepo, design tokens, bilingual shell and API foundation are in place. Authentication, classification and documents follow in the next phases.",
+    "statusItems": {
+      "repo": "pnpm + Turborepo monorepo with CI",
+      "design": "WCAG-aware palette and dark mode",
+      "i18n": "English and Romanian from day one",
+      "api": "NestJS API shell with Prisma, Redis and health checks"
+    },
+    "disclaimerTitle": "Legal notice"
+  },
+  "design": {
+    "title": "Design system",
+    "subtitle": "The visual language shared by the application, DOCX and PDF exports.",
+    "palette": "Primary palette",
+    "paletteHint": "Hue 206 throughout. primary-600 is the base and the minimum step for normal text on white (6.8:1).",
+    "semantic": "Semantic anchors",
+    "severity": "Severity badges",
+    "severityHint": "Fixed colors across the UI and every export: Low, Medium, High, Critical.",
+    "typography": "Typography",
+    "typographyHint": "System font stack with Inter as the preferred face; no external font request.",
+    "components": "Components",
+    "progress": "Progress",
+    "progressHint": "Progress bars use the warning → primary → success gradient.",
+    "formatting": "Locale formatting",
+    "formattingHint": "Dates, numbers and currency follow the active locale.",
+    "accessibility": "Accessibility",
+    "accessibilityBody": "Focus rings, keyboard navigation, semantic landmarks and reduced-motion support are built in. The target is WCAG 2.2 AA.",
+    "sampleDate": "Date",
+    "sampleNumber": "Number",
+    "sampleCurrency": "Currency",
+    "buttonPrimary": "Primary action",
+    "buttonSecondary": "Secondary",
+    "buttonOutline": "Outline",
+    "buttonGhost": "Ghost",
+    "buttonDanger": "Danger"
+  },
+  "footer": {
+    "disclaimer": "This tool supports compliance preparation and does not constitute legal advice.",
+    "legalReview": "Romanian jurisdiction content is pending legal review.",
+    "rights": "NIS2 Compass · MIT licensed"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you are looking for does not exist or has moved."
+  }
+}

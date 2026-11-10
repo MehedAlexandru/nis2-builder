@@ -1,0 +1,58 @@
+{
+  "name": "nis2-compass",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NIS2 Compass — guided NIS2 compliance preparation for EU SMEs",
+  "license": "MIT",
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "pnpm --filter @nis2/shared build && turbo run dev --parallel",
+    "dev:worker": "pnpm --filter @nis2/api dev:worker",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:go": "cd apps/scanner-agent && go test ./...",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "openapi:generate": "pnpm --filter @nis2/api openapi:generate",
+    "db:migrate": "dotenv -e .env -- pnpm --filter @nis2/api prisma:migrate",
+    "db:migrate:deploy": "dotenv -e .env -- pnpm --filter @nis2/api prisma:migrate:deploy",
+    "db:seed": "dotenv -e .env -- pnpm --filter @nis2/api prisma:seed",
+    "db:reset": "dotenv -e .env -- pnpm --filter @nis2/api exec prisma migrate reset --force",
+    "secrets:check": "sh scripts/check-secrets.sh",
+    "prepare": "husky",
+    "postinstall": "pnpm --filter @nis2/api prisma:generate"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@eslint/js": "^9.39.5",
+    "dotenv-cli": "^11.1.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.26",
+    "globals": "^15.15.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
+    "prettier": "^3.9.10",
+    "turbo": "^2.11.10",
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.72.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "prisma"
+    ],
+    "ignoredBuiltDependencies": [
+      "@scarf/scarf",
+      "msgpackr-extract"
+    ]
+  }
+}

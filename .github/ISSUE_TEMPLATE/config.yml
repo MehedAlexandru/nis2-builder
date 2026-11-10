@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/MehedAlexandru/nis2-builder/security/policy
+    about: Please report security issues privately, never in a public issue.
+  - name: Legal content review
+    url: https://github.com/MehedAlexandru/nis2-builder/discussions
+    about: For questions about jurisdiction content and its review status.

@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+.turbo/
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.test.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local data
+deploy/data/
+apps/api/prisma/*.db
+apps/api/prisma/*.db-journal
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+
+# Editors and OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.recommended.json
+
+# Tooling caches
+.eslintcache
+.cache/
+.tmp/
+
+# Go
+apps/scanner-agent/bin/
+apps/scanner-agent/dist/
+
+# Local MinIO / Mailpit volumes (if bind-mounted)
+deploy/minio-data/
+deploy/mailpit-data/

@@ -1,0 +1,177 @@
+# Local development stack: web, api, worker, postgres, redis, minio, mailpit.
+# Usage: cp .env.example .env && docker compose up --build
+name: nis2-compass
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-nis2}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nis2_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-nis2_compass}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-nis2} -d ${POSTGRES_DB:-nis2_compass}']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    command: ['redis-server', '--appendonly', 'yes']
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-minioadmin}
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio-data:/data
+
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-minioadmin}
+      S3_BUCKET: ${S3_BUCKET:-nis2-compass}
+    entrypoint: >
+      /bin/sh -c "
+      until mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD; do sleep 2; done;
+      mc mb --ignore-existing local/$$S3_BUCKET;
+      mc anonymous set none local/$$S3_BUCKET;
+      exit 0
+      "
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
+  api:
+    build:
+      context: .
+      dockerfile: deploy/docker/api.Dockerfile
+      target: dev
+    command: sh -c "pnpm --filter @nis2/shared build && pnpm --filter @nis2/api dev"
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+      API_PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-nis2}:${POSTGRES_PASSWORD:-nis2_dev_password}@postgres:5432/${POSTGRES_DB:-nis2_compass}?schema=public
+      REDIS_URL: redis://redis:6379
+      PUBLIC_APP_URL: http://localhost:5173
+      CORS_ORIGINS: http://localhost:5173,http://localhost:4173
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: ${S3_BUCKET:-nis2-compass}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin}
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      MAIL_FROM: 'NIS2 Compass <no-reply@nis2-compass.local>'
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-local-dev-only-change-me-access-secret}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-local-dev-only-change-me-refresh-secret}
+      COOKIE_SECRET: ${COOKIE_SECRET:-local-dev-only-change-me-cookie-secret}
+      ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY:-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/app
+      - api-node-modules:/app/node_modules
+      - api-pkg-node-modules:/app/apps/api/node_modules
+      - web-pkg-node-modules:/app/apps/web/node_modules
+      - shared-pkg-node-modules:/app/packages/shared/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      mailpit:
+        condition: service_started
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:3000/healthz || exit 1']
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 90s
+
+  worker:
+    build:
+      context: .
+      dockerfile: deploy/docker/api.Dockerfile
+      target: dev
+    command: sh -c "pnpm --filter @nis2/shared build && pnpm --filter @nis2/api dev:worker"
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+      DATABASE_URL: postgresql://${POSTGRES_USER:-nis2}:${POSTGRES_PASSWORD:-nis2_dev_password}@postgres:5432/${POSTGRES_DB:-nis2_compass}?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-local-dev-only-change-me-access-secret}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-local-dev-only-change-me-refresh-secret}
+      COOKIE_SECRET: ${COOKIE_SECRET:-local-dev-only-change-me-cookie-secret}
+      ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY:-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
+    volumes:
+      - .:/app
+      - worker-node-modules:/app/node_modules
+      - worker-api-node-modules:/app/apps/api/node_modules
+      - worker-shared-node-modules:/app/packages/shared/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/docker/web.Dockerfile
+      target: dev
+    command: sh -c "pnpm --filter @nis2/shared build && pnpm --filter @nis2/web dev --host 0.0.0.0"
+    environment:
+      NODE_ENV: development
+      VITE_API_PROXY: http://api:3000
+    ports:
+      - '5173:5173'
+    volumes:
+      - .:/app
+      - web-node-modules:/app/node_modules
+      - web-app-node-modules:/app/apps/web/node_modules
+      - web-shared-node-modules:/app/packages/shared/node_modules
+    depends_on:
+      api:
+        condition: service_started
+
+volumes:
+  postgres-data:
+  redis-data:
+  minio-data:
+  api-node-modules:
+  api-pkg-node-modules:
+  web-pkg-node-modules:
+  shared-pkg-node-modules:
+  worker-node-modules:
+  worker-api-node-modules:
+  worker-shared-node-modules:
+  web-node-modules:
+  web-app-node-modules:
+  web-shared-node-modules:

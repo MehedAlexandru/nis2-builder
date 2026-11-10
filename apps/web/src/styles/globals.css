@@ -1,0 +1,185 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * NIS2 Compass design tokens.
+ * Base primary: hsl(206, 100%, 32%) — mirrored in packages/shared/src/brand.ts.
+ * Values are stored as HSL components so Tailwind can apply opacity modifiers.
+ */
+@layer base {
+  :root {
+    /* Primary — hue 206 */
+    --primary-50: 206 100% 96%;
+    --primary-100: 206 100% 90%;
+    --primary-200: 206 100% 80%;
+    --primary-300: 206 95% 66%;
+    --primary-400: 206 96% 52%;
+    --primary-500: 206 100% 42%;
+    --primary-600: 206 100% 32%;
+    --primary-700: 206 100% 25%;
+    --primary-800: 206 100% 19%;
+    --primary-900: 206 100% 14%;
+    --primary-950: 206 100% 9%;
+
+    /* Success */
+    --success-50: 152 60% 96%;
+    --success-100: 152 60% 90%;
+    --success-500: 152 60% 42%;
+    --success-600: 152 60% 35%;
+    --success-700: 152 60% 27%;
+
+    /* Warning */
+    --warning-50: 38 95% 96%;
+    --warning-100: 38 95% 90%;
+    --warning-500: 38 95% 48%;
+    --warning-600: 38 95% 40%;
+    --warning-700: 38 95% 30%;
+
+    /* Danger */
+    --danger-50: 355 75% 96%;
+    --danger-100: 355 75% 90%;
+    --danger-500: 355 75% 55%;
+    --danger-600: 355 75% 48%;
+    --danger-700: 355 75% 38%;
+    --danger-foreground: 0 0% 100%;
+
+    /* Accent (teal) */
+    --accent-50: 176 70% 96%;
+    --accent-100: 176 70% 90%;
+    --accent-500: 176 70% 44%;
+    --accent-600: 176 70% 36%;
+    --accent-700: 176 70% 28%;
+    --accent: 176 70% 36%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Severity — fixed semantic colors */
+    --severity-low: 152 60% 35%;
+    --severity-medium: 38 95% 48%;
+    --severity-high: 24 90% 50%;
+    --severity-critical: 355 75% 48%;
+
+    /* Neutrals tinted with hue 206 */
+    --neutral-50: 206 20% 98%;
+    --neutral-100: 206 16% 94%;
+    --neutral-200: 206 14% 88%;
+    --neutral-300: 206 12% 80%;
+    --neutral-400: 206 10% 62%;
+    --neutral-500: 206 10% 46%;
+    --neutral-600: 206 12% 38%;
+    --neutral-700: 206 14% 30%;
+    --neutral-800: 206 16% 22%;
+    --neutral-900: 206 18% 15%;
+    --neutral-950: 206 20% 9%;
+
+    /* Semantic surfaces */
+    --background: 206 20% 98%;
+    --foreground: 206 20% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 206 20% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 206 20% 12%;
+    --primary: 206 100% 32%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 206 16% 94%;
+    --secondary-foreground: 206 18% 18%;
+    --muted: 206 16% 94%;
+    --muted-foreground: 206 10% 40%;
+    --border: 206 14% 87%;
+    --input: 206 14% 84%;
+    --ring: 206 100% 42%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 206 20% 9%;
+    --foreground: 206 16% 94%;
+    --card: 206 18% 12%;
+    --card-foreground: 206 16% 94%;
+    --popover: 206 18% 12%;
+    --popover-foreground: 206 16% 94%;
+    /* On dark surfaces the 500 step gives AA contrast for interactive text/icons. */
+    --primary: 206 95% 66%;
+    --primary-foreground: 206 20% 9%;
+    --secondary: 206 16% 18%;
+    --secondary-foreground: 206 16% 94%;
+    --muted: 206 16% 18%;
+    --muted-foreground: 206 10% 68%;
+    --border: 206 14% 22%;
+    --input: 206 14% 26%;
+    --ring: 206 95% 66%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  ::selection {
+    background-color: hsl(var(--primary-200));
+    color: hsl(var(--neutral-950));
+  }
+}
+
+@layer components {
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground;
+  }
+
+  .severity-badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+
+  .severity-low {
+    @apply bg-success-100 text-success-700 dark:bg-success-700/25 dark:text-success-100;
+  }
+
+  .severity-medium {
+    background-color: hsl(var(--warning-100));
+    color: hsl(38 95% 22%);
+  }
+
+  .dark .severity-medium {
+    background-color: hsl(var(--warning-500) / 0.22);
+    color: hsl(var(--warning-100));
+  }
+
+  .severity-high {
+    background-color: hsl(24 90% 93%);
+    color: hsl(24 90% 28%);
+  }
+
+  .dark .severity-high {
+    background-color: hsl(24 90% 50% / 0.22);
+    color: hsl(24 90% 85%);
+  }
+
+  .severity-critical {
+    @apply bg-danger-100 text-danger-700 dark:bg-danger-700/30 dark:text-danger-100;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "app": {
+    "name": "NIS2 Compass",
+    "tagline": "Conformitate NIS2, fără ghicit.",
+    "description": "Clasifică entitatea, construiește documentația necesară și auditează rețeaua — ghidat de la început până la final."
+  },
+  "nav": {
+    "primaryLabel": "Principală",
+    "home": "Acasă",
+    "design": "Sistem de design",
+    "signIn": "Autentificare"
+  },
+  "actions": {
+    "startClassification": "Începe clasificarea",
+    "exploreDesign": "Explorează sistemul de design",
+    "comingSoon": "Disponibil într-o etapă viitoare",
+    "backHome": "Înapoi la pagina principală"
+  },
+  "common": {
+    "language": "Limbă",
+    "theme": "Temă",
+    "light": "Luminos",
+    "dark": "Întunecat",
+    "system": "Sistem",
+    "phase": "Etapa 0",
+    "inProgress": "În lucru",
+    "skipToContent": "Sari la conținut"
+  },
+  "severity": {
+    "low": "Scăzută",
+    "medium": "Medie",
+    "high": "Ridicată",
+    "critical": "Critică"
+  },
+  "landing": {
+    "eyebrow": "Pregătire NIS2 pentru IMM-urile din UE",
+    "title": "Cunoaște-ți obligațiile NIS2. Apoi îndeplinește-le.",
+    "subtitle": "NIS2 Compass te ajută să afli dacă directiva ți se aplică, să pregătești documentația necesară și să îți auditezi mediul IT — cu îndrumare în română și engleză din prima zi.",
+    "modulesTitle": "Un singur spațiu, trei module conectate",
+    "modules": {
+      "classification": {
+        "title": "Clasificarea entității",
+        "description": "Un chestionar bazat pe date aplică regulile NIS2 privind dimensiunea și sectorul, arată baza legală și explică regimul de supraveghere."
+      },
+      "documents": {
+        "title": "Centrul de documentație",
+        "description": "Șabloane ghidate pentru măsurile din Art. 21, revizii versionate, aprobări și exporturi profesionale DOCX/PDF."
+      },
+      "audit": {
+        "title": "Audit de securitate",
+        "description": "Cartografiază rețeaua, evaluează fiecare dispozitiv, urmărește constatările și exportă un raport de audit corelat cu cerințele NIS2."
+      }
+    },
+    "statusTitle": "Etapa 0 este live",
+    "statusBody": "Monorepo-ul, tokenurile de design, interfața bilingvă și fundația API sunt gata. Autentificarea, clasificarea și documentele urmează în etapele viitoare.",
+    "statusItems": {
+      "repo": "Monorepo pnpm + Turborepo cu CI",
+      "design": "Paletă conformă WCAG și mod întunecat",
+      "i18n": "Română și engleză din prima zi",
+      "api": "API NestJS cu Prisma, Redis și verificări de stare"
+    },
+    "disclaimerTitle": "Notă juridică"
+  },
+  "design": {
+    "title": "Sistem de design",
+    "subtitle": "Limbajul vizual comun aplicației și exporturilor DOCX și PDF.",
+    "palette": "Paleta primară",
+    "paletteHint": "Nuanța 206 pe tot parcursul. primary-600 este baza și treapta minimă pentru text normal pe alb (6,8:1).",
+    "semantic": "Culori semantice",
+    "severity": "Etichete de severitate",
+    "severityHint": "Culori fixe în interfață și în fiecare export: scăzută, medie, ridicată, critică.",
+    "typography": "Tipografie",
+    "typographyHint": "Stack de fonturi de sistem cu Inter preferat; nicio cerere către fonturi externe.",
+    "components": "Componente",
+    "progress": "Progres",
+    "progressHint": "Barele de progres folosesc gradientul warning → primary → success.",
+    "formatting": "Formatare locală",
+    "formattingHint": "Datele, numerele și moneda urmează limba activă.",
+    "accessibility": "Accesibilitate",
+    "accessibilityBody": "Inelul de focus, navigarea cu tastatura, reperele semantice și suportul pentru mișcare redusă sunt incluse. Ținta este WCAG 2.2 AA.",
+    "sampleDate": "Dată",
+    "sampleNumber": "Număr",
+    "sampleCurrency": "Monedă",
+    "buttonPrimary": "Acțiune principală",
+    "buttonSecondary": "Secundar",
+    "buttonOutline": "Contur",
+    "buttonGhost": "Fără fundal",
+    "buttonDanger": "Periculos"
+  },
+  "footer": {
+    "disclaimer": "Acest instrument sprijină pregătirea conformității și nu constituie consultanță juridică.",
+    "legalReview": "Conținutul juridic pentru România este în așteptarea revizuirii legale.",
+    "rights": "NIS2 Compass · licență MIT"
+  },
+  "notFound": {
+    "title": "Pagina nu a fost găsită",
+    "body": "Pagina căutată nu există sau a fost mutată."
+  }
+}

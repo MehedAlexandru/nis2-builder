@@ -1,0 +1,114 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/healthz": {
+      "get": {
+        "operationId": "HealthController_liveness",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Process is alive. Does not touch dependencies."
+          }
+        },
+        "tags": [
+          "platform"
+        ]
+      }
+    },
+    "/readyz": {
+      "get": {
+        "operationId": "HealthController_readiness",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Database and Redis are reachable."
+          },
+          "503": {
+            "description": "At least one dependency is unavailable."
+          }
+        },
+        "tags": [
+          "platform"
+        ]
+      }
+    },
+    "/metrics": {
+      "get": {
+        "operationId": "HealthController_getMetrics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "platform"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "NIS2 Compass API",
+    "description": "API for NIS2 Compass — classification, documentation, security audits and administration.\n\n**Legal notice:** This tool supports compliance preparation and does not constitute legal advice.\n\nAll business resources are scoped to an organization. Access tokens are short-lived;\nrefresh tokens rotate in an HttpOnly cookie.",
+    "version": "0.1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "platform",
+      "description": "Health, readiness and metrics"
+    },
+    {
+      "name": "auth",
+      "description": "Registration, login, MFA and sessions"
+    },
+    {
+      "name": "organizations",
+      "description": "Tenant profile, members and invites"
+    },
+    {
+      "name": "classification",
+      "description": "NIS2 entity classification"
+    },
+    {
+      "name": "documents",
+      "description": "Documentation centre, revisions and approvals"
+    },
+    {
+      "name": "audits",
+      "description": "Security audits, devices and network map"
+    },
+    {
+      "name": "findings",
+      "description": "Findings and remediation register"
+    },
+    {
+      "name": "agents",
+      "description": "Scanner agent enrollment and scan jobs"
+    },
+    {
+      "name": "exports",
+      "description": "DOCX/PDF generation jobs"
+    },
+    {
+      "name": "notifications",
+      "description": "In-app notifications"
+    },
+    {
+      "name": "admin",
+      "description": "Platform administration"
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "access-token": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "description": "Short-lived access token issued by POST /auth/login"
+      }
+    },
+    "schemas": {}
+  }
+}

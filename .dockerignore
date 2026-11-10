@@ -1,0 +1,17 @@
+**/node_modules
+**/dist
+**/coverage
+**/.turbo
+**/.git
+**/.github
+**/playwright-report
+**/test-results
+**/*.log
+**/.env
+**/.env.*
+!**/.env.example
+deploy/data
+deploy/minio-data
+deploy/mailpit-data
+docs
+apps/scanner-agent/bin

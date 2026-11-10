@@ -1,0 +1,18 @@
+title = "NIS2 Compass — gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Known-safe development placeholders and generated artifacts"
+paths = [
+  '''pnpm-lock\.yaml''',
+  '''docs/openapi/openapi\.json''',
+  '''\.env\.example''',
+]
+regexes = [
+  '''dev-only-change-me''',
+  '''local-dev-only''',
+  '''minioadmin''',
+  '''nis2_dev_password''',
+]

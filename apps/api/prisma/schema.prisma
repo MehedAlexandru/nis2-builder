@@ -1,0 +1,953 @@
+// NIS2 Compass — canonical data model.
+// Every tenant-scoped table carries organizationId so PostgreSQL RLS can be
+// applied as defense in depth (see migration 0002_rls).
+//
+// Conventions:
+//  - Business IDs are UUID v7 (time-ordered).
+//  - Timestamps are UTC.
+//  - Payloads that are form/template driven use JSONB.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ──────────────────────────────────────────────────────────────────
+
+enum GlobalRole {
+  USER
+  ADMIN
+}
+
+enum MembershipRole {
+  OWNER
+  MEMBER
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  DISABLED
+}
+
+enum OrganizationStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum ScopeMode {
+  MANDATORY
+  VOLUNTARY
+}
+
+enum ClassificationResult {
+  ESSENTIAL
+  IMPORTANT
+  LIKELY_IN_SCOPE
+  OUT_OF_SCOPE
+}
+
+enum DocumentStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETE
+  NEEDS_REVIEW
+}
+
+enum DocumentClassification {
+  PUBLIC
+  INTERNAL
+  CONFIDENTIAL
+}
+
+enum Applicability {
+  ESSENTIAL
+  IMPORTANT
+  BOTH
+  VOLUNTARY
+}
+
+enum VersionStatus {
+  DRAFT
+  APPROVED
+  SUPERSEDED
+}
+
+enum AuditStatus {
+  DRAFT
+  IN_PROGRESS
+  CLOSED
+}
+
+enum DeviceType {
+  ROUTER
+  SWITCH
+  FIREWALL
+  SERVER
+  WORKSTATION
+  LAPTOP
+  PRINTER
+  IP_CAMERA
+  NVR
+  NAS
+  ACCESS_POINT
+  PHONE
+  IOT
+  CLOUD_SERVICE
+  UNKNOWN
+}
+
+enum DeviceSource {
+  SCAN
+  NMAP_IMPORT
+  CSV_IMPORT
+  MANUAL
+}
+
+enum ConnectionType {
+  WIRED
+  WIRELESS
+  VPN
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum FindingStatus {
+  OPEN
+  IN_PROGRESS
+  MITIGATED
+  ACCEPTED_RISK
+  CLOSED
+}
+
+enum Effort {
+  S
+  M
+  L
+}
+
+enum AgentStatus {
+  PENDING
+  ACTIVE
+  REVOKED
+}
+
+enum ScanJobStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum AttachmentScanStatus {
+  PENDING
+  CLEAN
+  INFECTED
+  FAILED
+}
+
+enum NotificationType {
+  REVIEW_DUE
+  LICENSE_EXPIRY
+  FINDING_DUE
+  INCIDENT
+  TRAINING_RENEWAL
+  SYSTEM
+}
+
+enum ExportType {
+  DOCX
+  PDF
+  ZIP
+  COMPLIANCE_SUMMARY
+  AUDIT_REPORT
+}
+
+enum ExportStatus {
+  QUEUED
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum MfaType {
+  TOTP
+}
+
+// ─── Identity and tenancy ───────────────────────────────────────────────────
+
+model Organization {
+  id                   String             @id @default(uuid(7))
+  name                 String
+  slug                 String?            @unique
+  status               OrganizationStatus @default(ACTIVE)
+  plan                 Plan               @default(FREE)
+  scopeMode            ScopeMode          @default(MANDATORY)
+  countryCode          String             @default("RO")
+  jurisdictionPackCode String             @default("RO")
+  logoKey              String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  memberships       Membership[]
+  invites           Invite[]
+  companyProfile    CompanyProfile?
+  classificationRuns ClassificationRun[]
+  documents         Document[]
+  documentRevisions DocumentRevision[]
+  documentVersions  DocumentVersion[]
+  approvals         Approval[]
+  attachments       Attachment[]
+  audits            Audit[]
+  agents            Agent[]
+  scanJobs          ScanJob[]
+  zones             Zone[]
+  devices           Device[]
+  deviceAssessments DeviceAssessment[]
+  connections       Connection[]
+  findings          Finding[]
+  findingDevices    FindingDevice[]
+  findingHistory    FindingHistory[]
+  riskEntries       RiskRegisterEntry[]
+  suppliers         Supplier[]
+  trainingRecords   TrainingRecord[]
+  notifications     Notification[]
+  exportJobs        ExportJob[]
+  auditLogs         AuditLog[]
+
+  @@map("organizations")
+}
+
+model User {
+  id                  String     @id @default(uuid(7))
+  email               String     @unique
+  passwordHash        String
+  givenName           String
+  familyName          String
+  globalRole          GlobalRole @default(USER)
+  status              UserStatus @default(PENDING)
+  locale              String     @default("en")
+  timezone            String     @default("Europe/Bucharest")
+  emailVerifiedAt     DateTime?
+  mfaEnabled          Boolean    @default(false)
+  failedLoginCount    Int        @default(0)
+  lockedUntil         DateTime?
+  lastLoginAt         DateTime?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  memberships             Membership[]
+  invitesSent             Invite[]                 @relation("InviteSender")
+  refreshTokens           RefreshToken[]
+  mfaFactors              MfaFactor[]
+  sessions                Session[]
+  passwordResetTokens     PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+  auditLogs               AuditLog[]               @relation("AuditLogActor")
+  notifications           Notification[]
+  approvals               Approval[]
+  lockedDocuments         Document[]               @relation("DocumentLock")
+  ownedFindings           Finding[]                @relation("FindingOwner")
+  trainingRecords         TrainingRecord[]
+
+  @@index([status])
+  @@map("users")
+}
+
+model Membership {
+  id             String         @id @default(uuid(7))
+  organizationId String
+  userId         String
+  role           MembershipRole @default(MEMBER)
+  createdAt      DateTime       @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@map("memberships")
+}
+
+model Invite {
+  id             String         @id @default(uuid(7))
+  organizationId String
+  email          String
+  role           MembershipRole @default(MEMBER)
+  tokenHash      String         @unique
+  invitedById    String
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime       @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy    User         @relation("InviteSender", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, email])
+  @@map("invites")
+}
+
+model RefreshToken {
+  id           String    @id @default(uuid(7))
+  userId       String
+  familyId     String
+  tokenHash    String    @unique
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  replacedById String?
+  userAgent    String?
+  ip           String?
+  createdAt    DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+  @@map("refresh_tokens")
+}
+
+model Session {
+  id             String    @id @default(uuid(7))
+  userId         String
+  refreshTokenId String?   @unique
+  userAgent      String?
+  ip             String?
+  createdAt      DateTime  @default(now())
+  lastSeenAt     DateTime  @default(now())
+  revokedAt      DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model MfaFactor {
+  id                String    @id @default(uuid(7))
+  userId            String
+  type              MfaType   @default(TOTP)
+  secretEncrypted   String
+  recoveryCodesHash String[]
+  verifiedAt        DateTime?
+  createdAt         DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("mfa_factors")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid(7))
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(uuid(7))
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("email_verification_tokens")
+}
+
+model AuditLog {
+  id             String      @id @default(uuid(7))
+  actorUserId    String?
+  actorRole      GlobalRole?
+  organizationId String?
+  action         String
+  resourceType   String?
+  resourceId     String?
+  ip             String?
+  userAgent      String?
+  metadata       Json?
+  correlationId  String?
+  createdAt      DateTime    @default(now())
+
+  actor        User?         @relation("AuditLogActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([action])
+  @@map("audit_log")
+}
+
+// ─── Company profile and classification ─────────────────────────────────────
+
+model CompanyProfile {
+  id                   String   @id @default(uuid(7))
+  organizationId       String   @unique
+  legalName            String
+  tradingName          String?
+  vatNumber            String?
+  registrationNumber   String?
+  addressLine1         String?
+  addressLine2         String?
+  city                 String?
+  county               String?
+  postalCode           String?
+  countryCode          String   @default("RO")
+  website              String?
+  sector               String?
+  subsector            String?
+  employeeCount        Int?
+  annualTurnoverEur    Decimal? @db.Decimal(14, 2)
+  balanceSheetTotalEur Decimal? @db.Decimal(14, 2)
+  partnerEnterprises   Json?
+  linkedEnterprises    Json?
+  contactPoints        Json?
+  dpo                  Json?
+  ciso                 Json?
+  managementBody       Json?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("company_profiles")
+}
+
+model ClassificationRun {
+  id                       String               @id @default(uuid(7))
+  organizationId           String
+  version                  Int
+  inputs                   Json
+  result                   ClassificationResult
+  confidence               String?
+  legalBasis               Json
+  consequences             Json?
+  jurisdictionPackCode     String
+  jurisdictionPackVersion  String
+  createdById              String
+  createdAt                DateTime             @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, version])
+  @@index([organizationId, createdAt])
+  @@map("classification_runs")
+}
+
+model JurisdictionPack {
+  id        String   @id @default(uuid(7))
+  code      String
+  version   String
+  name      String
+  authority String
+  content   Json
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([code, version])
+  @@index([code, isActive])
+  @@map("jurisdiction_packs")
+}
+
+// ─── Documents ──────────────────────────────────────────────────────────────
+
+model DocumentTemplate {
+  id                   String        @id @default(uuid(7))
+  key                  String        @unique
+  title                String
+  shortDescription     String
+  category             String
+  legalReference       String
+  applicability        Applicability @default(BOTH)
+  ownerRole            String
+  reviewFrequencyMonths Int          @default(12)
+  schema               Json
+  version              Int           @default(1)
+  isActive             Boolean       @default(true)
+  sortOrder            Int           @default(0)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  documents Document[]
+
+  @@index([category])
+  @@map("document_templates")
+}
+
+model Document {
+  id                   String                 @id @default(uuid(7))
+  organizationId       String
+  templateId           String
+  status               DocumentStatus         @default(NOT_STARTED)
+  classification       DocumentClassification @default(INTERNAL)
+  payload              Json                   @default("{}")
+  progress             Int                    @default(0)
+  currentRevisionNo    Int                    @default(0)
+  currentVersionLabel  String?
+  nextReviewDate       DateTime?
+  lastEditedById       String?
+  lockOwnerId          String?
+  lockExpiresAt        DateTime?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  template     DocumentTemplate @relation(fields: [templateId], references: [id])
+  lockOwner    User?            @relation("DocumentLock", fields: [lockOwnerId], references: [id], onDelete: SetNull)
+  revisions    DocumentRevision[]
+  versions     DocumentVersion[]
+
+  @@unique([organizationId, templateId])
+  @@index([organizationId, status])
+  @@map("documents")
+}
+
+model DocumentRevision {
+  id             String   @id @default(uuid(7))
+  organizationId String
+  documentId     String
+  revisionNo     Int
+  payload        Json
+  changedFields  Json?
+  changeNote     String?
+  createdById    String
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  document     Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, revisionNo])
+  @@index([documentId, createdAt])
+  @@index([organizationId])
+  @@map("document_revisions")
+}
+
+model DocumentVersion {
+  id             String        @id @default(uuid(7))
+  organizationId String
+  documentId     String
+  versionLabel   String
+  revisionNo     Int
+  status         VersionStatus @default(DRAFT)
+  approvedAt     DateTime?
+  createdAt      DateTime      @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  document     Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  approvals    Approval[]
+
+  @@unique([documentId, versionLabel])
+  @@index([organizationId])
+  @@map("document_versions")
+}
+
+model Approval {
+  id                String   @id @default(uuid(7))
+  organizationId    String
+  documentVersionId String
+  approverUserId    String
+  role              String?
+  signature         Json?
+  comment           String?
+  createdAt         DateTime @default(now())
+
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  documentVersion DocumentVersion @relation(fields: [documentVersionId], references: [id], onDelete: Cascade)
+  approver        User            @relation(fields: [approverUserId], references: [id])
+
+  @@index([organizationId])
+  @@index([documentVersionId])
+  @@map("approvals")
+}
+
+model Attachment {
+  id             String               @id @default(uuid(7))
+  organizationId String
+  entityType     String
+  entityId       String
+  storageKey     String
+  filename       String
+  mimeType       String
+  sizeBytes      Int
+  sha256         String
+  scanStatus     AttachmentScanStatus @default(PENDING)
+  encrypted      Boolean              @default(true)
+  uploadedById   String?
+  createdAt      DateTime             @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, entityType, entityId])
+  @@map("attachments")
+}
+
+// ─── Audits, network map and agents ─────────────────────────────────────────
+
+model Audit {
+  id             String      @id @default(uuid(7))
+  organizationId String
+  name           String
+  period         String
+  scope          String?
+  methodology    String?
+  auditorName    String?
+  limitations    String?
+  status         AuditStatus @default(DRAFT)
+  startedAt      DateTime    @default(now())
+  closedAt       DateTime?
+  createdById    String
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  devices      Device[]
+  zones        Zone[]
+  connections  Connection[]
+  scanJobs     ScanJob[]
+  findings     Finding[]
+
+  @@index([organizationId, createdAt])
+  @@map("audits")
+}
+
+model Agent {
+  id             String      @id @default(uuid(7))
+  organizationId String
+  name           String
+  tokenHash      String      @unique
+  status         AgentStatus @default(PENDING)
+  version        String?
+  platform       String?
+  lastSeenAt     DateTime?
+  createdById    String
+  createdAt      DateTime    @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  scanJobs     ScanJob[]
+
+  @@index([organizationId])
+  @@map("agents")
+}
+
+model ScanJob {
+  id             String        @id @default(uuid(7))
+  organizationId String
+  auditId        String?
+  agentId        String?
+  method         String
+  params         Json?
+  status         ScanJobStatus @default(QUEUED)
+  resultSummary  Json?
+  startedAt      DateTime?
+  finishedAt     DateTime?
+  createdById    String
+  createdAt      DateTime      @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  audit        Audit?       @relation(fields: [auditId], references: [id], onDelete: SetNull)
+  agent        Agent?       @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
+  @@map("scan_jobs")
+}
+
+model Zone {
+  id             String   @id @default(uuid(7))
+  organizationId String
+  auditId        String
+  name           String
+  color          String?
+  description    String?
+  bounds         Json?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  audit        Audit        @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  devices      Device[]
+
+  @@unique([auditId, name])
+  @@index([organizationId])
+  @@map("zones")
+}
+
+model Device {
+  id                     String       @id @default(uuid(7))
+  organizationId         String
+  auditId                String
+  zoneId                 String?
+  name                   String?
+  type                   DeviceType   @default(UNKNOWN)
+  vendor                 String?
+  model                  String?
+  serial                 String?
+  ipAddresses            String[]
+  macAddress             String?
+  location               String?
+  ownerLabel             String?
+  criticality            String?
+  dataClassification     String?
+  businessServices       String[]
+  source                 DeviceSource @default(MANUAL)
+  fingerprint            String?
+  position               Json?
+  notes                  String?
+  informationComplete    Boolean      @default(false)
+  completeness           Int          @default(0)
+  firstSeenAt            DateTime     @default(now())
+  lastSeenAt             DateTime     @default(now())
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  audit           Audit            @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  zone            Zone?            @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  assessment      DeviceAssessment?
+  findings        FindingDevice[]
+  connectionsFrom Connection[]     @relation("ConnectionSource")
+  connectionsTo   Connection[]     @relation("ConnectionTarget")
+
+  @@index([organizationId, auditId])
+  @@index([auditId])
+  @@index([macAddress])
+  @@map("devices")
+}
+
+model DeviceAssessment {
+  id                  String   @id @default(uuid(7))
+  organizationId      String
+  deviceId            String   @unique
+  data                Json     @default("{}")
+  completeness        Int      @default(0)
+  informationComplete Boolean  @default(false)
+  assessedById        String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  device       Device       @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("device_assessments")
+}
+
+model Connection {
+  id             String         @id @default(uuid(7))
+  organizationId String
+  auditId        String
+  sourceDeviceId String
+  targetDeviceId String
+  type           ConnectionType @default(WIRED)
+  speedMbps      Int?
+  vlan           Int?
+  createdAt      DateTime       @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  audit        Audit        @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  sourceDevice Device       @relation("ConnectionSource", fields: [sourceDeviceId], references: [id], onDelete: Cascade)
+  targetDevice Device       @relation("ConnectionTarget", fields: [targetDeviceId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, auditId])
+  @@index([sourceDeviceId])
+  @@index([targetDeviceId])
+  @@map("connections")
+}
+
+// ─── Findings and risk ──────────────────────────────────────────────────────
+
+model Finding {
+  id               String        @id @default(uuid(7))
+  organizationId   String
+  auditId          String?
+  code             String?
+  title            String
+  description      String?
+  category         String?
+  severity         Severity      @default(MEDIUM)
+  likelihood       Int?
+  impact           Int?
+  riskScore        Int?
+  organizationWide Boolean       @default(false)
+  evidence         Json?
+  proposedSolution String?
+  effort           Effort?
+  costEstimateEur  Decimal?      @db.Decimal(12, 2)
+  ownerUserId      String?
+  dueDate          DateTime?
+  status           FindingStatus @default(OPEN)
+  riskAcceptance   Json?
+  source           String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  audit        Audit?             @relation(fields: [auditId], references: [id], onDelete: SetNull)
+  owner        User?              @relation("FindingOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  devices      FindingDevice[]
+  history      FindingHistory[]
+  riskEntries  RiskRegisterEntry[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId, status, severity])
+  @@index([auditId])
+  @@map("findings")
+}
+
+model FindingDevice {
+  organizationId String
+  findingId      String
+  deviceId       String
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  finding      Finding      @relation(fields: [findingId], references: [id], onDelete: Cascade)
+  device       Device       @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@id([findingId, deviceId])
+  @@index([organizationId])
+  @@index([deviceId])
+  @@map("finding_devices")
+}
+
+model FindingHistory {
+  id             String   @id @default(uuid(7))
+  organizationId String
+  findingId      String
+  fieldChanges   Json
+  note           String?
+  changedById    String
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  finding      Finding      @relation(fields: [findingId], references: [id], onDelete: Cascade)
+
+  @@index([findingId, createdAt])
+  @@index([organizationId])
+  @@map("finding_history")
+}
+
+model RiskRegisterEntry {
+  id             String   @id @default(uuid(7))
+  organizationId String
+  asset          String
+  threat         String
+  vulnerability  String?
+  likelihood     Int
+  impact         Int
+  score          Int
+  treatment      String?
+  ownerUserId    String?
+  status         String   @default("OPEN")
+  sourceFindingId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sourceFinding Finding?     @relation(fields: [sourceFindingId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@map("risk_register_entries")
+}
+
+// ─── Shared single-source-of-truth entities ─────────────────────────────────
+
+model Supplier {
+  id             String   @id @default(uuid(7))
+  organizationId String
+  name           String
+  category       String?
+  criticality    Severity @default(MEDIUM)
+  services       Json?
+  riskRating     Int?
+  contact        Json?
+  assessment     Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("suppliers")
+}
+
+model TrainingRecord {
+  id                      String    @id @default(uuid(7))
+  organizationId          String
+  userId                  String?
+  participantName         String?
+  course                  String
+  completedAt             DateTime
+  expiresAt               DateTime?
+  certificateAttachmentId String?
+  createdAt               DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, expiresAt])
+  @@map("training_records")
+}
+
+// ─── Operations ─────────────────────────────────────────────────────────────
+
+model Notification {
+  id             String           @id @default(uuid(7))
+  organizationId String?
+  userId         String
+  type           NotificationType
+  title          String
+  body           String
+  actionUrl      String?
+  readAt         DateTime?
+  createdAt      DateTime         @default(now())
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([organizationId])
+  @@map("notifications")
+}
+
+model ExportJob {
+  id             String       @id @default(uuid(7))
+  organizationId String
+  type           ExportType
+  entityType     String?
+  entityIds      Json?
+  status         ExportStatus @default(QUEUED)
+  storageKey     String?
+  errorMessage   String?
+  requestedById  String
+  createdAt      DateTime     @default(now())
+  completedAt    DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, createdAt])
+  @@map("export_jobs")
+}

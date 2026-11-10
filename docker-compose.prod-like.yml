@@ -1,0 +1,140 @@
+# Production-like smoke-test stack. Builds the runtime images, runs migrations,
+# then starts api, worker and the nginx-served SPA.
+# Usage: docker compose -f docker-compose.prod-like.yml up --build
+name: nis2-compass-prod-like
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-nis2}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-prod_like_smoke_password}
+      POSTGRES_DB: ${POSTGRES_DB:-nis2_compass}
+    volumes:
+      - prod-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-nis2} -d ${POSTGRES_DB:-nis2_compass}']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes:
+      - prod-redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-minioadmin}
+    volumes:
+      - prod-minio-data:/data
+
+  mailpit:
+    image: axllent/mailpit:latest
+
+  migrate:
+    build:
+      context: .
+      dockerfile: deploy/docker/api.Dockerfile
+      target: runtime
+    command: ['sh', '-c', 'pnpm --filter @nis2/api prisma:migrate:deploy']
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-nis2}:${POSTGRES_PASSWORD:-prod_like_smoke_password}@postgres:5432/${POSTGRES_DB:-nis2_compass}?schema=public
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-prod-like-smoke-test-access-secret-change-me}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-prod-like-smoke-test-refresh-secret-change-me}
+      COOKIE_SECRET: ${COOKIE_SECRET:-prod-like-smoke-test-cookie-secret-change-me}
+      ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY:-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin}
+      SMTP_HOST: mailpit
+      MAIL_FROM: 'NIS2 Compass <no-reply@nis2-compass.local>'
+      PUBLIC_APP_URL: https://app.nis2-compass.local
+      CORS_ORIGINS: https://app.nis2-compass.local
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build:
+      context: .
+      dockerfile: deploy/docker/api.Dockerfile
+      target: runtime
+    environment:
+      NODE_ENV: production
+      API_PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-nis2}:${POSTGRES_PASSWORD:-prod_like_smoke_password}@postgres:5432/${POSTGRES_DB:-nis2_compass}?schema=public
+      REDIS_URL: redis://redis:6379
+      PUBLIC_APP_URL: https://app.nis2-compass.local
+      CORS_ORIGINS: https://app.nis2-compass.local
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: ${S3_BUCKET:-nis2-compass}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin}
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      MAIL_FROM: 'NIS2 Compass <no-reply@nis2-compass.local>'
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-prod-like-smoke-test-access-secret-change-me}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-prod-like-smoke-test-refresh-secret-change-me}
+      COOKIE_SECRET: ${COOKIE_SECRET:-prod-like-smoke-test-cookie-secret-change-me}
+      ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY:-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  worker:
+    build:
+      context: .
+      dockerfile: deploy/docker/api.Dockerfile
+      target: runtime
+    command: ['node', 'apps/api/dist/worker.js']
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-nis2}:${POSTGRES_PASSWORD:-prod_like_smoke_password}@postgres:5432/${POSTGRES_DB:-nis2_compass}?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-prod-like-smoke-test-access-secret-change-me}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-prod-like-smoke-test-refresh-secret-change-me}
+      COOKIE_SECRET: ${COOKIE_SECRET:-prod-like-smoke-test-cookie-secret-change-me}
+      ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY:-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin}
+      SMTP_HOST: mailpit
+      MAIL_FROM: 'NIS2 Compass <no-reply@nis2-compass.local>'
+      PUBLIC_APP_URL: https://app.nis2-compass.local
+      CORS_ORIGINS: https://app.nis2-compass.local
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/docker/web.Dockerfile
+      target: runtime
+    ports:
+      - '8080:8080'
+    depends_on:
+      api:
+        condition: service_started
+
+volumes:
+  prod-postgres-data:
+  prod-redis-data:
+  prod-minio-data:
