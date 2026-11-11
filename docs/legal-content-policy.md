@@ -43,8 +43,10 @@ Every jurisdiction pack and document template carries one of:
 | `pending-legal-review` | Authored from official sources; awaiting qualified review | Yes, with a visible warning |
 | `verified`             | Reviewed and signed off by a qualified reviewer           | Yes                         |
 
-The current Romania pack is `pending-legal-review` (version `0.1.0-draft`). The UI displays:
-“Romanian jurisdiction content is pending legal review.”
+The current Romania pack is `pending-legal-review` (version `0.2.0-draft`). Phase 2 completed the
+technical review: the 64-scenario table passes and every rule/consequence carries a citation. Legal
+review of the OUG 155/2024 national mapping is still required. The UI displays: “Romanian jurisdiction
+content is pending legal review.”
 
 ## 5. Workflow
 

@@ -4,4 +4,8 @@ export * from './enums';
 export * from './schemas/common';
 export * from './schemas/auth';
 export * from './schemas/organization';
+export * from './schemas/classification';
 export * from './data/jurisdictions';
+export * from './data/classification';
+export * from './classification/size';
+export * from './classification/engine';

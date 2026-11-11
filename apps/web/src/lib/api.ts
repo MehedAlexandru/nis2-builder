@@ -2,6 +2,10 @@ import type {
   AcceptInviteInput,
   AuthResponse,
   AuthSession,
+  ClassificationAnswers,
+  ClassificationCatalog,
+  ClassificationRun,
+  ClassificationRunSummary,
   LoginInput,
   LoginResponse,
   MfaSetupResponse,
@@ -81,6 +85,44 @@ async function rawRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
     );
   }
   return body as T;
+}
+
+async function rawRequestBlob(path: string): Promise<Blob> {
+  const headers = new Headers();
+  if (accessToken) headers.set('authorization', `Bearer ${accessToken}`);
+  const response = await fetch(`${API_BASE}${path}`, {
+    method: 'GET',
+    headers,
+    credentials: 'include',
+  });
+  if (!response.ok) {
+    type ErrorEnvelope = { error?: { code?: string; message?: string; details?: unknown } };
+    let body: ErrorEnvelope | null = null;
+    try {
+      body = (await response.json()) as ErrorEnvelope;
+    } catch {
+      body = null;
+    }
+    throw new ApiClientError(
+      response.status,
+      body?.error?.code ?? `HTTP_${response.status}`,
+      body?.error?.message ?? response.statusText,
+      body?.error?.details,
+    );
+  }
+  return response.blob();
+}
+
+async function requestBlob(path: string): Promise<Blob> {
+  try {
+    return await rawRequestBlob(path);
+  } catch (error) {
+    if (error instanceof ApiClientError && error.status === 401) {
+      const refreshed = await refreshAccessToken();
+      if (refreshed) return rawRequestBlob(path);
+    }
+    throw error;
+  }
 }
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -171,4 +213,14 @@ export const usersApi = {
     request<unknown>('/users/me', { method: 'PATCH', ...jsonBody(input) }),
   exportData: () => request<Record<string, unknown>>('/users/me/export'),
   deleteAccount: () => request<void>('/users/me', { method: 'DELETE' }),
+};
+
+export const classificationApi = {
+  catalog: () => request<ClassificationCatalog>('/classification/catalog'),
+  current: () => request<ClassificationRun | null>('/classification/current'),
+  runs: () => request<ClassificationRunSummary[]>('/classification/runs'),
+  run: (runId: string) => request<ClassificationRun>(`/classification/runs/${runId}`),
+  create: (input: ClassificationAnswers) =>
+    request<ClassificationRun>('/classification/runs', { method: 'POST', ...jsonBody(input) }),
+  downloadPdf: (runId: string) => requestBlob(`/classification/runs/${runId}/summary.pdf`),
 };

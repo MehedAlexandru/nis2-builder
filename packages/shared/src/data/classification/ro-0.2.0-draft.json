@@ -1,0 +1,1384 @@
+{
+  "code": "RO",
+  "version": "0.2.0-draft",
+  "name": "Romania",
+  "authority": "DNSC",
+  "authorityUrl": "https://www.dnsc.ro",
+  "legalInstrument": "OUG 155/2024",
+  "status": "pending-legal-review",
+  "language": "ro",
+  "updatedAt": "2026-11-11",
+  "sources": [
+    {
+      "label": "Directive (EU) 2022/2555 (NIS2), consolidated text",
+      "url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+      "retrievedAt": "2026-11-11"
+    },
+    {
+      "label": "Recommendation 2003/361/EC (SME definition)",
+      "url": "https://eur-lex.europa.eu/eli/reco/2003/361/oj",
+      "retrievedAt": "2026-11-11"
+    },
+    {
+      "label": "DNSC — national competent authority",
+      "url": "https://www.dnsc.ro",
+      "retrievedAt": "2026-11-11"
+    }
+  ],
+  "sizeRules": {
+    "employeeBands": {
+      "micro": 10,
+      "small": 50,
+      "medium": 250
+    },
+    "financialThresholdsEur": {
+      "micro": 2000000,
+      "small": 10000000,
+      "mediumTurnover": 50000000,
+      "mediumBalanceSheet": 43000000
+    },
+    "citations": [
+      {
+        "citation": "NIS2 Art. 2(1)",
+        "note": "Applies to entities that qualify as medium-sized or exceed the medium-sized ceilings."
+      },
+      {
+        "citation": "Recommendation 2003/361/EC Art. 2(1)",
+        "note": "Medium-sized ceilings: fewer than 250 employees and either turnover not exceeding EUR 50 million or balance sheet total not exceeding EUR 43 million."
+      },
+      {
+        "citation": "Recommendation 2003/361/EC Art. 3",
+        "note": "Partner and linked enterprise consolidation rules."
+      }
+    ]
+  },
+  "sectors": [
+    {
+      "code": "energy",
+      "annex": "I",
+      "name": { "en": "Energy", "ro": "Energie" },
+      "subsectors": [
+        {
+          "code": "electricity",
+          "name": { "en": "Electricity", "ro": "Electricitate" },
+          "entityTypes": [
+            {
+              "code": "electricity_supplier",
+              "name": { "en": "Electricity supplier", "ro": "Furnizor de energie electrică" },
+              "annexRef": { "citation": "NIS2 Annex I, energy, electricity" }
+            },
+            {
+              "code": "electricity_distribution_operator",
+              "name": {
+                "en": "Electricity distribution system operator",
+                "ro": "Operator de distribuție a energiei electrice"
+              },
+              "annexRef": { "citation": "NIS2 Annex I, energy, electricity" }
+            }
+          ]
+        },
+        {
+          "code": "district_heating_cooling",
+          "name": {
+            "en": "District heating and cooling",
+            "ro": "Termoficare și răcire centralizată"
+          },
+          "entityTypes": [
+            {
+              "code": "district_heating_operator",
+              "name": {
+                "en": "District heating or cooling operator",
+                "ro": "Operator de termoficare sau răcire centralizată"
+              },
+              "annexRef": { "citation": "NIS2 Annex I, energy, district heating and cooling" }
+            }
+          ]
+        },
+        {
+          "code": "oil",
+          "name": { "en": "Oil", "ro": "Petrol" },
+          "entityTypes": [
+            {
+              "code": "oil_supplier",
+              "name": { "en": "Oil supplier", "ro": "Furnizor de produse petroliere" },
+              "annexRef": { "citation": "NIS2 Annex I, energy, oil" }
+            },
+            {
+              "code": "oil_pipeline_operator",
+              "name": { "en": "Oil pipeline operator", "ro": "Operator de conducte petroliere" },
+              "annexRef": { "citation": "NIS2 Annex I, energy, oil" }
+            }
+          ]
+        },
+        {
+          "code": "gas",
+          "name": { "en": "Gas", "ro": "Gaze" },
+          "entityTypes": [
+            {
+              "code": "gas_supplier",
+              "name": { "en": "Gas supplier", "ro": "Furnizor de gaze" },
+              "annexRef": { "citation": "NIS2 Annex I, energy, gas" }
+            },
+            {
+              "code": "gas_distribution_operator",
+              "name": {
+                "en": "Gas distribution operator",
+                "ro": "Operator de distribuție a gazelor"
+              },
+              "annexRef": { "citation": "NIS2 Annex I, energy, gas" }
+            }
+          ]
+        },
+        {
+          "code": "hydrogen",
+          "name": { "en": "Hydrogen", "ro": "Hidrogen" },
+          "entityTypes": [
+            {
+              "code": "hydrogen_operator",
+              "name": {
+                "en": "Hydrogen producer or operator",
+                "ro": "Producător sau operator de hidrogen"
+              },
+              "annexRef": { "citation": "NIS2 Annex I, energy, hydrogen" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "transport",
+      "annex": "I",
+      "name": { "en": "Transport", "ro": "Transport" },
+      "subsectors": [
+        {
+          "code": "air",
+          "name": { "en": "Air", "ro": "Aerian" },
+          "entityTypes": [
+            {
+              "code": "air_carrier",
+              "name": { "en": "Air carrier", "ro": "Transportator aerian" },
+              "annexRef": { "citation": "NIS2 Annex I, transport, air" }
+            },
+            {
+              "code": "airport_operator",
+              "name": { "en": "Airport operator", "ro": "Operator aeroportuar" },
+              "annexRef": { "citation": "NIS2 Annex I, transport, air" }
+            },
+            {
+              "code": "air_traffic_control",
+              "name": {
+                "en": "Air traffic control provider",
+                "ro": "Furnizor de control al traficului aerian"
+              },
+              "annexRef": { "citation": "NIS2 Annex I, transport, air" }
+            }
+          ]
+        },
+        {
+          "code": "rail",
+          "name": { "en": "Rail", "ro": "Feroviar" },
+          "entityTypes": [
+            {
+              "code": "rail_infrastructure_manager",
+              "name": {
+                "en": "Rail infrastructure manager",
+                "ro": "Administrator de infrastructură feroviară"
+              },
+              "annexRef": { "citation": "NIS2 Annex I, transport, rail" }
+            },
+            {
+              "code": "rail_undertaking",
+              "name": { "en": "Rail undertaking", "ro": "Întreprindere feroviară" },
+              "annexRef": { "citation": "NIS2 Annex I, transport, rail" }
+            }
+          ]
+        },
+        {
+          "code": "water",
+          "name": { "en": "Water transport", "ro": "Transport pe apă" },
+          "entityTypes": [
+            {
+              "code": "water_transport_company",
+              "name": {
+                "en": "Inland, sea or coastal transport company",
+                "ro": "Companie de transport interior, maritim sau costier"
+              },
+              "annexRef": { "citation": "NIS2 Annex I, transport, water" }
+            },
+            {
+              "code": "port_operator",
+              "name": { "en": "Port operator", "ro": "Operator portuar" },
+              "annexRef": { "citation": "NIS2 Annex I, transport, water" }
+            }
+          ]
+        },
+        {
+          "code": "road",
+          "name": { "en": "Road", "ro": "Rutier" },
+          "entityTypes": [
+            {
+              "code": "road_authority",
+              "name": { "en": "Road authority", "ro": "Autoritate rutieră" },
+              "annexRef": { "citation": "NIS2 Annex I, transport, road" }
+            },
+            {
+              "code": "intelligent_transport_system_operator",
+              "name": {
+                "en": "Intelligent transport systems operator",
+                "ro": "Operator de sisteme de transport inteligente"
+              },
+              "annexRef": { "citation": "NIS2 Annex I, transport, road" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "banking",
+      "annex": "I",
+      "name": { "en": "Banking", "ro": "Activitate bancară" },
+      "subsectors": [
+        {
+          "code": "credit_institutions",
+          "name": { "en": "Credit institutions", "ro": "Instituții de credit" },
+          "entityTypes": [
+            {
+              "code": "credit_institution",
+              "name": { "en": "Credit institution", "ro": "Instituție de credit" },
+              "annexRef": { "citation": "NIS2 Annex I, banking" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "financial_market_infrastructure",
+      "annex": "I",
+      "name": {
+        "en": "Financial market infrastructure",
+        "ro": "Infrastructuri ale piețelor financiare"
+      },
+      "subsectors": [
+        {
+          "code": "trading_venues",
+          "name": { "en": "Trading venues", "ro": "Locuri de tranzacționare" },
+          "entityTypes": [
+            {
+              "code": "trading_venue",
+              "name": { "en": "Trading venue operator", "ro": "Operator de loc de tranzacționare" },
+              "annexRef": { "citation": "NIS2 Annex I, financial market infrastructure" }
+            }
+          ]
+        },
+        {
+          "code": "central_counterparties",
+          "name": { "en": "Central counterparties", "ro": "Contrapărți centrale" },
+          "entityTypes": [
+            {
+              "code": "central_counterparty",
+              "name": { "en": "Central counterparty", "ro": "Contraparte centrală" },
+              "annexRef": { "citation": "NIS2 Annex I, financial market infrastructure" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "health",
+      "annex": "I",
+      "name": { "en": "Health", "ro": "Sănătate" },
+      "subsectors": [
+        {
+          "code": "healthcare",
+          "name": { "en": "Healthcare", "ro": "Asistență medicală" },
+          "entityTypes": [
+            {
+              "code": "healthcare_provider",
+              "name": { "en": "Healthcare provider", "ro": "Furnizor de servicii medicale" },
+              "annexRef": { "citation": "NIS2 Annex I, health" }
+            },
+            {
+              "code": "eu_reference_laboratory",
+              "name": { "en": "EU reference laboratory", "ro": "Laborator de referință UE" },
+              "annexRef": { "citation": "NIS2 Annex I, health" }
+            }
+          ]
+        },
+        {
+          "code": "pharmaceuticals",
+          "name": { "en": "Pharmaceuticals", "ro": "Produse farmaceutice" },
+          "entityTypes": [
+            {
+              "code": "pharma_manufacturer",
+              "name": { "en": "Medicinal product manufacturer", "ro": "Producător de medicamente" },
+              "annexRef": { "citation": "NIS2 Annex I, health, pharmaceuticals" }
+            },
+            {
+              "code": "medical_research",
+              "name": {
+                "en": "Medical research organisation",
+                "ro": "Organizație de cercetare medicală"
+              },
+              "annexRef": { "citation": "NIS2 Annex I, health, research and development" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "drinking_water",
+      "annex": "I",
+      "name": { "en": "Drinking water", "ro": "Apă potabilă" },
+      "subsectors": [
+        {
+          "code": "drinking_water_supply",
+          "name": { "en": "Drinking water supply", "ro": "Furnizare de apă potabilă" },
+          "entityTypes": [
+            {
+              "code": "drinking_water_supplier",
+              "name": {
+                "en": "Drinking water supplier or distributor",
+                "ro": "Furnizor sau distribuitor de apă potabilă"
+              },
+              "annexRef": { "citation": "NIS2 Annex I, drinking water" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "waste_water",
+      "annex": "I",
+      "name": { "en": "Waste water", "ro": "Ape uzate" },
+      "subsectors": [
+        {
+          "code": "waste_water_collection",
+          "name": {
+            "en": "Waste water collection and treatment",
+            "ro": "Colectare și tratare a apelor uzate"
+          },
+          "entityTypes": [
+            {
+              "code": "waste_water_operator",
+              "name": { "en": "Waste water operator", "ro": "Operator de ape uzate" },
+              "annexRef": { "citation": "NIS2 Annex I, waste water" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "digital_infrastructure",
+      "annex": "I",
+      "name": { "en": "Digital infrastructure", "ro": "Infrastructură digitală" },
+      "subsectors": [
+        {
+          "code": "internet_exchange",
+          "name": { "en": "Internet exchange points", "ro": "Puncte de schimb internet" },
+          "entityTypes": [
+            {
+              "code": "internet_exchange_point",
+              "name": {
+                "en": "Internet exchange point provider",
+                "ro": "Furnizor de punct de schimb internet"
+              },
+              "annexRef": { "citation": "NIS2 Annex I, digital infrastructure" }
+            }
+          ]
+        },
+        {
+          "code": "dns",
+          "name": { "en": "DNS and domain names", "ro": "DNS și nume de domenii" },
+          "entityTypes": [
+            {
+              "code": "dns_service_provider",
+              "name": { "en": "DNS service provider", "ro": "Furnizor de servicii DNS" },
+              "annexRef": {
+                "citation": "NIS2 Annex I, digital infrastructure, DNS service providers"
+              }
+            },
+            {
+              "code": "tld_registry",
+              "name": {
+                "en": "Top-level domain name registry",
+                "ro": "Registru de nume de domenii de nivel superior"
+              },
+              "annexRef": {
+                "citation": "NIS2 Annex I, digital infrastructure, TLD name registries"
+              }
+            },
+            {
+              "code": "domain_name_registration",
+              "name": {
+                "en": "Domain name registration service",
+                "ro": "Serviciu de înregistrare de nume de domenii"
+              },
+              "annexRef": { "citation": "NIS2 Art. 2(4)" }
+            }
+          ]
+        },
+        {
+          "code": "cloud_and_data_centres",
+          "name": { "en": "Cloud, data centres and CDNs", "ro": "Cloud, centre de date și CDN" },
+          "entityTypes": [
+            {
+              "code": "cloud_provider",
+              "name": {
+                "en": "Cloud computing service provider",
+                "ro": "Furnizor de servicii de cloud computing"
+              },
+              "annexRef": {
+                "citation": "NIS2 Annex I, digital infrastructure, cloud computing service providers"
+              }
+            },
+            {
+              "code": "data_centre_provider",
+              "name": {
+                "en": "Data centre service provider",
+                "ro": "Furnizor de servicii de centre de date"
+              },
+              "annexRef": {
+                "citation": "NIS2 Annex I, digital infrastructure, data centre service providers"
+              }
+            },
+            {
+              "code": "cdn_provider",
+              "name": {
+                "en": "Content delivery network provider",
+                "ro": "Furnizor de rețea de distribuție de conținut"
+              },
+              "annexRef": {
+                "citation": "NIS2 Annex I, digital infrastructure, content delivery networks"
+              }
+            }
+          ]
+        },
+        {
+          "code": "trust_services",
+          "name": { "en": "Trust services", "ro": "Servicii de încredere" },
+          "entityTypes": [
+            {
+              "code": "trust_service_provider",
+              "name": { "en": "Trust service provider", "ro": "Furnizor de servicii de încredere" },
+              "annexRef": { "citation": "NIS2 Art. 2(2)(a)(ii); Annex I, digital infrastructure" }
+            }
+          ]
+        },
+        {
+          "code": "electronic_communications",
+          "name": { "en": "Electronic communications", "ro": "Comunicații electronice" },
+          "entityTypes": [
+            {
+              "code": "public_electronic_communications",
+              "name": {
+                "en": "Public electronic communications network or service provider",
+                "ro": "Furnizor de rețele sau servicii publice de comunicații electronice"
+              },
+              "annexRef": { "citation": "NIS2 Art. 2(2)(a)(i); Annex I, digital infrastructure" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "ict_service_management",
+      "annex": "I",
+      "name": { "en": "ICT service management (B2B)", "ro": "Managementul serviciilor TIC (B2B)" },
+      "subsectors": [
+        {
+          "code": "managed_services",
+          "name": { "en": "Managed services", "ro": "Servicii gestionate" },
+          "entityTypes": [
+            {
+              "code": "managed_service_provider",
+              "name": { "en": "Managed service provider", "ro": "Furnizor de servicii gestionate" },
+              "annexRef": {
+                "citation": "NIS2 Annex I, ICT service management, managed service providers"
+              }
+            },
+            {
+              "code": "managed_security_service_provider",
+              "name": {
+                "en": "Managed security service provider",
+                "ro": "Furnizor de servicii de securitate gestionate"
+              },
+              "annexRef": {
+                "citation": "NIS2 Annex I, ICT service management, managed security service providers"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "public_administration",
+      "annex": "I",
+      "name": { "en": "Public administration", "ro": "Administrație publică" },
+      "subsectors": [
+        {
+          "code": "central_government",
+          "name": { "en": "Central government", "ro": "Administrație centrală" },
+          "entityTypes": [
+            {
+              "code": "central_public_administration",
+              "name": {
+                "en": "Central government public administration entity",
+                "ro": "Entitate de administrație publică centrală"
+              },
+              "annexRef": { "citation": "NIS2 Art. 2(2)(f)(i); Annex I, public administration" }
+            }
+          ]
+        },
+        {
+          "code": "regional_government",
+          "name": { "en": "Regional government", "ro": "Administrație regională" },
+          "entityTypes": [
+            {
+              "code": "regional_public_administration",
+              "name": {
+                "en": "Regional public administration entity",
+                "ro": "Entitate de administrație publică regională"
+              },
+              "annexRef": { "citation": "NIS2 Art. 2(2)(f)(ii); Annex I, public administration" }
+            }
+          ]
+        },
+        {
+          "code": "local_government",
+          "name": { "en": "Local government", "ro": "Administrație locală" },
+          "entityTypes": [
+            {
+              "code": "local_public_administration",
+              "name": {
+                "en": "Local public administration entity",
+                "ro": "Entitate de administrație publică locală"
+              },
+              "annexRef": { "citation": "NIS2 Art. 2(5)(a)" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "space",
+      "annex": "I",
+      "name": { "en": "Space", "ro": "Spațiu" },
+      "subsectors": [
+        {
+          "code": "ground_infrastructure",
+          "name": { "en": "Ground-based infrastructure", "ro": "Infrastructură terestră" },
+          "entityTypes": [
+            {
+              "code": "space_ground_infrastructure_operator",
+              "name": {
+                "en": "Space ground infrastructure operator",
+                "ro": "Operator de infrastructură terestră spațială"
+              },
+              "annexRef": { "citation": "NIS2 Annex I, space" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "postal_and_courier",
+      "annex": "II",
+      "name": { "en": "Postal and courier services", "ro": "Servicii poștale și de curierat" },
+      "subsectors": [
+        {
+          "code": "postal",
+          "name": { "en": "Postal and courier services", "ro": "Servicii poștale și de curierat" },
+          "entityTypes": [
+            {
+              "code": "postal_service_provider",
+              "name": { "en": "Postal service provider", "ro": "Furnizor de servicii poștale" },
+              "annexRef": { "citation": "NIS2 Annex II, postal and courier services" }
+            },
+            {
+              "code": "courier_service_provider",
+              "name": {
+                "en": "Courier service provider",
+                "ro": "Furnizor de servicii de curierat"
+              },
+              "annexRef": { "citation": "NIS2 Annex II, postal and courier services" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "waste_management",
+      "annex": "II",
+      "name": { "en": "Waste management", "ro": "Gestionarea deșeurilor" },
+      "subsectors": [
+        {
+          "code": "waste_management",
+          "name": { "en": "Waste management", "ro": "Gestionarea deșeurilor" },
+          "entityTypes": [
+            {
+              "code": "waste_management_undertaking",
+              "name": {
+                "en": "Waste management undertaking",
+                "ro": "Întreprindere de gestionare a deșeurilor"
+              },
+              "annexRef": { "citation": "NIS2 Annex II, waste management" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "chemicals",
+      "annex": "II",
+      "name": { "en": "Chemicals", "ro": "Substanțe chimice" },
+      "subsectors": [
+        {
+          "code": "chemicals",
+          "name": {
+            "en": "Manufacture and distribution of chemicals",
+            "ro": "Producția și distribuția de substanțe chimice"
+          },
+          "entityTypes": [
+            {
+              "code": "chemical_manufacturer",
+              "name": { "en": "Chemical manufacturer", "ro": "Producător de substanțe chimice" },
+              "annexRef": {
+                "citation": "NIS2 Annex II, manufacture, production and distribution of chemicals"
+              }
+            },
+            {
+              "code": "chemical_distributor",
+              "name": { "en": "Chemical distributor", "ro": "Distribuitor de substanțe chimice" },
+              "annexRef": {
+                "citation": "NIS2 Annex II, manufacture, production and distribution of chemicals"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "food",
+      "annex": "II",
+      "name": { "en": "Food", "ro": "Alimente" },
+      "subsectors": [
+        {
+          "code": "food_production",
+          "name": {
+            "en": "Production, processing and distribution of food",
+            "ro": "Producția, procesarea și distribuția alimentelor"
+          },
+          "entityTypes": [
+            {
+              "code": "food_industrial_producer",
+              "name": {
+                "en": "Industrial food producer or processor",
+                "ro": "Producător sau procesator industrial de alimente"
+              },
+              "annexRef": {
+                "citation": "NIS2 Annex II, production, processing and distribution of food"
+              }
+            },
+            {
+              "code": "food_wholesale_distributor",
+              "name": {
+                "en": "Food wholesale distributor",
+                "ro": "Distribuitor angro de alimente"
+              },
+              "annexRef": {
+                "citation": "NIS2 Annex II, production, processing and distribution of food"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "manufacturing",
+      "annex": "II",
+      "name": { "en": "Manufacturing", "ro": "Producție" },
+      "subsectors": [
+        {
+          "code": "medical_devices",
+          "name": { "en": "Medical devices", "ro": "Dispozitive medicale" },
+          "entityTypes": [
+            {
+              "code": "medical_device_manufacturer",
+              "name": {
+                "en": "Medical device manufacturer",
+                "ro": "Producător de dispozitive medicale"
+              },
+              "annexRef": { "citation": "NIS2 Annex II, manufacturing, medical devices" }
+            }
+          ]
+        },
+        {
+          "code": "electronics",
+          "name": {
+            "en": "Computer, electronic and optical products",
+            "ro": "Produse informatice, electronice și optice"
+          },
+          "entityTypes": [
+            {
+              "code": "electronics_manufacturer",
+              "name": {
+                "en": "Electronics manufacturer",
+                "ro": "Producător de produse electronice"
+              },
+              "annexRef": {
+                "citation": "NIS2 Annex II, manufacturing, computer, electronic and optical products"
+              }
+            }
+          ]
+        },
+        {
+          "code": "electrical_equipment",
+          "name": { "en": "Electrical equipment", "ro": "Echipamente electrice" },
+          "entityTypes": [
+            {
+              "code": "electrical_equipment_manufacturer",
+              "name": {
+                "en": "Electrical equipment manufacturer",
+                "ro": "Producător de echipamente electrice"
+              },
+              "annexRef": { "citation": "NIS2 Annex II, manufacturing, electrical equipment" }
+            }
+          ]
+        },
+        {
+          "code": "machinery",
+          "name": { "en": "Machinery and equipment", "ro": "Mașini și echipamente" },
+          "entityTypes": [
+            {
+              "code": "machinery_manufacturer",
+              "name": { "en": "Machinery manufacturer", "ro": "Producător de mașini" },
+              "annexRef": { "citation": "NIS2 Annex II, manufacturing, machinery and equipment" }
+            }
+          ]
+        },
+        {
+          "code": "vehicles",
+          "name": {
+            "en": "Motor vehicles and transport equipment",
+            "ro": "Vehicule și echipamente de transport"
+          },
+          "entityTypes": [
+            {
+              "code": "motor_vehicle_manufacturer",
+              "name": { "en": "Motor vehicle manufacturer", "ro": "Producător de vehicule" },
+              "annexRef": { "citation": "NIS2 Annex II, manufacturing, motor vehicles" }
+            },
+            {
+              "code": "other_transport_equipment_manufacturer",
+              "name": {
+                "en": "Other transport equipment manufacturer",
+                "ro": "Producător de alte echipamente de transport"
+              },
+              "annexRef": { "citation": "NIS2 Annex II, manufacturing, other transport equipment" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "digital_providers",
+      "annex": "II",
+      "name": { "en": "Digital providers", "ro": "Furnizori digitali" },
+      "subsectors": [
+        {
+          "code": "digital_platforms",
+          "name": { "en": "Online platforms and services", "ro": "Platforme și servicii online" },
+          "entityTypes": [
+            {
+              "code": "online_marketplace",
+              "name": { "en": "Online marketplace provider", "ro": "Furnizor de piață online" },
+              "annexRef": { "citation": "NIS2 Annex II, digital providers, online marketplaces" }
+            },
+            {
+              "code": "online_search_engine",
+              "name": {
+                "en": "Online search engine provider",
+                "ro": "Furnizor de motor de căutare online"
+              },
+              "annexRef": { "citation": "NIS2 Annex II, digital providers, online search engines" }
+            },
+            {
+              "code": "social_network",
+              "name": {
+                "en": "Social networking service provider",
+                "ro": "Furnizor de servicii de rețele sociale"
+              },
+              "annexRef": {
+                "citation": "NIS2 Annex II, digital providers, social networking services"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "research",
+      "annex": "II",
+      "name": { "en": "Research", "ro": "Cercetare" },
+      "subsectors": [
+        {
+          "code": "research_organisations",
+          "name": { "en": "Research organisations", "ro": "Organizații de cercetare" },
+          "entityTypes": [
+            {
+              "code": "research_organisation",
+              "name": { "en": "Research organisation", "ro": "Organizație de cercetare" },
+              "annexRef": { "citation": "NIS2 Annex II, research" }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "ro-cer-critical",
+      "priority": 1000,
+      "outcome": "ESSENTIAL",
+      "confidence": "high",
+      "reasonKey": "classification.reasons.cerCritical",
+      "legalBasis": [{ "citation": "NIS2 Art. 2(3)" }, { "citation": "NIS2 Art. 3(1)(f)" }],
+      "when": { "field": "cerCriticalEntity", "op": "eq", "value": true }
+    },
+    {
+      "id": "ro-domain-registration",
+      "priority": 995,
+      "outcome": "IMPORTANT",
+      "confidence": "medium",
+      "reasonKey": "classification.reasons.domainRegistration",
+      "legalBasis": [{ "citation": "NIS2 Art. 2(4)" }, { "citation": "NIS2 Art. 3(2)" }],
+      "when": { "field": "domainNameRegistration", "op": "eq", "value": true }
+    },
+    {
+      "id": "ro-qualified-trust",
+      "priority": 990,
+      "outcome": "ESSENTIAL",
+      "confidence": "high",
+      "reasonKey": "classification.reasons.qualifiedTrust",
+      "legalBasis": [{ "citation": "NIS2 Art. 2(2)(a)(ii)" }, { "citation": "NIS2 Art. 3(1)(b)" }],
+      "when": { "field": "qualifiedTrustServiceProvider", "op": "eq", "value": true }
+    },
+    {
+      "id": "ro-tld-registry",
+      "priority": 980,
+      "outcome": "ESSENTIAL",
+      "confidence": "high",
+      "reasonKey": "classification.reasons.tldRegistry",
+      "legalBasis": [{ "citation": "NIS2 Art. 2(2)(a)(iii)" }, { "citation": "NIS2 Art. 3(1)(b)" }],
+      "when": { "field": "tldRegistry", "op": "eq", "value": true }
+    },
+    {
+      "id": "ro-dns-provider",
+      "priority": 970,
+      "outcome": "ESSENTIAL",
+      "confidence": "high",
+      "reasonKey": "classification.reasons.dnsProvider",
+      "legalBasis": [{ "citation": "NIS2 Art. 2(2)(a)(iii)" }, { "citation": "NIS2 Art. 3(1)(b)" }],
+      "when": { "field": "dnsServiceProvider", "op": "eq", "value": true }
+    },
+    {
+      "id": "ro-central-public-admin",
+      "priority": 960,
+      "outcome": "ESSENTIAL",
+      "confidence": "high",
+      "reasonKey": "classification.reasons.centralPublicAdministration",
+      "legalBasis": [{ "citation": "NIS2 Art. 2(2)(f)(i)" }, { "citation": "NIS2 Art. 3(1)(d)" }],
+      "when": { "field": "publicAdministrationLevel", "op": "eq", "value": "CENTRAL" }
+    },
+    {
+      "id": "ro-public-electronic-communications-medium-plus",
+      "priority": 950,
+      "outcome": "ESSENTIAL",
+      "confidence": "high",
+      "reasonKey": "classification.reasons.publicElectronicCommunications",
+      "legalBasis": [{ "citation": "NIS2 Art. 2(2)(a)(i)" }, { "citation": "NIS2 Art. 3(1)(c)" }],
+      "when": {
+        "all": [
+          { "field": "publicElectronicCommunications", "op": "eq", "value": true },
+          { "field": "sizeCategory", "op": "in", "value": ["MEDIUM", "LARGE"] }
+        ]
+      }
+    },
+    {
+      "id": "ro-identified-essential",
+      "priority": 940,
+      "outcome": "ESSENTIAL",
+      "confidence": "high",
+      "reasonKey": "classification.reasons.identifiedEssential",
+      "legalBasis": [{ "citation": "NIS2 Art. 3(1)(e)" }],
+      "when": { "field": "identifiedEssentialByMemberState", "op": "eq", "value": true }
+    },
+    {
+      "id": "ro-annex-i-large",
+      "priority": 900,
+      "outcome": "ESSENTIAL",
+      "confidence": "high",
+      "reasonKey": "classification.reasons.annexILarge",
+      "legalBasis": [{ "citation": "NIS2 Art. 3(1)(a)" }, { "citation": "NIS2 Annex I" }],
+      "when": {
+        "all": [
+          { "field": "annex", "op": "eq", "value": "I" },
+          { "field": "sizeCategory", "op": "eq", "value": "LARGE" }
+        ]
+      }
+    },
+    {
+      "id": "ro-annex-i-medium",
+      "priority": 890,
+      "outcome": "IMPORTANT",
+      "confidence": "high",
+      "reasonKey": "classification.reasons.annexIMedium",
+      "legalBasis": [{ "citation": "NIS2 Art. 3(2)" }, { "citation": "NIS2 Annex I" }],
+      "when": {
+        "all": [
+          { "field": "annex", "op": "eq", "value": "I" },
+          { "field": "sizeCategory", "op": "eq", "value": "MEDIUM" }
+        ]
+      }
+    },
+    {
+      "id": "ro-annex-ii-medium-plus",
+      "priority": 880,
+      "outcome": "IMPORTANT",
+      "confidence": "high",
+      "reasonKey": "classification.reasons.annexIIMediumPlus",
+      "legalBasis": [{ "citation": "NIS2 Art. 3(2)" }, { "citation": "NIS2 Annex II" }],
+      "when": {
+        "all": [
+          { "field": "annex", "op": "eq", "value": "II" },
+          { "field": "sizeCategory", "op": "in", "value": ["MEDIUM", "LARGE"] }
+        ]
+      }
+    },
+    {
+      "id": "ro-public-electronic-communications-small",
+      "priority": 870,
+      "outcome": "IMPORTANT",
+      "confidence": "medium",
+      "reasonKey": "classification.reasons.publicElectronicCommunicationsSmall",
+      "legalBasis": [{ "citation": "NIS2 Art. 2(2)(a)(i)" }, { "citation": "NIS2 Art. 3(2)" }],
+      "when": {
+        "all": [
+          { "field": "publicElectronicCommunications", "op": "eq", "value": true },
+          { "field": "sizeCategory", "op": "in", "value": ["MICRO", "SMALL"] }
+        ]
+      }
+    },
+    {
+      "id": "ro-trust-service-provider",
+      "priority": 860,
+      "outcome": "IMPORTANT",
+      "confidence": "medium",
+      "reasonKey": "classification.reasons.trustServiceProvider",
+      "legalBasis": [{ "citation": "NIS2 Art. 2(2)(a)(ii)" }, { "citation": "NIS2 Art. 3(2)" }],
+      "when": {
+        "all": [
+          { "field": "trustServiceProvider", "op": "eq", "value": true },
+          { "field": "qualifiedTrustServiceProvider", "op": "eq", "value": false }
+        ]
+      }
+    },
+    {
+      "id": "ro-regional-public-admin",
+      "priority": 897,
+      "outcome": "LIKELY_IN_SCOPE",
+      "confidence": "medium",
+      "reasonKey": "classification.reasons.regionalPublicAdministration",
+      "legalBasis": [{ "citation": "NIS2 Art. 2(2)(f)(ii)" }, { "citation": "NIS2 Art. 3(2)" }],
+      "when": { "field": "publicAdministrationLevel", "op": "eq", "value": "REGIONAL" }
+    },
+    {
+      "id": "ro-local-public-admin",
+      "priority": 896,
+      "outcome": "LIKELY_IN_SCOPE",
+      "confidence": "low",
+      "reasonKey": "classification.reasons.localPublicAdministration",
+      "legalBasis": [{ "citation": "NIS2 Art. 2(5)(a)" }],
+      "when": { "field": "publicAdministrationLevel", "op": "eq", "value": "LOCAL" }
+    },
+    {
+      "id": "ro-not-listed-sector",
+      "priority": 485,
+      "outcome": "OUT_OF_SCOPE",
+      "confidence": "high",
+      "reasonKey": "classification.reasons.notListedSector",
+      "legalBasis": [{ "citation": "NIS2 Art. 2(1)" }, { "citation": "NIS2 Annexes I and II" }],
+      "when": { "field": "sectorCode", "op": "eq", "value": "not_listed" }
+    },
+    {
+      "id": "ro-size-independent-ambiguous",
+      "priority": 480,
+      "outcome": "LIKELY_IN_SCOPE",
+      "confidence": "medium",
+      "reasonKey": "classification.reasons.sizeIndependentAmbiguous",
+      "legalBasis": [{ "citation": "NIS2 Art. 2(2)(b)-(e)" }, { "citation": "NIS2 Art. 3(2)" }],
+      "when": {
+        "any": [
+          { "field": "soleProvider", "op": "eq", "value": true },
+          { "field": "significantSocietalImpact", "op": "eq", "value": true },
+          { "field": "crossBorderSystemic", "op": "eq", "value": true },
+          { "field": "nationalImportance", "op": "eq", "value": true }
+        ]
+      }
+    },
+    {
+      "id": "ro-listed-sector-small",
+      "priority": 300,
+      "outcome": "OUT_OF_SCOPE",
+      "confidence": "high",
+      "reasonKey": "classification.reasons.listedSectorSmall",
+      "legalBasis": [{ "citation": "NIS2 Art. 2(1)" }, { "citation": "NIS2 Annexes I and II" }],
+      "when": {
+        "all": [
+          { "field": "annex", "op": "in", "value": ["I", "II"] },
+          { "field": "sizeCategory", "op": "in", "value": ["MICRO", "SMALL"] }
+        ]
+      }
+    },
+    {
+      "id": "ro-default-likely",
+      "priority": -1000,
+      "outcome": "LIKELY_IN_SCOPE",
+      "confidence": "low",
+      "reasonKey": "classification.reasons.insufficientInformation",
+      "legalBasis": [{ "citation": "NIS2 Art. 2" }, { "citation": "NIS2 Art. 3" }],
+      "when": { "all": [] }
+    }
+  ],
+  "consequences": {
+    "ESSENTIAL": {
+      "heading": { "en": "Essential entity", "ro": "Entitate esențială" },
+      "supervision": {
+        "en": "The competent authority may supervise you proactively (ex ante) and reactively (ex post), including audits, on-site inspections and information requests.",
+        "ro": "Autoritatea competentă vă poate supraveghea proactiv (ex ante) și reactiv (ex post), inclusiv prin audituri, inspecții la fața locului și solicitări de informații."
+      },
+      "supervisionCitation": "NIS2 Art. 32",
+      "fines": {
+        "maxEur": 10000000,
+        "maxTurnoverPercent": 2,
+        "description": {
+          "en": "Up to EUR 10,000,000 or 2% of total worldwide annual turnover, whichever is higher.",
+          "ro": "Până la 10.000.000 EUR sau 2% din cifra de afaceri anuală mondială totală, oricare este mai mare."
+        },
+        "citation": "NIS2 Art. 34(4)"
+      },
+      "managementLiability": {
+        "en": "Management bodies can be held liable for infringements and may face temporary bans from managerial functions.",
+        "ro": "Organele de conducere pot fi trase la răspundere pentru încălcări și pot primi interdicții temporare de a exercita funcții de conducere."
+      },
+      "registration": {
+        "en": "Registration with the national competent authority is required. Confirm the Romanian portal, data set and deadline with DNSC.",
+        "ro": "Înregistrarea la autoritatea națională competentă este obligatorie. Confirmați portalul român, datele solicitate și termenul la DNSC."
+      },
+      "reporting": {
+        "en": "Significant incidents: early warning within 24 hours, incident notification within 72 hours and final report within one month.",
+        "ro": "Incidente semnificative: avertizare timpurie în 24 de ore, notificare în 72 de ore și raport final în termen de o lună."
+      },
+      "citations": [
+        { "citation": "NIS2 Art. 20" },
+        { "citation": "NIS2 Art. 23(4)" },
+        { "citation": "NIS2 Art. 27" },
+        { "citation": "NIS2 Art. 32" },
+        { "citation": "NIS2 Art. 34(4)" }
+      ]
+    },
+    "IMPORTANT": {
+      "heading": { "en": "Important entity", "ro": "Entitate importantă" },
+      "supervision": {
+        "en": "The competent authority supervises you reactively (ex post), including after an incident or on suspicion of non-compliance.",
+        "ro": "Autoritatea competentă vă supraveghează reactiv (ex post), inclusiv după un incident sau la suspiciunea de neconformitate."
+      },
+      "supervisionCitation": "NIS2 Art. 33",
+      "fines": {
+        "maxEur": 7000000,
+        "maxTurnoverPercent": 1.4,
+        "description": {
+          "en": "Up to EUR 7,000,000 or 1.4% of total worldwide annual turnover, whichever is higher.",
+          "ro": "Până la 7.000.000 EUR sau 1,4% din cifra de afaceri anuală mondială totală, oricare este mai mare."
+        },
+        "citation": "NIS2 Art. 34(5)"
+      },
+      "managementLiability": {
+        "en": "Management bodies can be held liable for infringements and may face temporary bans from managerial functions.",
+        "ro": "Organele de conducere pot fi trase la răspundere pentru încălcări și pot primi interdicții temporare de a exercita funcții de conducere."
+      },
+      "registration": {
+        "en": "Registration with the national competent authority is required. Confirm the Romanian portal, data set and deadline with DNSC.",
+        "ro": "Înregistrarea la autoritatea națională competentă este obligatorie. Confirmați portalul român, datele solicitate și termenul la DNSC."
+      },
+      "reporting": {
+        "en": "Significant incidents: early warning within 24 hours, incident notification within 72 hours and final report within one month.",
+        "ro": "Incidente semnificative: avertizare timpurie în 24 de ore, notificare în 72 de ore și raport final în termen de o lună."
+      },
+      "citations": [
+        { "citation": "NIS2 Art. 20" },
+        { "citation": "NIS2 Art. 23(4)" },
+        { "citation": "NIS2 Art. 27" },
+        { "citation": "NIS2 Art. 33" },
+        { "citation": "NIS2 Art. 34(5)" }
+      ]
+    },
+    "LIKELY_IN_SCOPE": {
+      "heading": { "en": "Likely in scope — confirm", "ro": "Probabil în domeniu — confirmați" },
+      "supervision": {
+        "en": "The answer depends on a designation or risk assessment by the Romanian authority. Ask DNSC or a qualified lawyer to confirm before relying on this result.",
+        "ro": "Răspunsul depinde de o desemnare sau evaluare de risc a autorității române. Confirmați cu DNSC sau un avocat calificat înainte de a vă baza pe acest rezultat."
+      },
+      "supervisionCitation": "NIS2 Art. 2; NIS2 Art. 3",
+      "fines": {
+        "maxEur": 0,
+        "maxTurnoverPercent": 0,
+        "description": {
+          "en": "No fine ceiling can be determined until the entity is confirmed as essential or important.",
+          "ro": "Nu se poate determina plafonul amenzii până când entitatea nu este confirmată ca esențială sau importantă."
+        },
+        "citation": "NIS2 Art. 34"
+      },
+      "managementLiability": {
+        "en": "Management liability depends on the final designation.",
+        "ro": "Răspunderea conducerii depinde de desemnarea finală."
+      },
+      "registration": {
+        "en": "Registration may be required if the authority confirms that you are in scope.",
+        "ro": "Înregistrarea poate fi necesară dacă autoritatea confirmă că intrați în domeniu."
+      },
+      "reporting": {
+        "en": "Incident reporting obligations apply only if the entity is confirmed in scope.",
+        "ro": "Obligațiile de raportare a incidentelor se aplică numai dacă entitatea este confirmată în domeniu."
+      },
+      "citations": [{ "citation": "NIS2 Art. 2" }, { "citation": "NIS2 Art. 3" }]
+    },
+    "OUT_OF_SCOPE": {
+      "heading": { "en": "Out of scope", "ro": "În afara domeniului" },
+      "supervision": {
+        "en": "Based on the answers, the Directive does not apply. You can still use the documentation as voluntary good practice.",
+        "ro": "Pe baza răspunsurilor, Directiva nu se aplică. Puteți folosi documentația ca bună practică voluntară."
+      },
+      "supervisionCitation": "NIS2 Art. 2(1); NIS2 Annexes I and II",
+      "fines": {
+        "maxEur": 0,
+        "maxTurnoverPercent": 0,
+        "description": {
+          "en": "No NIS2 fine applies when the entity is out of scope.",
+          "ro": "Nu se aplică amenzi NIS2 atunci când entitatea este în afara domeniului."
+        },
+        "citation": "NIS2 Art. 2(1)"
+      },
+      "managementLiability": {
+        "en": "No NIS2 management liability applies, but other laws may still apply.",
+        "ro": "Nu se aplică răspunderea conducerii conform NIS2, dar pot fi relevante alte legi."
+      },
+      "registration": {
+        "en": "No NIS2 registration duty applies based on these answers.",
+        "ro": "Nu se aplică o obligație de înregistrare NIS2 pe baza acestor răspunsuri."
+      },
+      "reporting": {
+        "en": "No NIS2 incident reporting duty applies based on these answers.",
+        "ro": "Nu se aplică o obligație NIS2 de raportare a incidentelor pe baza acestor răspunsuri."
+      },
+      "citations": [{ "citation": "NIS2 Art. 2(1)" }, { "citation": "NIS2 Annexes I and II" }]
+    }
+  },
+  "documentRules": [
+    {
+      "templateKey": "governance_registration",
+      "title": { "en": "Governance and registration", "ro": "Guvernanță și înregistrare" },
+      "category": "governance",
+      "applicability": "BOTH",
+      "priority": 1,
+      "reasonKey": "classification.documents.reasons.art20",
+      "when": { "all": [] }
+    },
+    {
+      "templateKey": "risk_management_policy",
+      "title": { "en": "Risk management policy", "ro": "Politica de gestionare a riscurilor" },
+      "category": "risk",
+      "applicability": "BOTH",
+      "priority": 2,
+      "reasonKey": "classification.documents.reasons.art21",
+      "when": { "all": [] }
+    },
+    {
+      "templateKey": "incident_response_plan",
+      "title": { "en": "Incident response plan", "ro": "Plan de răspuns la incidente" },
+      "category": "incident",
+      "applicability": "BOTH",
+      "priority": 3,
+      "reasonKey": "classification.documents.reasons.art21",
+      "when": { "all": [] }
+    },
+    {
+      "templateKey": "incident_reporting_procedure",
+      "title": {
+        "en": "Incident reporting procedure",
+        "ro": "Procedură de raportare a incidentelor"
+      },
+      "category": "incident",
+      "applicability": "BOTH",
+      "priority": 4,
+      "reasonKey": "classification.documents.reasons.art23",
+      "when": { "all": [] }
+    },
+    {
+      "templateKey": "business_continuity_plan",
+      "title": {
+        "en": "Business continuity and crisis management",
+        "ro": "Continuitatea afacerii și gestionarea crizelor"
+      },
+      "category": "continuity",
+      "applicability": "BOTH",
+      "priority": 5,
+      "reasonKey": "classification.documents.reasons.art21",
+      "when": { "all": [] }
+    },
+    {
+      "templateKey": "supply_chain_security",
+      "title": { "en": "Supply chain security", "ro": "Securitatea lanțului de aprovizionare" },
+      "category": "supply_chain",
+      "applicability": "BOTH",
+      "priority": 6,
+      "reasonKey": "classification.documents.reasons.art22",
+      "when": { "all": [] }
+    },
+    {
+      "templateKey": "access_control_policy",
+      "title": {
+        "en": "Access control and identity management",
+        "ro": "Controlul accesului și gestionarea identităților"
+      },
+      "category": "access",
+      "applicability": "BOTH",
+      "priority": 7,
+      "reasonKey": "classification.documents.reasons.art21",
+      "when": { "all": [] }
+    },
+    {
+      "templateKey": "asset_inventory",
+      "title": { "en": "Asset inventory", "ro": "Inventarul activelor" },
+      "category": "assets",
+      "applicability": "BOTH",
+      "priority": 8,
+      "reasonKey": "classification.documents.reasons.art21",
+      "when": { "all": [] }
+    },
+    {
+      "templateKey": "vulnerability_management",
+      "title": {
+        "en": "Vulnerability and patch management",
+        "ro": "Gestionarea vulnerabilităților și a corecțiilor"
+      },
+      "category": "vulnerabilities",
+      "applicability": "BOTH",
+      "priority": 9,
+      "reasonKey": "classification.documents.reasons.art21",
+      "when": { "all": [] }
+    },
+    {
+      "templateKey": "cryptography_policy",
+      "title": {
+        "en": "Cryptography and encryption policy",
+        "ro": "Politica de criptografie și criptare"
+      },
+      "category": "cryptography",
+      "applicability": "BOTH",
+      "priority": 10,
+      "reasonKey": "classification.documents.reasons.art21",
+      "when": { "all": [] }
+    },
+    {
+      "templateKey": "security_awareness_training",
+      "title": {
+        "en": "Security awareness and training",
+        "ro": "Conștientizare și instruire în securitate"
+      },
+      "category": "training",
+      "applicability": "BOTH",
+      "priority": 11,
+      "reasonKey": "classification.documents.reasons.art20",
+      "when": { "all": [] }
+    },
+    {
+      "templateKey": "hr_security",
+      "title": { "en": "HR security", "ro": "Securitatea resurselor umane" },
+      "category": "hr",
+      "applicability": "BOTH",
+      "priority": 12,
+      "reasonKey": "classification.documents.reasons.art21",
+      "when": { "all": [] }
+    },
+    {
+      "templateKey": "physical_security",
+      "title": {
+        "en": "Physical and environmental security",
+        "ro": "Securitate fizică și de mediu"
+      },
+      "category": "physical",
+      "applicability": "BOTH",
+      "priority": 13,
+      "reasonKey": "classification.documents.reasons.art21",
+      "when": { "all": [] }
+    },
+    {
+      "templateKey": "backup_recovery",
+      "title": { "en": "Backup and recovery", "ro": "Copii de siguranță și recuperare" },
+      "category": "backup",
+      "applicability": "BOTH",
+      "priority": 14,
+      "reasonKey": "classification.documents.reasons.art21",
+      "when": { "all": [] }
+    },
+    {
+      "templateKey": "secure_development_policy",
+      "title": {
+        "en": "Secure development and acquisition",
+        "ro": "Dezvoltare și achiziție securizată"
+      },
+      "category": "development",
+      "applicability": "BOTH",
+      "priority": 15,
+      "reasonKey": "classification.documents.reasons.art21",
+      "when": {
+        "any": [
+          {
+            "field": "sectorCode",
+            "op": "in",
+            "value": ["digital_infrastructure", "ict_service_management", "digital_providers"]
+          }
+        ]
+      }
+    },
+    {
+      "templateKey": "audit_testing",
+      "title": { "en": "Security testing and audit", "ro": "Testare de securitate și audit" },
+      "category": "assurance",
+      "applicability": "BOTH",
+      "priority": 16,
+      "reasonKey": "classification.documents.reasons.art21",
+      "when": { "all": [] }
+    },
+    {
+      "templateKey": "management_reporting",
+      "title": {
+        "en": "Management reporting and review",
+        "ro": "Raportarea și revizuirea de către conducere"
+      },
+      "category": "governance",
+      "applicability": "BOTH",
+      "priority": 17,
+      "reasonKey": "classification.documents.reasons.art20",
+      "when": { "all": [] }
+    }
+  ],
+  "contacts": [
+    {
+      "name": "DNSC",
+      "role": "National competent authority and single point of contact",
+      "url": "https://www.dnsc.ro"
+    }
+  ]
+}

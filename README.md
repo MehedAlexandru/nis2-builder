@@ -5,11 +5,27 @@ documentation, audit your IT environment and track progress — in English and R
 
 > **Legal notice:** This tool supports compliance preparation and does not constitute legal advice.
 
-**Status: Phase 1 complete.** Registration, email verification, login, MFA, sessions, organizations,
-roles, audit logging and tenant-scoped RLS are live. Classification and the document engine follow in
-the next phases. The scanner agent is a verified skeleton; active discovery lands in Phase 6.
+**Status: Phase 2 complete.** Registration, MFA, organizations and tenant-scoped RLS are live, and
+the data-driven NIS2 entity classification wizard now produces a versioned result with cited legal
+basis, consequences, document priority and a PDF summary. The document engine follows in Phase 3.
+The scanner agent is a verified skeleton; active discovery lands in Phase 6.
 
 ---
+
+## What Phase 2 adds
+
+- Data-driven Romanian jurisdiction pack (`RO@0.2.0-draft`) with Annex I/II sectors, entity types and
+  cited rules — adding another member state is data, not code.
+- Four-step classification wizard: establishment, sector/entity type, consolidated size
+  (Recommendation 2003/361/EC partner/linked rules) and size-independent criteria.
+- Essential / Important / Likely in scope / Out of scope outcomes with the exact NIS2 citations,
+  supervision regime, fine ceilings, management liability, registration and reporting duties.
+- Versioned classification runs that pin the jurisdiction pack version and produce a document
+  priority snapshot for the Phase 3 documentation centre.
+- Downloadable PDF summary and a history of previous runs.
+- 64-scenario rules table plus engine, PDF and wizard tests.
+
+See [`docs/phase-2-report.md`](docs/phase-2-report.md) for the verification evidence and known gaps.
 
 ## What Phase 1 adds
 

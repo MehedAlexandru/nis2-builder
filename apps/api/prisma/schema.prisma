@@ -450,8 +450,11 @@ model ClassificationRun {
   inputs                   Json
   result                   ClassificationResult
   confidence               String?
+  ruleId                   String?
+  reasonKey                String?
   legalBasis               Json
   consequences             Json?
+  applicability            Json?
   jurisdictionPackCode     String
   jurisdictionPackVersion  String
   createdById              String

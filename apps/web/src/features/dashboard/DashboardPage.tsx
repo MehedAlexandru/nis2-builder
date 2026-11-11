@@ -8,9 +8,14 @@ import { Progress } from '@/components/ui/Progress';
 import { useAuth } from '@/features/auth/auth-context';
 
 const modules = [
-  { key: 'classification', icon: ShieldCheck, phase: 'auth.dashboard.phases.classification' },
-  { key: 'documents', icon: FileText, phase: 'auth.dashboard.phases.documents' },
-  { key: 'audit', icon: Network, phase: 'auth.dashboard.phases.audit' },
+  {
+    key: 'classification',
+    icon: ShieldCheck,
+    phase: 'auth.dashboard.phases.classification',
+    to: '/classification',
+  },
+  { key: 'documents', icon: FileText, phase: 'auth.dashboard.phases.documents', to: null },
+  { key: 'audit', icon: Network, phase: 'auth.dashboard.phases.audit', to: null },
 ] as const;
 
 export function DashboardPage() {
@@ -77,7 +82,7 @@ export function DashboardPage() {
           {t('auth.dashboard.modulesTitle')}
         </h2>
         <div className="grid gap-6 md:grid-cols-3">
-          {modules.map(({ key, icon: Icon, phase }) => (
+          {modules.map(({ key, icon: Icon, phase, to }) => (
             <Card key={key} className="h-full">
               <CardHeader>
                 <span className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 text-primary-700 dark:bg-primary-500/15 dark:text-primary-200">
@@ -89,7 +94,13 @@ export function DashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Badge variant="neutral">{t(phase)}</Badge>
+                {to ? (
+                  <Button asChild variant="outline" size="sm">
+                    <Link to={to}>{t('actions.open')}</Link>
+                  </Button>
+                ) : (
+                  <Badge variant="neutral">{t(phase)}</Badge>
+                )}
               </CardContent>
             </Card>
           ))}

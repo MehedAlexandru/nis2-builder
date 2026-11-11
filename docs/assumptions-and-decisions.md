@@ -147,8 +147,29 @@
     minutes and 24 hours respectively).
 43. **Account deletion is blocked while the user is the sole owner** of any organization; ownership
     must be transferred or the organization removed first.
-44. **Audit history survives account deletion** (`actorUserId` is set to null by the FK) so the
-    security trail is not destroyed by GDPR erasure of the profile.
+44. **Audit history survives account deletion** because `audit_log` has no foreign keys and keeps
+    actor/organization identifiers as immutable references. GDPR erasure removes the profile, not the
+    security trail.
+45. **Classification rules are ordered data, not code.** The rules engine evaluates declarative
+    conditions (`all`/`any`/`not` + field operators) and the first matching rule wins. This keeps
+    legal content reviewable and makes the 40+ scenario table the release gate.
+46. **Annex I medium-sized entities are important, not essential.** Essential status under
+    NIS2 Art. 3(1)(a) requires exceeding the medium-sized ceilings; Art. 3(2) defaults the
+    remaining listed entities to important. Regional/local public administration and the
+    Art. 2(2)(b)–(e) criteria return `LIKELY_IN_SCOPE` because the Member State makes the final
+    designation.
+47. **Partner and linked enterprises are consolidated in the wizard** using the Recommendation
+    2003/361/EC approach: linked at 100%, partners pro rata to ownership. Users can still choose
+    autonomous when no consolidation is required.
+48. **Classification runs store a document applicability snapshot** (`applicability` JSON) and the
+    matching `ruleId`/`reasonKey`. Phase 3 will consume the snapshot; historical runs are never
+    recomputed against a newer pack.
+49. **The Phase 2 PDF summary is server-rendered with PDFKit** and an ASCII-safe standard font.
+    Phase 4 replaces it with the canonical DOCX/PDF renderer and embedded brand fonts; the content
+    model is already the shared classification result.
+50. **A failed or ambiguous classification never coerces certainty.** Missing data or Member-State
+    designation criteria produce `LIKELY_IN_SCOPE` with a confirmation message and no invented fine
+    ceiling.
 
 ## 5. Open decisions for later phases (not blocking)
 

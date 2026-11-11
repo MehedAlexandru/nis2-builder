@@ -121,7 +121,8 @@ attachment`.
 - JSON logs with service, env, request ID, method, path, status, latency.
 - Redaction of credentials, cookies, tokens and secrets.
 - Audit log: append-only, tenant-readable, admin-visible globally; recorded events include login
-  success/failure, role changes, document edits/exports, admin access, scans, account changes.
+  success/failure, role changes, classification runs, document edits/exports, admin access, scans and
+  account changes.
 - Prometheus metrics at `/metrics`; scrape only from the internal network.
 - Alerts planned: auth failure spikes, 5xx rate, readiness failures, queue backlog, export failures.
 

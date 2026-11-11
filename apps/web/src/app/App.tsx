@@ -9,6 +9,8 @@ import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { RegisterPage } from '@/features/auth/RegisterPage';
 import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
 import { VerifyEmailPage } from '@/features/auth/VerifyEmailPage';
+import { ClassificationPage } from '@/features/classification/ClassificationPage';
+import { ClassificationResultPage } from '@/features/classification/ClassificationResultPage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { DesignSystemPage } from '@/features/design/DesignSystemPage';
 import { LandingPage } from '@/features/landing/LandingPage';
@@ -36,6 +38,22 @@ export function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="classification"
+            element={
+              <ProtectedRoute>
+                <ClassificationPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="classification/runs/:runId"
+            element={
+              <ProtectedRoute>
+                <ClassificationResultPage />
               </ProtectedRoute>
             }
           />

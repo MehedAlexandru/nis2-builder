@@ -24,7 +24,7 @@ export const jurisdictionPacks = {
     authorityUrl: 'https://www.dnsc.ro',
     legalInstrument: 'OUG 155/2024',
     status: 'pending-legal-review',
-    version: '0.1.0-draft',
+    version: '0.2.0-draft',
   },
 } as const satisfies Record<string, JurisdictionPackMetadata>;
 

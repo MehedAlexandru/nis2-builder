@@ -1,4 +1,11 @@
-import { LayoutDashboard, LogOut, Scale, Building2, MonitorSmartphone } from 'lucide-react';
+import {
+  LayoutDashboard,
+  LogOut,
+  Scale,
+  Building2,
+  MonitorSmartphone,
+  ShieldCheck,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { Logo } from '@/components/brand/Logo';
@@ -41,6 +48,10 @@ export function AppShell() {
                   <NavLink to="/dashboard" className={navLinkClass}>
                     <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
                     {t('nav.dashboard')}
+                  </NavLink>
+                  <NavLink to="/classification" className={navLinkClass}>
+                    <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                    {t('nav.classification')}
                   </NavLink>
                   <NavLink to="/organizations" className={navLinkClass}>
                     <Building2 className="h-4 w-4" aria-hidden="true" />

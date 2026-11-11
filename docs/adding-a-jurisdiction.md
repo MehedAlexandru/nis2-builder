@@ -10,7 +10,7 @@ A pack is versioned JSON stored in `jurisdiction_packs` and seeded from `package
 ```json
 {
   "code": "RO",
-  "version": "0.1.0-draft",
+  "version": "0.2.0-draft",
   "name": "Romania",
   "authority": "DNSC",
   "authorityUrl": "https://www.dnsc.ro",
@@ -55,7 +55,7 @@ Phase 0 ships only metadata for Romania. The article-level mapping is authored i
 
 - Authority: **DNSC**.
 - Instrument: **OUG 155/2024** (as supplied in the brief).
-- Status: `pending-legal-review`, version `0.1.0-draft`.
+- Status: `pending-legal-review`, version `0.2.0-draft`. Phase 2 adds the sector catalog and ordered rules.
 - The UI displays “Romanian jurisdiction content is pending legal review.”
 
 ## 5. Adding a new member state
