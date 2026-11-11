@@ -96,6 +96,20 @@ export type MembersQuery = z.infer<typeof membersQuerySchema>;
 
 export const organizationParamsSchema = z.object({ organizationId: z.string().uuid() }).strict();
 
+export const organizationLogoUploadSchema = z
+  .object({
+    filename: z
+      .string()
+      .trim()
+      .min(1)
+      .max(180)
+      .regex(/\.(png|jpe?g)$/i, 'Use a PNG or JPEG logo'),
+    mimeType: z.enum(['image/png', 'image/jpeg']),
+    dataBase64: z.string().min(1).max(3_500_000),
+  })
+  .strict();
+export type OrganizationLogoUploadInput = z.infer<typeof organizationLogoUploadSchema>;
+
 export const userListQuerySchema = paginationQuerySchema.extend({
   search: z.string().trim().max(120).optional(),
 });

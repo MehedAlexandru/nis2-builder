@@ -263,6 +263,9 @@ model User {
   notifications           Notification[]
   approvals               Approval[]
   lockedDocuments         Document[]               @relation("DocumentLock")
+  ownedDocuments          Document[]               @relation("DocumentOwner")
+  documentRevisions       DocumentRevision[]       @relation("DocumentRevisionAuthor")
+  publishedVersions       DocumentVersion[]        @relation("DocumentVersionPublisher")
   ownedFindings           Finding[]                @relation("FindingOwner")
   trainingRecords         TrainingRecord[]
 
@@ -487,7 +490,7 @@ model JurisdictionPack {
 
 model DocumentTemplate {
   id                   String        @id @default(uuid(7))
-  key                  String        @unique
+  key                  String
   title                String
   shortDescription     String
   category             String
@@ -504,6 +507,8 @@ model DocumentTemplate {
 
   documents Document[]
 
+  @@unique([key, version])
+  @@index([key, isActive])
   @@index([category])
   @@map("document_templates")
 }
@@ -512,6 +517,7 @@ model Document {
   id                   String                 @id @default(uuid(7))
   organizationId       String
   templateId           String
+  templateVersion      Int                    @default(1)
   status               DocumentStatus         @default(NOT_STARTED)
   classification       DocumentClassification @default(INTERNAL)
   payload              Json                   @default("{}")
@@ -519,6 +525,7 @@ model Document {
   currentRevisionNo    Int                    @default(0)
   currentVersionLabel  String?
   nextReviewDate       DateTime?
+  ownerUserId          String?
   lastEditedById       String?
   lockOwnerId          String?
   lockExpiresAt        DateTime?
@@ -527,6 +534,7 @@ model Document {
 
   organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   template     DocumentTemplate @relation(fields: [templateId], references: [id])
+  owner        User?            @relation("DocumentOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
   lockOwner    User?            @relation("DocumentLock", fields: [lockOwnerId], references: [id], onDelete: SetNull)
   revisions    DocumentRevision[]
   versions     DocumentVersion[]
@@ -537,18 +545,20 @@ model Document {
 }
 
 model DocumentRevision {
-  id             String   @id @default(uuid(7))
-  organizationId String
-  documentId     String
-  revisionNo     Int
-  payload        Json
-  changedFields  Json?
-  changeNote     String?
-  createdById    String
-  createdAt      DateTime @default(now())
+  id              String   @id @default(uuid(7))
+  organizationId  String
+  documentId      String
+  revisionNo      Int
+  templateVersion Int      @default(1)
+  payload         Json
+  changedFields   Json?
+  changeNote      String?
+  createdById     String
+  createdAt       DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   document     Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  createdBy    User         @relation("DocumentRevisionAuthor", fields: [createdById], references: [id])
 
   @@unique([documentId, revisionNo])
   @@index([documentId, createdAt])
@@ -564,10 +574,12 @@ model DocumentVersion {
   revisionNo     Int
   status         VersionStatus @default(DRAFT)
   approvedAt     DateTime?
+  createdById    String?
   createdAt      DateTime      @default(now())
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  document     Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  document     Document        @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  createdBy    User?           @relation("DocumentVersionPublisher", fields: [createdById], references: [id], onDelete: SetNull)
   approvals    Approval[]
 
   @@unique([documentId, versionLabel])
@@ -946,6 +958,7 @@ model ExportJob {
   organizationId String
   type           ExportType
   entityType     String?
+  entityId       String?
   entityIds      Json?
   status         ExportStatus @default(QUEUED)
   storageKey     String?

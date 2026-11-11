@@ -13,6 +13,8 @@ import { ClassificationPage } from '@/features/classification/ClassificationPage
 import { ClassificationResultPage } from '@/features/classification/ClassificationResultPage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { DesignSystemPage } from '@/features/design/DesignSystemPage';
+import { DocumentEditorPage } from '@/features/documents/DocumentEditorPage';
+import { DocumentsPage } from '@/features/documents/DocumentsPage';
 import { LandingPage } from '@/features/landing/LandingPage';
 import { NotFoundPage } from '@/features/landing/NotFoundPage';
 import { OrganizationsPage } from '@/features/organizations/OrganizationsPage';
@@ -54,6 +56,22 @@ export function App() {
             element={
               <ProtectedRoute>
                 <ClassificationResultPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="documents"
+            element={
+              <ProtectedRoute>
+                <DocumentsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="documents/:documentId"
+            element={
+              <ProtectedRoute>
+                <DocumentEditorPage />
               </ProtectedRoute>
             }
           />

@@ -7,6 +7,7 @@ import { PasswordService } from './crypto/password.service';
 import { TokenService } from './crypto/token.service';
 import { TotpService } from './crypto/totp';
 import { MailService } from './mail/mail.service';
+import { StorageService } from './storage/storage.service';
 import { TenantContextService } from './tenancy/tenant-context.service';
 import { TenantPrismaService } from './tenancy/tenant-prisma.service';
 
@@ -21,6 +22,7 @@ import { TenantPrismaService } from './tenancy/tenant-prisma.service';
     BreachCheckService,
     MailService,
     AuditService,
+    StorageService,
     TenantContextService,
     TenantPrismaService,
   ],
@@ -33,6 +35,7 @@ import { TenantPrismaService } from './tenancy/tenant-prisma.service';
     BreachCheckService,
     MailService,
     AuditService,
+    StorageService,
     TenantContextService,
     TenantPrismaService,
   ],

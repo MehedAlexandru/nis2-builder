@@ -9,11 +9,13 @@ import {
   Post,
   Query,
   Req,
+  Res,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import {
   createOrganizationSchema,
   inviteSchema,
+  organizationLogoUploadSchema,
   paginationQuerySchema,
   updateMemberRoleSchema,
   updateOrganizationSchema,
@@ -21,13 +23,14 @@ import {
   type InviteInput,
   type InviteSummary,
   type OrganizationDetail,
+  type OrganizationLogoUploadInput,
   type OrganizationMember,
   type OrganizationSummary,
   type PaginationQuery,
   type UpdateMemberRoleInput,
   type UpdateOrganizationInput,
 } from '@nis2/shared';
-import type { FastifyRequest } from 'fastify';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { CurrentAuth } from '../../common/auth/auth.decorators';
 import type { AccessTokenClaims } from '../../common/crypto/jwt.service';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
@@ -73,6 +76,32 @@ export class OrganizationsController {
     @Req() request: FastifyRequest,
   ): Promise<OrganizationDetail> {
     return this.organizations.update(actorOf(auth, request), organizationId, body);
+  }
+
+  @Post(':organizationId/logo')
+  @HttpCode(200)
+  uploadLogo(
+    @Param('organizationId') organizationId: string,
+    @Body(new ZodValidationPipe(organizationLogoUploadSchema)) body: OrganizationLogoUploadInput,
+    @CurrentAuth() auth: AccessTokenClaims,
+    @Req() request: FastifyRequest,
+  ): Promise<OrganizationDetail> {
+    return this.organizations.uploadLogo(actorOf(auth, request), organizationId, body);
+  }
+
+  @Get(':organizationId/logo')
+  async logo(
+    @Param('organizationId') organizationId: string,
+    @CurrentAuth() auth: AccessTokenClaims,
+    @Req() request: FastifyRequest,
+    @Res() reply: FastifyReply,
+  ): Promise<void> {
+    const object = await this.organizations.logo(actorOf(auth, request), organizationId);
+    if (object.contentLength) reply.header('Content-Length', object.contentLength);
+    reply
+      .header('Content-Type', object.contentType ?? 'image/png')
+      .header('Cache-Control', 'private, max-age=60')
+      .send(object.body);
   }
 
   @Get(':organizationId/members')

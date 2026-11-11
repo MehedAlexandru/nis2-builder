@@ -5,12 +5,53 @@ documentation, audit your IT environment and track progress — in English and R
 
 > **Legal notice:** This tool supports compliance preparation and does not constitute legal advice.
 
-**Status: Phase 2 complete.** Registration, MFA, organizations and tenant-scoped RLS are live, and
-the data-driven NIS2 entity classification wizard now produces a versioned result with cited legal
-basis, consequences, document priority and a PDF summary. The document engine follows in Phase 3.
+**Status: Phase 4 complete.** Registration, MFA, organizations, tenant-scoped RLS, the
+data-driven NIS2 classification wizard and the full documentation centre are live. Documents now
+export as professionally styled DOCX and PDF, with a compliance summary and a complete ZIP bundle.
 The scanner agent is a verified skeleton; active discovery lands in Phase 6.
 
 ---
+
+## What Phase 4 adds
+
+- Queued DOCX/PDF export jobs processed by the worker and stored privately in S3-compatible
+  storage; authenticated download and recent-export history in the UI.
+- Professional DOCX with real Heading 1-3/table styles, cover page, TOC field, headers/footers,
+  styled tables, risk heat map, revision history and approval/signature block.
+- PDF with the same content model, embedded DejaVu/Arial fonts, cover, TOC with page numbers,
+  styled tables, heat map and page furniture.
+- Compliance summary in DOCX/PDF: classification, sector/size, pack version, overall progress,
+  per-document status and outstanding required fields.
+- ZIP bundle containing DOCX and PDF for every active template plus the compliance summary and
+  README.
+- Organization logo upload (PNG/JPEG, 2 MB limit, magic-byte validation) used on covers and in the
+  documentation centre.
+- `font-dejavu` in the API/worker images for correct Romanian diacritics; worker S3 configuration.
+
+See [`docs/phase-4-report.md`](docs/phase-4-report.md) for verification evidence and known gaps.
+
+## What Phase 3 adds
+
+- Documentation grid with overall progress ring, weighted per-document progress, filters, search,
+  legal references, review dates and overdue status.
+- 24 data-driven bilingual templates covering the governance/registration records, all Art. 21(2)
+  measures, incident reporting, continuity, supply chain, access, cryptography, training, HR,
+  logging, network security, patches and the optional statement of applicability.
+- Dynamic form renderer for text, rich text, select, multi-select, dates, tables, people pickers,
+  checklists, yes/no, risk matrices, signatures and attachments (upload lands in Phase 4).
+- Autosave every few seconds plus manual save, unsaved-change guard, per-field validation,
+  weighted completion and "what auditors look for" guidance.
+- Immutable revision on every save, side-by-side diff of any two revisions, and restore that
+  creates a new revision without deleting history.
+- Named versions (e.g. 1.0, 1.1), approval records with role/comment/signature fields, and an
+  approval block ready for the Phase 4 renderer.
+- Optimistic concurrency (`expectedRevisionNo`) and 10-minute edit locks so colleagues cannot
+  overwrite each other.
+- Company-profile prefill (legal name, registration number, address, DPO/CISO) and per-document
+  owner, classification and next review date.
+- Seed includes a demo governance record and a completed risk register.
+
+See [`docs/phase-3-report.md`](docs/phase-3-report.md) for the verification evidence and known gaps.
 
 ## What Phase 2 adds
 
@@ -192,10 +233,10 @@ See [`docs/security.md`](docs/security.md) and [`SECURITY.md`](SECURITY.md).
 | ----- | ------------------------------------------------------------------- | -------- |
 | 0     | Architecture, scaffold, tokens, i18n, API shell, data model, RLS    | **Done** |
 | 1     | Auth, organizations, roles, MFA, audit log, runtime RLS, dashboards | **Done** |
-| 2     | Classification wizard, rules engine, result PDF                     | Next     |
-| 3     | Document template engine, revisions, diff/restore, approvals        | Planned  |
-| 4     | DOCX/PDF pipeline, ZIP and compliance summary                       | Planned  |
-| 5     | Network canvas, devices, assessments, Nmap/CSV import               | Planned  |
+| 2     | Classification wizard, rules engine, result PDF                     | **Done** |
+| 3     | Document template engine, revisions, diff/restore, approvals        | **Done** |
+| 4     | DOCX/PDF pipeline, ZIP and compliance summary                       | **Done** |
+| 5     | Network canvas, devices, assessments, Nmap/CSV import               | Next     |
 | 6     | Scanner Agent, enrollment, diff-based rescans                       | Planned  |
 | 7     | Findings register, auto-suggestions, audit lifecycle/report         | Planned  |
 | 8     | Admin dashboard, drill-down, reminders, notifications               | Planned  |

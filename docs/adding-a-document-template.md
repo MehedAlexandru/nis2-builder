@@ -6,15 +6,21 @@
 
 ## 1. What a template contains
 
-A document template is versioned JSON stored in `document_templates.schema`, validated by Zod, and
-seeded from `packages/shared`. It defines:
+A document template is authored in `packages/shared/src/data/document-templates/catalog.ts` using
+small typed helpers, validated by Zod, and serialized to JSONB in `document_templates.schema`.
+The UI, progress engine and Phase 4 renderers read the stored JSON definition; never hand-code a
+form for a document. A template defines:
 
-- identity: `key`, bilingual `title`, bilingual `description`, `category`;
+- identity: `key`, bilingual `title`, bilingual `shortDescription`/`description`, `category`;
 - legal basis: `legalReference` (real article/annex), `applicability`
   (`ESSENTIAL`/`IMPORTANT`/`BOTH`/`VOLUNTARY`);
-- ownership: `ownerRole`, `reviewFrequencyMonths`;
-- structure: sections and fields (type, validation, help, example, weight, export mapping);
+- ownership: `ownerRole`, `reviewFrequencyMonths`, `sortOrder`;
+- structure: sections and fields (type, validation, help, example, weight, conditional logic,
+  prefill and export mapping);
 - export: headings, tables, callouts, matrices, signature block and revision history.
+
+The current catalogue has 24 templates. Phase 2 classification keys are stable and must not be
+renamed; add new supporting documents when a rule needs them.
 
 ## 2. Structure
 
@@ -64,23 +70,25 @@ seeded from `packages/shared`. It defines:
 
 ## 3. Field types
 
-| Type                | Purpose                            | Notes                                                   |
-| ------------------- | ---------------------------------- | ------------------------------------------------------- |
-| `text`              | Short answer                       | min/max length, pattern                                 |
-| `richText`          | Policy prose                       | sanitized allowlist, no raw HTML from users             |
-| `select`            | Single choice                      | bilingual options                                       |
-| `multiSelect`       | Multiple choices                   | max selections                                          |
-| `date` / `datetime` | Dates                              | timezone-aware                                          |
-| `table`             | Repeater rows                      | column definitions, min/max rows, per-column validation |
-| `peoplePicker`      | Internal owner/approver            | references organization members                         |
-| `checklist`         | Evidence/controls                  | item state + optional evidence                          |
-| `attachment`        | Files                              | MIME/size limits, virus scan                            |
-| `yesNo`             | Binary with conditional follow-ups | `followUps` shown when true/false                       |
-| `riskMatrix`        | Likelihood × impact                | color-coded heat map in exports                         |
-| `signature`         | Approval block                     | approver, role, date, optional signature image          |
+| Type                | Purpose                 | Notes                                                   |
+| ------------------- | ----------------------- | ------------------------------------------------------- |
+| `text`              | Short answer            | min/max length, pattern                                 |
+| `richText`          | Policy prose            | sanitized allowlist, no raw HTML from users             |
+| `select`            | Single choice           | bilingual options                                       |
+| `multiSelect`       | Multiple choices        | max selections                                          |
+| `date` / `datetime` | Dates                   | timezone-aware                                          |
+| `table`             | Repeater rows           | column definitions, min/max rows, per-column validation |
+| `peoplePicker`      | Internal owner/approver | references organization members                         |
+| `checklist`         | Evidence/controls       | item state + optional evidence                          |
+| `attachment`        | Files                   | MIME/size limits, virus scan                            |
+| `yesNo`             | Binary answer           | use `followUpKeys` + `conditional` on the follow-ups    |
+| `riskMatrix`        | Likelihood × impact     | 1–5 scores, color-coded heat map in exports             |
+| `signature`         | Approval block          | approver, role, date, optional signature image          |
 
 Common attributes: `key`, `type`, `label`, `help`, `example`, `required`, `weight`, `validation`,
-`conditional` (show when another field has a value), `export`.
+`conditional` (show when another field has a value), `followUpKeys`, `prefillKey`, `export`.
+Table columns use `key`, `label`, `type`, `required` and optional `options`; checklist items use
+`key`, `label` and `required`.
 
 ## 4. Progress weighting
 
@@ -115,19 +123,24 @@ Common attributes: `key`, `type`, `label`, `help`, `example`, `required`, `weigh
 
 ## 8. Export mapping
 
-- `export.kind`: `paragraph`, `definition_row`, `table`, `callout`, `risk_matrix`, `signature`,
-  `toc`, `page_break`.
-- Tables use primary-600 headers and primary-50 zebra rows in both DOCX and PDF.
-- Callouts map to info/warning/critical tints.
-- The same canonical content model feeds both renderers (see `docs/architecture.md`).
+- Phase 4 renders both DOCX and PDF from `ExportDocumentModel` in
+  `apps/api/src/modules/exports/export-model.ts`; the renderers never read the form payload directly.
+- Field types map to text paragraphs, definition rows, styled tables, checklists, risk heat maps,
+  signatures and attachment notes.
+- Tables use primary-600 headers with white text and primary-50 zebra rows in both formats.
+- Callouts use info/warning/danger tints; document control and approval blocks are added
+  automatically.
+- If you add a field type, update `exportField()` and both renderers together. Do not create a
+  per-document export branch.
 
 ## 9. Seeding and tests
 
-1. Add the JSON under `packages/shared/src/data/document-templates/`.
-2. Validate it with the template Zod schema at build time.
+1. Add the template to `packages/shared/src/data/document-templates/catalog.ts` using the helpers.
+2. Keep every `key` unique; validate with `documentTemplateCatalogSchema` at import time.
 3. Add unit tests for schema validity, weighted progress and conditional fields.
-4. Add export golden tests in Phase 4 (DOCX opens in LibreOffice; PDF visual regression).
-5. Seed via an idempotent upsert keyed by `key + version`.
+4. Add renderer coverage; Phase 9 should add LibreOffice headless and PDF visual-regression tests.
+5. Bump `version` for breaking changes; seed via an idempotent upsert keyed by `key + version`.
+6. Update the API/UI only if a new field type is introduced; templates do not get bespoke forms.
 
 ## 10. Checklist
 

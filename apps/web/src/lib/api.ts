@@ -6,10 +6,24 @@ import type {
   ClassificationCatalog,
   ClassificationRun,
   ClassificationRunSummary,
+  DocumentApprovalInput,
+  DocumentCatalog,
+  DocumentDetail,
+  DocumentRestoreInput,
+  DocumentRevisionDetail,
+  DocumentRevisionSummary,
+  DocumentSaveInput,
+  DocumentVersion,
+  DocumentVersionInput,
+  CreateBundleExportInput,
+  CreateDocumentExportInput,
+  CreateSummaryExportInput,
+  ExportJobSummary,
   LoginInput,
   LoginResponse,
   MfaSetupResponse,
   OrganizationDetail,
+  OrganizationLogoUploadInput,
   OrganizationSummary,
   RegisterInput,
   SelectOrganizationInput,
@@ -205,6 +219,12 @@ export const organizationsApi = {
   list: () => request<OrganizationSummary[]>('/organizations'),
   create: (input: { name: string; countryCode?: string }) =>
     request<OrganizationDetail>('/organizations', { method: 'POST', ...jsonBody(input) }),
+  uploadLogo: (organizationId: string, input: OrganizationLogoUploadInput) =>
+    request<OrganizationDetail>(`/organizations/${organizationId}/logo`, {
+      method: 'POST',
+      ...jsonBody(input),
+    }),
+  logo: (organizationId: string) => requestBlob(`/organizations/${organizationId}/logo`),
 };
 
 export const usersApi = {
@@ -223,4 +243,55 @@ export const classificationApi = {
   create: (input: ClassificationAnswers) =>
     request<ClassificationRun>('/classification/runs', { method: 'POST', ...jsonBody(input) }),
   downloadPdf: (runId: string) => requestBlob(`/classification/runs/${runId}/summary.pdf`),
+};
+
+export const documentsApi = {
+  catalog: () => request<DocumentCatalog>('/documents'),
+  open: (templateKey: string) =>
+    request<DocumentDetail>('/documents', { method: 'POST', ...jsonBody({ templateKey }) }),
+  detail: (documentId: string) => request<DocumentDetail>(`/documents/${documentId}`),
+  save: (documentId: string, input: DocumentSaveInput) =>
+    request<DocumentDetail>(`/documents/${documentId}`, { method: 'PATCH', ...jsonBody(input) }),
+  lock: (documentId: string) =>
+    request<DocumentDetail>(`/documents/${documentId}/lock`, { method: 'POST' }),
+  unlock: (documentId: string) =>
+    request<DocumentDetail>(`/documents/${documentId}/lock`, { method: 'DELETE' }),
+  revisions: (documentId: string) =>
+    request<DocumentRevisionSummary[]>(`/documents/${documentId}/revisions`),
+  revision: (documentId: string, revisionNo: number) =>
+    request<DocumentRevisionDetail>(`/documents/${documentId}/revisions/${revisionNo}`),
+  restore: (documentId: string, revisionNo: number, input: DocumentRestoreInput) =>
+    request<DocumentDetail>(`/documents/${documentId}/revisions/${revisionNo}/restore`, {
+      method: 'POST',
+      ...jsonBody(input),
+    }),
+  versions: (documentId: string) => request<DocumentVersion[]>(`/documents/${documentId}/versions`),
+  publish: (documentId: string, input: DocumentVersionInput) =>
+    request<DocumentDetail>(`/documents/${documentId}/versions`, {
+      method: 'POST',
+      ...jsonBody(input),
+    }),
+  approve: (documentId: string, versionId: string, input: DocumentApprovalInput) =>
+    request<DocumentDetail>(`/documents/${documentId}/versions/${versionId}/approve`, {
+      method: 'POST',
+      ...jsonBody(input),
+    }),
+};
+
+export const exportsApi = {
+  list: () => request<ExportJobSummary[]>('/exports'),
+  get: (jobId: string) => request<ExportJobSummary>(`/exports/${jobId}`),
+  createDocument: (documentId: string, input: CreateDocumentExportInput) =>
+    request<ExportJobSummary>(`/exports/documents/${documentId}`, {
+      method: 'POST',
+      ...jsonBody(input),
+    }),
+  createBundle: (input: CreateBundleExportInput) =>
+    request<ExportJobSummary>('/exports/all', { method: 'POST', ...jsonBody(input) }),
+  createSummary: (input: CreateSummaryExportInput) =>
+    request<ExportJobSummary>('/exports/compliance-summary', {
+      method: 'POST',
+      ...jsonBody(input),
+    }),
+  download: (jobId: string) => requestBlob(`/exports/${jobId}/download`),
 };

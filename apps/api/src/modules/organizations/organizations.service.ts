@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import type { GlobalRole, MembershipRole } from '@prisma/client';
 import {
@@ -10,6 +12,7 @@ import {
   type InviteInput,
   type InviteSummary,
   type OrganizationDetail,
+  type OrganizationLogoUploadInput,
   type OrganizationMember,
   type OrganizationSummary,
   type UpdateMemberRoleInput,
@@ -19,6 +22,7 @@ import { AuditService } from '../../common/audit/audit.service';
 import { TokenService } from '../../common/crypto/token.service';
 import { uuidv7 } from '../../common/id';
 import { MailService } from '../../common/mail/mail.service';
+import { StorageService, type StoredObject } from '../../common/storage/storage.service';
 import { TenantPrismaService } from '../../common/tenancy/tenant-prisma.service';
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -40,6 +44,7 @@ export class OrganizationsService {
     private readonly tokens: TokenService,
     private readonly mail: MailService,
     private readonly audit: AuditService,
+    private readonly storage: StorageService,
   ) {}
 
   async list(actor: OrgActor): Promise<OrganizationSummary[]> {
@@ -147,6 +152,90 @@ export class OrganizationsService {
       membershipRole: membership?.role ?? null,
       memberCount,
     };
+  }
+
+  async uploadLogo(
+    actor: OrgActor,
+    organizationId: string,
+    input: OrganizationLogoUploadInput,
+  ): Promise<OrganizationDetail> {
+    await this.requireOwner(actor, organizationId);
+    if (!this.storage.isConfigured()) {
+      throw new ServiceUnavailableException({
+        code: 'STORAGE_UNAVAILABLE',
+        message: 'Object storage is not configured',
+      });
+    }
+    const buffer = Buffer.from(input.dataBase64, 'base64');
+    if (buffer.length === 0 || buffer.length > 2 * 1024 * 1024) {
+      throw new BadRequestException({
+        code: 'LOGO_INVALID',
+        message: 'The logo must be a PNG or JPEG file up to 2 MB',
+      });
+    }
+    const isPng =
+      buffer.length > 8 &&
+      buffer[0] === 0x89 &&
+      buffer[1] === 0x50 &&
+      buffer[2] === 0x4e &&
+      buffer[3] === 0x47;
+    const isJpeg =
+      buffer.length > 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+    if (
+      (input.mimeType === 'image/png' && !isPng) ||
+      (input.mimeType === 'image/jpeg' && !isJpeg)
+    ) {
+      throw new BadRequestException({
+        code: 'LOGO_INVALID',
+        message: 'The uploaded file content does not match the declared image type',
+      });
+    }
+
+    const organization = await this.tenantPrisma.runInTenant(organizationId, actor.userId, (tx) =>
+      tx.organization.findUnique({ where: { id: organizationId } }),
+    );
+    if (!organization) {
+      throw new NotFoundException({ code: 'NOT_FOUND', message: 'Organization not found' });
+    }
+    const extension = input.mimeType === 'image/png' ? 'png' : 'jpg';
+    const key = `org/${organizationId}/branding/logo-${Date.now()}.${extension}`;
+    await this.storage.putObject(key, buffer, input.mimeType);
+    await this.tenantPrisma.runInTenant(organizationId, actor.userId, (tx) =>
+      tx.organization.update({ where: { id: organizationId }, data: { logoKey: key } }),
+    );
+    if (organization.logoKey && organization.logoKey !== key) {
+      await this.storage.deleteObject(organization.logoKey).catch(() => undefined);
+    }
+    await this.audit.record({
+      action: 'ORGANIZATION_LOGO_UPDATED',
+      actorUserId: actor.userId,
+      actorRole: actor.globalRole,
+      organizationId,
+      resourceType: 'organization',
+      resourceId: organizationId,
+      metadata: { mimeType: input.mimeType, sizeBytes: buffer.length },
+      ip: actor.ip,
+      userAgent: actor.userAgent,
+      correlationId: actor.correlationId,
+    });
+    return this.get(actor, organizationId);
+  }
+
+  async logo(actor: OrgActor, organizationId: string): Promise<StoredObject> {
+    await this.requireAccess(actor, organizationId);
+    if (!this.storage.isConfigured()) {
+      throw new ServiceUnavailableException({
+        code: 'STORAGE_UNAVAILABLE',
+        message: 'Object storage is not configured',
+      });
+    }
+    const organization = await this.tenantPrisma.runInTenant(organizationId, actor.userId, (tx) =>
+      tx.organization.findUnique({ where: { id: organizationId } }),
+    );
+    if (!organization?.logoKey) {
+      throw new NotFoundException({ code: 'LOGO_NOT_FOUND', message: 'No logo uploaded' });
+    }
+    return this.storage.getObject(organization.logoKey);
   }
 
   async update(

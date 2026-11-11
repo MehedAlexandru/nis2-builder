@@ -4,7 +4,8 @@
 FROM node:20-alpine AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
-RUN corepack enable && corepack prepare pnpm@10.34.9 --activate
+RUN corepack enable && corepack prepare pnpm@10.34.9 --activate \
+  && apk add --no-cache font-dejavu
 WORKDIR /app
 
 # Install with the lockfile before copying sources for better layer caching.
@@ -35,6 +36,7 @@ ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@10.34.9 --activate \
+  && apk add --no-cache font-dejavu \
   && addgroup -S app && adduser -S app -G app
 COPY --from=build --chown=app:app /app /app
 USER app

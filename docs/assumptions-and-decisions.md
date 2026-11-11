@@ -42,13 +42,13 @@
 | Local scanning from a browser is impossible            | Outbound-only agent + Nmap XML/CSV/manual fallbacks; MAC/L2 limitation explained | Agent skeleton in Phase 0; active discovery Phase 6 |
 | Tenancy undefined                                      | Organizations + memberships + RLS                                                | Schema and RLS done; runtime guards Phase 1         |
 | Admin access vs GDPR                                   | Mandatory audit entries, read-only impersonation, customer-visible log           | Audit schema/trigger done; admin UI Phase 8         |
-| Classification must drive documentation                | `classification_runs` versioned; required documents computed from result         | Phase 2/3                                           |
+| Classification must drive documentation                | `classification_runs` versioned; required documents computed from result         | Done (Phases 2-3)                                   |
 | Duplicate data entry                                   | Shared `suppliers`, `devices`, `risk_register_entries`                           | Schema done                                         |
 | Completion checkbox on empty devices                   | Required-field rules per device type + completeness                              | Phase 5                                             |
 | Rescans destroying manual layout                       | Diff/merge model with new/missing/changed proposals                              | Phase 6                                             |
 | Audits comparable over time                            | Dated `audits` snapshots                                                         | Schema done                                         |
 | Review cycles and reminders                            | `nextReviewDate`, notifications, cron jobs                                       | Schema done; Phase 8                                |
-| Concurrent editing                                     | Lock owner/expiry + optimistic concurrency                                       | Schema done; Phase 3                                |
+| Concurrent editing                                     | Lock owner/expiry + optimistic concurrency                                       | Done (Phase 3)                                      |
 | Platform is high-value target                          | ASVS L2, RLS, encryption, signed images, SBOM                                    | Baseline in Phase 0; full by Phase 9                |
 | Legal accuracy risk                                    | Versioned data packs, review status, disclaimer                                  | Policy + metadata in Phase 0                        |
 | Incident reporting is operational, not just documented | Stretch incident register with 24h/72h/1-month timers                            | Stretch; data model compatible                      |
@@ -162,7 +162,7 @@
     2003/361/EC approach: linked at 100%, partners pro rata to ownership. Users can still choose
     autonomous when no consolidation is required.
 48. **Classification runs store a document applicability snapshot** (`applicability` JSON) and the
-    matching `ruleId`/`reasonKey`. Phase 3 will consume the snapshot; historical runs are never
+    matching `ruleId`/`reasonKey`. Phase 3 consumes the snapshot; historical runs are never
     recomputed against a newer pack.
 49. **The Phase 2 PDF summary is server-rendered with PDFKit** and an ASCII-safe standard font.
     Phase 4 replaces it with the canonical DOCX/PDF renderer and embedded brand fonts; the content
@@ -170,6 +170,47 @@
 50. **A failed or ambiguous classification never coerces certainty.** Missing data or Member-State
     designation criteria produce `LIKELY_IN_SCOPE` with a confirmation message and no invented fine
     ceiling.
+51. **Document templates are authored as typed data, stored as JSONB.** The catalogue lives in
+    `packages/shared/src/data/document-templates/catalog.ts`; the API, form renderer and future
+    exports read the stored JSON definition. No document gets a hand-coded form.
+52. **A save creates a revision only when the payload or lifecycle fields change.** No-op autosaves
+    return the current document; the first revision is created when the document is opened.
+53. **Document lifecycle status is derived, not manually selected.** Overdue review or a template
+    version change produces `NEEDS_REVIEW`; 100% weighted completion produces `COMPLETE`.
+54. **Optimistic concurrency plus a 10-minute edit lock prevents silent overwrites.** A stale
+    `expectedRevisionNo` returns `409 DOCUMENT_CONFLICT`; another editor gets `409 DOCUMENT_LOCKED`
+    and a read-only view. There is deliberately no force-overwrite path in Phase 3.
+55. **Named versions pin a revision; approvals are evidence, not qualified e-signatures.** The
+    approval stores approver, role, comment, timestamp and optional signature JSON. A qualified
+    e-signature provider is a later integration decision.
+56. **Attachment upload remains deferred beyond Phase 4.** Templates may declare attachment fields,
+    but exports show a platform-reference note until S3 storage, MIME/size checks and malware
+    scanning exist. Phase 4 enabled private storage for exports and organization logos only.
+57. **Company profile data is read-only for prefill in Phase 3.** Classification updates the profile;
+    a dedicated profile editor will follow. Assets and suppliers become shared entities in Phase 5.
+58. **Review reminders are Phase 7, but the document card already computes overdue state.** Email
+    and in-app notifications will use `NotificationType.REVIEW_DUE` without changing the document
+    contract.
+59. **Exports are queued jobs, rendered by the worker, not in the request path.** The API creates a
+    tenant-scoped `export_jobs` row and enqueues its id; the worker renders, uploads and marks it
+    `READY` or `FAILED`. Failed jobs retain a bounded error message.
+60. **DOCX and PDF share a canonical `ExportDocumentModel`, but PDF uses PDFKit rather than headless
+    Chromium.** This avoids a large Chromium sidecar and keeps rendering deterministic; the same
+    model can later feed an HTML/Chromium renderer without changing templates.
+61. **Exports and logos live in private S3-compatible storage and are downloaded through authenticated
+    API streams.** No public bucket policy or long-lived presigned URL is used. S3 keys include the
+    organization id and export job id.
+62. **Organization logo upload is a JSON base64 payload limited to 2 MB with magic-byte checks.**
+    SVG is deliberately rejected because it can contain active content. The logo is not treated as
+    an attachment and has no malware scanner yet.
+63. **The ZIP bundle contains every active template, including drafts for documents not started.**
+    This makes handover complete; the compliance summary still distinguishes missing/outstanding
+    work.
+64. **The compliance summary reports preparation status, not a legal conclusion.** It shows the
+    classification snapshot, progress and outstanding required fields while retaining the legal
+    disclaimer.
+65. **The DOCX TOC is a Word field and may prompt the user to update fields on open.** The PDF TOC is
+    rendered with final page numbers; both list the same sections.
 
 ## 5. Open decisions for later phases (not blocking)
 
@@ -186,3 +227,6 @@
 | ---------- | ----------------------------------------------------------------------------------------- |
 | 2026-11-10 | Phase 0 decisions recorded; five blocking questions resolved.                             |
 | 2026-11-11 | Phase 1 decisions recorded (auth, sessions, MFA, RLS path, runtime role, dev MinIO fork). |
+| 2026-11-11 | Phase 2 classification pack, rules engine and document applicability snapshot recorded.   |
+| 2026-11-11 | Phase 3 template catalogue, revisions, locks, versions and approval decisions recorded.   |
+| 2026-11-11 | Phase 4 queued exports, shared content model, PDFKit decision, private S3 and ZIP bundle. |

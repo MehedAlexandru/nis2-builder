@@ -110,10 +110,17 @@ and CSRF, rate limits, input validation, file scanning and least-privilege runti
 
 - Zod schemas shared by API and SPA; unknown keys rejected; pagination capped at 100.
 - Output encoding is handled by React; no `dangerouslySetInnerHTML` for user content.
-- Rich text (Phase 3) is sanitized server-side with an allowlist before storage/export.
+- Rich-text template fields are stored and rendered as plain text in Phase 3; a sanitized WYSIWYG
+  allowlist will be added with the Phase 4 renderer. Unknown document payload field keys are
+  rejected server-side.
 - Uploads: allowlisted MIME + extension, size limit, magic-byte check, antivirus scan (ClamAV
   sidecar or provider), private S3 bucket, short-lived signed URLs, `Content-Disposition:
 attachment`.
+- Phase 4 logos accept only PNG/JPEG, maximum 2 MB, with magic-byte validation; SVG is rejected.
+- Export and logo objects are private; downloads are streamed through authenticated, tenant-scoped
+  API endpoints. Bucket listings/public policies are not exposed.
+- DOCX/PDF rendering consumes template data and user text only; no user HTML is executed and no
+  shell/Chromium process is spawned.
 - Nmap XML/CSV imports are parsed with size/depth limits and never executed.
 
 ## 9. Logging, audit and monitoring
@@ -135,6 +142,20 @@ attachment`.
 - Breach notification procedure for the platform itself (see runbook).
 - Admin access transparency via the customer-visible audit log.
 
+## 10a. Document editing controls
+
+- Every document read/write is resolved through the active organization membership; every revision,
+  version and approval also carries `organizationId` for RLS.
+- Autosave uses `expectedRevisionNo` as optimistic concurrency and a 10-minute edit lock. A second
+  editor gets a read-only response rather than silently overwriting work.
+- Revisions are immutable; restore appends a new revision. Change notes and changed-field keys are
+  audit evidence.
+- Template payloads are validated against the pinned template definition before save. The API
+  rejects unknown/invalid fields at the Zod boundary and the renderer escapes rich text as plain
+  content until a sanitized rich-text editor is introduced.
+- Attachment fields are placeholders in Phase 3; upload, MIME/size validation, malware scanning and
+  encrypted S3 storage are required before they are enabled in Phase 4.
+
 ## 11. Supply chain and CI
 
 - Lockfile committed; Dependabot weekly.
@@ -154,7 +175,7 @@ attachment`.
 - [ ] Tests: cross-tenant negative test and role-escalation test.
 - [ ] i18n: both languages.
 
-## 13. Known gaps after Phase 1 (tracked)
+## 13. Known gaps after Phase 4 (tracked)
 
 1. DB-backed authorization/RLS integration tests in CI (non-superuser role, cross-tenant matrix).
 2. Instant access-token revocation: sessions kill refresh tokens immediately; access tokens expire
@@ -162,6 +183,13 @@ attachment`.
 3. Password-reset/verification token cleanup job.
 4. CSP for the SPA is set in nginx; the API disables CSP in development only to serve Swagger.
 5. Base images are tag-pinned, not digest-pinned; signing/SBOM in Phase 9.
-6. No automated axe/Playwright security tests yet (Phase 3/9).
-7. The dev Compose stack uses the PostgreSQL superuser; production must use
+6. No automated axe/Playwright security tests yet (Phase 9); document flows have component tests
+   and a Docker smoke test.
+7. Document attachment upload and malware scanning are still not enabled; only logos and generated
+   exports use object storage.
+8. Document template legal content is pending legal review.
+9. The dev Compose stack uses the PostgreSQL superuser; production must use
    `prisma:setup-runtime-role` and `APP_DATABASE_URL`.
+10. Export artifact retention/cleanup and object lifecycle rules are not implemented yet.
+11. PDF visual regression and LibreOffice-headless export tests are still Phase 9 work; current
+    renderer tests validate OOXML/PDF structure, styles and embedded content.
