@@ -1,6 +1,10 @@
+import { hash } from '@node-rs/argon2';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
+
+const DEMO_EMAIL = 'owner@demo.local';
+const DEMO_PASSWORD = process.env.DEMO_OWNER_PASSWORD ?? 'Demo!Passw0rd123';
 
 async function main(): Promise<void> {
   // Metadata only — no legal claims. The Romanian pack remains
@@ -42,7 +46,36 @@ async function main(): Promise<void> {
     },
   });
 
+  // @node-rs/argon2 defaults to Argon2id.
+  const passwordHash = await hash(DEMO_PASSWORD, {
+    memoryCost: 19_456,
+    timeCost: 2,
+    parallelism: 1,
+  });
+
+  const owner = await prisma.user.upsert({
+    where: { email: DEMO_EMAIL },
+    update: { passwordHash, status: 'ACTIVE', emailVerifiedAt: new Date() },
+    create: {
+      email: DEMO_EMAIL,
+      passwordHash,
+      givenName: 'Demo',
+      familyName: 'Owner',
+      globalRole: 'USER',
+      status: 'ACTIVE',
+      emailVerifiedAt: new Date(),
+      locale: 'en',
+    },
+  });
+
+  await prisma.membership.upsert({
+    where: { organizationId_userId: { organizationId: organization.id, userId: owner.id } },
+    update: { role: 'OWNER' },
+    create: { organizationId: organization.id, userId: owner.id, role: 'OWNER' },
+  });
+
   console.log(`[seed] demo organization ready: ${organization.name} (${organization.id})`);
+  console.log(`[seed] demo owner: ${DEMO_EMAIL} / ${DEMO_PASSWORD}`);
 }
 
 main()

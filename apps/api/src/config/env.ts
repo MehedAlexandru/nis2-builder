@@ -24,16 +24,27 @@ const envSchema = z
     METRICS_ENABLED: booleanString(true),
 
     DATABASE_URL: z.string().min(1).default(DEV_DATABASE_URL),
-    APP_DATABASE_URL: z.string().min(1).optional(),
+    APP_DATABASE_URL: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z.string().min(1).optional(),
+    ),
     REDIS_URL: z.string().min(1).default('redis://localhost:6379'),
 
     JWT_ACCESS_SECRET: optionalSecret,
     JWT_REFRESH_SECRET: optionalSecret,
     JWT_ACCESS_TTL_SECONDS: z.coerce.number().int().positive().default(900),
     JWT_REFRESH_TTL_SECONDS: z.coerce.number().int().positive().default(2_592_000),
+    AUTH_ISSUER: z.string().min(1).default('nis2-compass'),
+    AUTH_AUDIENCE: z.string().min(1).default('nis2-compass-web'),
     COOKIE_SECRET: optionalSecret,
+    COOKIE_SECURE: booleanString(true),
     ENCRYPTION_MASTER_KEY: optionalSecret,
     ADMIN_BOOTSTRAP_TOKEN: z.string().min(32).optional(),
+    BREACH_CHECK_ENABLED: booleanString(true),
+    BREACH_CHECK_TIMEOUT_MS: z.coerce.number().int().min(250).max(10_000).default(2_500),
+    ARGON2_MEMORY_KIB: z.coerce.number().int().min(8_192).max(262_144).default(19_456),
+    ARGON2_TIME_COST: z.coerce.number().int().min(2).max(10).default(2),
+    ARGON2_PARALLELISM: z.coerce.number().int().min(1).max(8).default(1),
 
     S3_ENDPOINT: z.string().url().optional(),
     S3_REGION: z.string().default('eu-central-1'),

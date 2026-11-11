@@ -47,22 +47,22 @@ and CSRF, rate limits, input validation, file scanning and least-privilege runti
 
 ## 4. ASVS Level 2 matrix (target)
 
-| ASVS chapter       | Controls                                                               | Phase 0 status                    | Owner phase |
-| ------------------ | ---------------------------------------------------------------------- | --------------------------------- | ----------- |
-| V1 Architecture    | Threat model, secure defaults, trust boundaries                        | Documented here                   | 0           |
-| V2 Authentication  | Argon2id, breach check, MFA, lockout, recovery                         | Designed, not implemented         | 1           |
-| V3 Session         | Rotating refresh tokens, reuse detection, revoke, idle/absolute expiry | Designed                          | 1           |
-| V4 Access control  | Deny by default, tenant scoping, RLS, admin auditing                   | RLS in place; guards next         | 1           |
-| V5 Validation      | Zod everywhere, shared schemas, file type/size limits                  | Pipe + shared schemas in place    | 1–5         |
-| V6 Cryptography    | TLS 1.2+, AES-256-GCM envelope encryption, KMS                         | Design + key config               | 1/7         |
-| V7 Error/logging   | Generic errors, correlation IDs, no secrets in logs                    | Implemented                       | 0           |
-| V8 Data protection | Classification, retention, encrypted attachments                       | Schema + map                      | 3/7         |
-| V9 Communication   | TLS, HSTS, strict CORS, secure cookies                                 | Headers in place; cookies Phase 1 | 1           |
-| V10 Malicious code | Signed images, SBOM, dependency scanning                               | CI skeleton; signing Phase 9      | 9           |
-| V11 Business logic | Server-side authorization, state transitions                           | Module boundaries                 | 1–8         |
-| V12 Files          | Upload scanning, content-type allowlist, size limits, private storage  | Design                            | 3/5         |
-| V13 API            | OpenAPI, schema validation, rate limits, pagination caps               | Contract + validation             | 1+          |
-| V14 Config         | Secrets management, least privilege, hardened images                   | Env validation + non-root         | 1/9         |
+| ASVS chapter       | Controls                                                               | Phase 0 status                                | Owner phase |
+| ------------------ | ---------------------------------------------------------------------- | --------------------------------------------- | ----------- |
+| V1 Architecture    | Threat model, secure defaults, trust boundaries                        | Documented here                               | 0           |
+| V2 Authentication  | Argon2id, breach check, MFA, lockout, recovery                         | **Implemented**                               | 1           |
+| V3 Session         | Rotating refresh tokens, reuse detection, revoke, idle/absolute expiry | **Implemented** (TTL-bounded access)          | 1           |
+| V4 Access control  | Deny by default, tenant scoping, RLS, admin auditing                   | **Implemented** (guards + user RLS path)      | 1           |
+| V5 Validation      | Zod everywhere, shared schemas, file type/size limits                  | Pipe + shared schemas in place                | 1–5         |
+| V6 Cryptography    | TLS 1.2+, AES-256-GCM envelope encryption, KMS                         | Design + key config                           | 1/7         |
+| V7 Error/logging   | Generic errors, correlation IDs, no secrets in logs                    | Implemented                                   | 0           |
+| V8 Data protection | Classification, retention, encrypted attachments                       | Schema + map                                  | 3/7         |
+| V9 Communication   | TLS, HSTS, strict CORS, secure cookies                                 | **Implemented** (`COOKIE_SECURE`)             | 1           |
+| V10 Malicious code | Signed images, SBOM, dependency scanning                               | CI skeleton; signing Phase 9                  | 9           |
+| V11 Business logic | Server-side authorization, state transitions                           | Module boundaries                             | 1–8         |
+| V12 Files          | Upload scanning, content-type allowlist, size limits, private storage  | Design                                        | 3/5         |
+| V13 API            | OpenAPI, schema validation, rate limits, pagination caps               | Contract + validation; auth throttles         | 1+          |
+| V14 Config         | Secrets management, least privilege, hardened images                   | Env validation, runtime role script, non-root | 1/9         |
 
 ## 5. Authentication and session design (Phase 1)
 
@@ -153,11 +153,14 @@ attachment`.
 - [ ] Tests: cross-tenant negative test and role-escalation test.
 - [ ] i18n: both languages.
 
-## 13. Known Phase 0 gaps (tracked)
+## 13. Known gaps after Phase 1 (tracked)
 
-1. Runtime DB role separation and the Prisma tenant extension (Phase 1).
-2. Auth, MFA, CSRF, rate limiting and session revocation (Phase 1).
-3. CSP for the SPA is set in nginx; the API disables CSP in development only to serve Swagger.
-4. Base images are tag-pinned, not digest-pinned; signing/SBOM in Phase 9.
-5. No automated axe/Playwright security tests yet (Phase 3/9).
-6. The dev Compose stack uses the PostgreSQL superuser; do not use it as a production template.
+1. DB-backed authorization/RLS integration tests in CI (non-superuser role, cross-tenant matrix).
+2. Instant access-token revocation: sessions kill refresh tokens immediately; access tokens expire
+   within 15 minutes.
+3. Password-reset/verification token cleanup job.
+4. CSP for the SPA is set in nginx; the API disables CSP in development only to serve Swagger.
+5. Base images are tag-pinned, not digest-pinned; signing/SBOM in Phase 9.
+6. No automated axe/Playwright security tests yet (Phase 3/9).
+7. The dev Compose stack uses the PostgreSQL superuser; production must use
+   `prisma:setup-runtime-role` and `APP_DATABASE_URL`.

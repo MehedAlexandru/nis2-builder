@@ -8,7 +8,11 @@
     "primaryLabel": "Primary",
     "home": "Home",
     "design": "Design system",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "register": "Create account",
+    "dashboard": "Dashboard",
+    "organizations": "Organizations",
+    "sessions": "Sessions"
   },
   "actions": {
     "startClassification": "Start classification",
@@ -60,6 +64,191 @@
       "api": "NestJS API shell with Prisma, Redis and health checks"
     },
     "disclaimerTitle": "Legal notice"
+  },
+  "auth": {
+    "logout": "Sign out",
+    "noActiveOrganization": "No organization selected",
+    "roles": {
+      "owner": "Owner",
+      "member": "Member"
+    },
+    "scopeMode": {
+      "mandatory": "NIS2 mandatory",
+      "voluntary": "Good practice"
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "passwordHint": "At least 12 characters. Length matters more than symbols.",
+      "givenName": "First name",
+      "familyName": "Last name",
+      "organizationName": "Organization name",
+      "country": "Country"
+    },
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "INVALID_CREDENTIALS": "Invalid email or password.",
+      "EMAIL_NOT_VERIFIED": "Verify your email address before signing in.",
+      "ACCOUNT_LOCKED": "Too many attempts. Try again later.",
+      "RATE_LIMITED": "Too many attempts. Try again later.",
+      "PASSWORD_BREACHED": "This password appears in known breaches. Choose a different one.",
+      "PASSWORD_TOO_SHORT": "The password is too short.",
+      "VALIDATION_ERROR": "Please check the form and try again.",
+      "CSRF_INVALID": "Your session expired. Reload the page and try again.",
+      "MFA_INVALID_CODE": "Invalid code. Check your authenticator app and try again.",
+      "MFA_SETUP_EXPIRED": "The MFA setup expired. Start again.",
+      "INVALID_TOKEN": "This link is invalid or has expired.",
+      "INVALID_INVITE": "This invitation is invalid or has expired.",
+      "ACCOUNT_EXISTS": "An account already exists for this email.",
+      "FORBIDDEN": "You do not have permission for this action.",
+      "OWNER_REQUIRED": "Only an owner can perform this action.",
+      "LAST_OWNER": "The organization must keep at least one owner.",
+      "ALREADY_MEMBER": "This person is already a member."
+    },
+    "login": {
+      "title": "Sign in",
+      "description": "Continue your NIS2 readiness workspace.",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "noAccount": "No account yet?",
+      "createAccount": "Create one",
+      "forgotPassword": "Forgot your password?",
+      "resendVerification": "Resend verification email"
+    },
+    "register": {
+      "title": "Create your workspace",
+      "description": "Start by creating your organization. You can invite colleagues after verifying your email.",
+      "submit": "Create account",
+      "submitting": "Creating account…",
+      "haveAccount": "Already have an account?",
+      "checkEmailTitle": "Check your email",
+      "checkEmailBody": "If {{email}} is new, we sent a verification link. It expires in 24 hours.",
+      "backToLogin": "Back to sign in"
+    },
+    "verify": {
+      "title": "Verify your email",
+      "description": "Confirm your address to activate your account.",
+      "resend": "Resend verification email",
+      "working": "Verifying your email…",
+      "success": "Email verified. You can now sign in.",
+      "error": "The verification link is invalid or has expired.",
+      "resent": "If the account needs verification, a new message has been sent."
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "description": "Enter your email and we will send a reset link if the account exists.",
+      "submit": "Send reset link",
+      "sent": "If the account exists, a reset message has been sent."
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "description": "Set a new password for your account.",
+      "submit": "Update password",
+      "mismatch": "The passwords do not match.",
+      "invalidLink": "This reset link is invalid. Request a new one."
+    },
+    "invite": {
+      "title": "Accept your invitation",
+      "description": "Create your account to join the organization.",
+      "submit": "Accept invitation",
+      "invalidLink": "This invitation link is invalid or has expired."
+    },
+    "mfa": {
+      "challengeTitle": "Two-factor verification",
+      "challengeDescription": "Enter the 6-digit code from your authenticator app.",
+      "codeLabel": "Authentication code",
+      "codeHint": "You can also use one of your recovery codes.",
+      "verify": "Verify",
+      "missingChallenge": "This verification step has expired. Sign in again.",
+      "setupTitle": "Set up two-factor authentication",
+      "setupDescription": "Administrators must use TOTP. Add the secret to your authenticator app, then confirm a code.",
+      "missingSetup": "This setup step has expired. Sign in again.",
+      "setupInstructions": "Add this secret to your authenticator app (or use the otpauth URI), then enter the generated code.",
+      "secretTitle": "Secret",
+      "secretHint": "Keep this secret private. Store the recovery codes somewhere safe; they are shown only once.",
+      "recoveryCodesTitle": "Recovery codes",
+      "recoveryCodesHint": "Each code can be used once if you lose access to your authenticator.",
+      "preparing": "Preparing your MFA secret…",
+      "activateCodeLabel": "Code from your authenticator",
+      "activate": "Enable MFA"
+    },
+    "dashboard": {
+      "welcome": "Welcome, {{name}}",
+      "title": "Compliance workspace",
+      "subtitle": "Your organization's NIS2 readiness at a glance.",
+      "manageOrganizations": "Manage organizations",
+      "overallProgress": "Overall compliance progress",
+      "selectOrganizationTitle": "Select an organization",
+      "selectOrganizationBody": "Choose which organization to work in.",
+      "noOrganizationBody": "Create your first organization to get started.",
+      "modulesTitle": "Modules",
+      "modules": {
+        "classification": {
+          "title": "Entity classification",
+          "description": "Determine whether NIS2 applies and whether you are essential or important."
+        },
+        "documents": {
+          "title": "Documentation centre",
+          "description": "Build the required documents with versioning and professional exports."
+        },
+        "audit": {
+          "title": "Security audit",
+          "description": "Map your network, assess devices and track findings."
+        }
+      },
+      "phases": {
+        "classification": "Phase 2",
+        "documents": "Phase 3",
+        "audit": "Phase 5"
+      },
+      "nextActionsTitle": "Next best actions",
+      "actions": {
+        "profile": {
+          "title": "Complete your profile",
+          "description": "Review your name, locale and timezone."
+        },
+        "security": {
+          "title": "Enable MFA",
+          "description": "Add a second factor to protect your account (required for administrators)."
+        },
+        "organization": {
+          "title": "Invite colleagues",
+          "description": "Owners can invite team members to collaborate."
+        },
+        "invite": {
+          "title": "Start the classification",
+          "description": "Available in Phase 2."
+        }
+      }
+    },
+    "organizations": {
+      "title": "Organizations",
+      "subtitle": "A user can belong to several organizations. Business data is always scoped to one organization.",
+      "yourOrganizations": "Your organizations",
+      "empty": "You are not a member of any organization yet.",
+      "active": "Active",
+      "current": "Current",
+      "select": "Switch to this organization",
+      "createTitle": "Create another organization",
+      "createSubmit": "Create organization",
+      "status": {
+        "active": "Active",
+        "suspended": "Suspended"
+      }
+    },
+    "sessions": {
+      "title": "Active sessions",
+      "subtitle": "Review the devices signed in to your account and revoke anything you do not recognize.",
+      "loading": "Loading sessions…",
+      "empty": "No active sessions.",
+      "unknownDevice": "Unknown device",
+      "lastSeen": "Last seen",
+      "thisDevice": "This device",
+      "revoke": "Revoke",
+      "started": "Started"
+    }
   },
   "design": {
     "title": "Design system",

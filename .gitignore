@@ -46,6 +46,7 @@ Thumbs.db
 .eslintcache
 .cache/
 .tmp/
+.pnpm-store/
 
 # Go
 apps/scanner-agent/bin/

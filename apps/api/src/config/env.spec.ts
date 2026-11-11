@@ -20,6 +20,11 @@ describe('validateEnv', () => {
     expect(env.SMTP_SECURE).toBe(true);
   });
 
+  it('treats an empty APP_DATABASE_URL as unset', () => {
+    const env = validateEnv({ APP_DATABASE_URL: '' });
+    expect(env.APP_DATABASE_URL).toBeUndefined();
+  });
+
   it('rejects an invalid port', () => {
     expect(() => validateEnv({ API_PORT: 'not-a-port' })).toThrow(/API_PORT/);
     expect(() => validateEnv({ API_PORT: '70000' })).toThrow(/API_PORT/);

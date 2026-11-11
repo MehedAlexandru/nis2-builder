@@ -7,6 +7,11 @@ import { SwaggerModule } from '@nestjs/swagger';
 
 // Must be set before AppModule is imported: the queue module is conditional.
 process.env.ENABLE_QUEUES = 'false';
+// The contract build does not handle requests; provide non-secret placeholders
+// so provider factories can be constructed without deployment secrets.
+process.env.JWT_ACCESS_SECRET ??= 'openapi-contract-generation-secret-not-for-runtime';
+process.env.COOKIE_SECRET ??= 'openapi-contract-generation-cookie-secret';
+process.env.ENCRYPTION_MASTER_KEY ??= Buffer.alloc(32, 1).toString('base64');
 
 async function main(): Promise<void> {
   const [{ AppModule }, { swaggerConfig }] = await Promise.all([

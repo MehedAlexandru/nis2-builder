@@ -228,7 +228,9 @@ model Organization {
   trainingRecords   TrainingRecord[]
   notifications     Notification[]
   exportJobs        ExportJob[]
-  auditLogs         AuditLog[]
+
+  // audit_log has no FK to organizations: the trail is append-only and must
+  // survive tenant/account deletion without triggering SET NULL updates.
 
   @@map("organizations")
 }
@@ -258,7 +260,6 @@ model User {
   sessions                Session[]
   passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
-  auditLogs               AuditLog[]               @relation("AuditLogActor")
   notifications           Notification[]
   approvals               Approval[]
   lockedDocuments         Document[]               @relation("DocumentLock")
@@ -324,6 +325,7 @@ model RefreshToken {
 model Session {
   id             String    @id @default(uuid(7))
   userId         String
+  organizationId String?
   refreshTokenId String?   @unique
   userAgent      String?
   ip             String?
@@ -334,6 +336,7 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([organizationId])
   @@map("sessions")
 }
 
@@ -344,6 +347,7 @@ model MfaFactor {
   secretEncrypted   String
   recoveryCodesHash String[]
   verifiedAt        DateTime?
+  lastUsedStep      Int?
   createdAt         DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -394,8 +398,9 @@ model AuditLog {
   correlationId  String?
   createdAt      DateTime    @default(now())
 
-  actor        User?         @relation("AuditLogActor", fields: [actorUserId], references: [id], onDelete: SetNull)
-  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  // Intentionally no foreign keys: actorUserId/organizationId are immutable
+  // denormalized references. SET NULL referential actions would fire the
+  // append-only trigger and break legitimate account/organization deletion.
 
   @@index([organizationId, createdAt])
   @@index([actorUserId, createdAt])

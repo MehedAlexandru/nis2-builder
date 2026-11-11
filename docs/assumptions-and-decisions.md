@@ -121,6 +121,34 @@
     product and legal constraint, not a temporary limitation.
 30. **Out-of-scope mode uses the same document templates** marked voluntary, so SMEs can adopt good
     practice without pretending NIS2 applies.
+31. **Argon2id is provided by `@node-rs/argon2`** (prebuilt binaries, no compiler in the runtime
+    image). Memory/time/parallelism are environment-configurable.
+32. **Access tokens are HS256 JWTs; refresh tokens are opaque 256-bit values** stored as SHA-256
+    hashes. The refresh cookie is `HttpOnly; SameSite=Strict; Path=/api/auth`.
+33. **CSRF uses double-submit** (readable cookie + `X-CSRF-Token`). Registration, verification,
+    login, recovery and MFA setup/challenge are exempt because no session token exists yet.
+34. **Breach-check failure policy is fail-open with a warning**; `BREACH_CHECK_ENABLED=false` covers
+    air-gapped deployments. A detected breach always rejects the password.
+35. **Revoking a session invalidates refresh tokens immediately**, but an already-issued access token
+    can remain valid for its 15-minute TTL. A denylist is a later hardening option.
+36. **`sessions.organizationId` stores the selected organization.** Multi-organization users receive
+    a token with no active organization until they call `/auth/select-organization`.
+37. **Administrators cannot receive an access token before MFA enrolment.** The bootstrap admin
+    enrols at first login; an admin cannot disable MFA.
+38. **User-scoped RLS path:** `app.user_id` allows organization/membership discovery before an
+    organization is selected; `app.invite_token_hash` allows invite lookup before an account exists.
+39. **Runtime DB role separation is an explicit script**, not an automatic migration, because the
+    role name/password come from deployment secrets. Dev Compose keeps the superuser connection.
+40. **Dev object storage uses the maintained `pgsty/silo` fork** because MinIO removed its community
+    images from Docker Hub and Quay in 2026. The S3 API and on-disk format are compatible.
+41. **Email is provider-agnostic via nodemailer.** Without `SMTP_HOST`, messages are logged (dev) so
+    verification links remain usable.
+42. **Password-reset and email-verification tokens are single-use, hashed and time-limited** (60
+    minutes and 24 hours respectively).
+43. **Account deletion is blocked while the user is the sole owner** of any organization; ownership
+    must be transferred or the organization removed first.
+44. **Audit history survives account deletion** (`actorUserId` is set to null by the FK) so the
+    security trail is not destroyed by GDPR erasure of the profile.
 
 ## 5. Open decisions for later phases (not blocking)
 
@@ -133,6 +161,7 @@
 
 ## 6. Change log
 
-| Date       | Change                                                        |
-| ---------- | ------------------------------------------------------------- |
-| 2026-11-10 | Phase 0 decisions recorded; five blocking questions resolved. |
+| Date       | Change                                                                                    |
+| ---------- | ----------------------------------------------------------------------------------------- |
+| 2026-11-10 | Phase 0 decisions recorded; five blocking questions resolved.                             |
+| 2026-11-11 | Phase 1 decisions recorded (auth, sessions, MFA, RLS path, runtime role, dev MinIO fork). |

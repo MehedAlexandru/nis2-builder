@@ -38,6 +38,10 @@ erDiagram
   USERS ||--o{ AUDIT_LOG : acts
 ```
 
+`audit_log` references users and organizations logically, not through foreign keys: `ON DELETE SET
+NULL` would update the append-only trail and hit its trigger. The UUIDs are retained as immutable
+references when an account or organization is deleted.
+
 ### Company profile, classification and documents
 
 ```mermaid
@@ -104,41 +108,41 @@ supply-chain document are the same row, not duplicates.
 
 ## 3. Entity inventory
 
-| Entity                                                | Purpose                                                 | Key relationships / constraints       |
-| ----------------------------------------------------- | ------------------------------------------------------- | ------------------------------------- |
-| `organizations`                                       | Tenant root; plan, scope mode, jurisdiction             | `slug` unique                         |
-| `users`                                               | Global account, Argon2id hash, global role, MFA flag    | `email` unique                        |
-| `memberships`                                         | User ↔ organization with `OWNER`/`MEMBER`               | unique `(organizationId, userId)`     |
-| `invites`                                             | One-time colleague invitation                           | `tokenHash` unique                    |
-| `refresh_tokens`                                      | Rotating refresh tokens with family reuse detection     | `tokenHash` unique, `familyId` index  |
-| `sessions`                                            | Device/session list and revocation                      | optional `refreshTokenId`             |
-| `mfa_factors`                                         | TOTP secret (encrypted) and hashed recovery codes       | per-user                              |
-| `password_reset_tokens` / `email_verification_tokens` | Single-use, expiring tokens                             | `tokenHash` unique                    |
-| `audit_log`                                           | Append-only security trail; admin cross-tenant access   | trigger blocks UPDATE/DELETE          |
-| `company_profiles`                                    | Shared company identity, contacts, DPO/CISO, size data  | one per organization                  |
-| `classification_runs`                                 | Versioned inputs, result, legal basis, consequences     | unique `(organizationId, version)`    |
-| `jurisdiction_packs`                                  | Versioned legal content as data                         | unique `(code, version)`              |
-| `document_templates`                                  | Versioned JSON form/export definitions                  | `key` unique                          |
-| `documents`                                           | One instance per org/template; payload, status, lock    | unique `(organizationId, templateId)` |
-| `document_revisions`                                  | Immutable save history with changed fields              | unique `(documentId, revisionNo)`     |
-| `document_versions`                                   | Named versions (v1.0, v1.1) and approval state          | unique `(documentId, versionLabel)`   |
-| `approvals`                                           | Approver, signature, comment, date                      | per version                           |
-| `attachments`                                         | S3 objects with hash, scan status, encryption flag      | polymorphic `entityType/entityId`     |
-| `audits`                                              | Dated snapshots with scope, methodology, limitations    | per organization                      |
-| `agents`                                              | Enrollment, token hash, platform, last seen             | `tokenHash` unique                    |
-| `scan_jobs`                                           | Requested/ingested scans and summaries                  | audit/agent optional                  |
-| `zones`                                               | LAN/DMZ/Guest/Server/Cloud containers                   | unique `(auditId, name)`              |
-| `devices`                                             | Identity, network data, layout, completeness            | per audit; MAC index                  |
-| `device_assessments`                                  | Per-tab security posture JSON + completeness            | one per device                        |
-| `connections`                                         | Wired/wireless/VPN edges with speed/VLAN                | source/target devices                 |
-| `findings`                                            | Remediation register, severity, status, risk acceptance | unique `(organizationId, code)`       |
-| `finding_devices`                                     | Explicit many-to-many with `organizationId`             | composite PK                          |
-| `finding_history`                                     | Append-only change log                                  | per finding                           |
-| `risk_register_entries`                               | Risk register fed by findings                           | optional `sourceFindingId`            |
-| `suppliers`                                           | Supplier register with risk rating                      | per organization                      |
-| `training_records`                                    | Awareness/management training log                       | optional user + expiry                |
-| `notifications`                                       | In-app and email reminder state                         | per user                              |
-| `export_jobs`                                         | DOCX/PDF/ZIP/summary job state and artifact key         | per organization                      |
+| Entity                                                | Purpose                                                     | Key relationships / constraints                                                             |
+| ----------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `organizations`                                       | Tenant root; plan, scope mode, jurisdiction                 | `slug` unique                                                                               |
+| `users`                                               | Global account, Argon2id hash, global role, MFA flag        | `email` unique                                                                              |
+| `memberships`                                         | User ↔ organization with `OWNER`/`MEMBER`                   | unique `(organizationId, userId)`                                                           |
+| `invites`                                             | One-time colleague invitation                               | `tokenHash` unique                                                                          |
+| `refresh_tokens`                                      | Rotating refresh tokens with family reuse detection         | `tokenHash` unique, `familyId` index                                                        |
+| `sessions`                                            | Device/session list, selected organization, revocation      | optional `refreshTokenId`                                                                   |
+| `mfa_factors`                                         | TOTP secret (encrypted), hashed recovery codes, replay step | per-user                                                                                    |
+| `password_reset_tokens` / `email_verification_tokens` | Single-use, expiring tokens                                 | `tokenHash` unique                                                                          |
+| `audit_log`                                           | Append-only security trail; admin cross-tenant access       | trigger blocks UPDATE/DELETE; no FKs (immutable denormalized actor/organization references) |
+| `company_profiles`                                    | Shared company identity, contacts, DPO/CISO, size data      | one per organization                                                                        |
+| `classification_runs`                                 | Versioned inputs, result, legal basis, consequences         | unique `(organizationId, version)`                                                          |
+| `jurisdiction_packs`                                  | Versioned legal content as data                             | unique `(code, version)`                                                                    |
+| `document_templates`                                  | Versioned JSON form/export definitions                      | `key` unique                                                                                |
+| `documents`                                           | One instance per org/template; payload, status, lock        | unique `(organizationId, templateId)`                                                       |
+| `document_revisions`                                  | Immutable save history with changed fields                  | unique `(documentId, revisionNo)`                                                           |
+| `document_versions`                                   | Named versions (v1.0, v1.1) and approval state              | unique `(documentId, versionLabel)`                                                         |
+| `approvals`                                           | Approver, signature, comment, date                          | per version                                                                                 |
+| `attachments`                                         | S3 objects with hash, scan status, encryption flag          | polymorphic `entityType/entityId`                                                           |
+| `audits`                                              | Dated snapshots with scope, methodology, limitations        | per organization                                                                            |
+| `agents`                                              | Enrollment, token hash, platform, last seen                 | `tokenHash` unique                                                                          |
+| `scan_jobs`                                           | Requested/ingested scans and summaries                      | audit/agent optional                                                                        |
+| `zones`                                               | LAN/DMZ/Guest/Server/Cloud containers                       | unique `(auditId, name)`                                                                    |
+| `devices`                                             | Identity, network data, layout, completeness                | per audit; MAC index                                                                        |
+| `device_assessments`                                  | Per-tab security posture JSON + completeness                | one per device                                                                              |
+| `connections`                                         | Wired/wireless/VPN edges with speed/VLAN                    | source/target devices                                                                       |
+| `findings`                                            | Remediation register, severity, status, risk acceptance     | unique `(organizationId, code)`                                                             |
+| `finding_devices`                                     | Explicit many-to-many with `organizationId`                 | composite PK                                                                                |
+| `finding_history`                                     | Append-only change log                                      | per finding                                                                                 |
+| `risk_register_entries`                               | Risk register fed by findings                               | optional `sourceFindingId`                                                                  |
+| `suppliers`                                           | Supplier register with risk rating                          | per organization                                                                            |
+| `training_records`                                    | Awareness/management training log                           | optional user + expiry                                                                      |
+| `notifications`                                       | In-app and email reminder state                             | per user                                                                                    |
+| `export_jobs`                                         | DOCX/PDF/ZIP/summary job state and artifact key             | per organization                                                                            |
 
 ## 4. Row Level Security
 
@@ -159,14 +163,20 @@ The API sets the tenant per transaction:
 SET LOCAL app.organization_id = '<organization-uuid>';
 ```
 
-**Phase 1 requirements:**
+**Phase 1 applied (migration `0003_auth_rls`):**
 
-1. Separate migration/seed role from the runtime application role (non-owner, no `BYPASSRLS`).
-2. Prisma client extension that injects `organizationId` into reads/writes and sets `SET LOCAL`.
-3. User-scoped policy path for organization discovery at login (`app.user_id`), before an
-   organization is selected.
-4. Integration tests that run as the non-superuser role and prove cross-tenant reads return zero
-   rows.
+1. `app.current_user_id()` plus user-scoped `organizations` and `memberships` policies allow
+   organization discovery before an organization is selected.
+2. `invites` can be looked up by `app.invite_token_hash` before the account exists.
+3. `audit_log` reads allow the actor as well as the tenant.
+4. `sessions.organizationId` stores the selected organization; `mfa_factors.lastUsedStep` prevents
+   TOTP replay.
+5. `TenantPrismaService` runs tenant/user/invite queries in a transaction with `set_config(...,
+true)`, so context never leaks across pooled connections.
+6. The runtime role is created by `prisma/setup-runtime-role.ts` (LOGIN, NOSUPERUSER, NOBYPASSRLS,
+   minimal DML/execute grants).
+
+Still required: DB-backed integration tests in CI that run as the non-superuser role.
 
 ## 5. Indexing and constraints
 

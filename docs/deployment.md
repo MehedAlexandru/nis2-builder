@@ -76,7 +76,10 @@ All variables are documented in [`.env.example`](../.env.example). Categories:
 - Runtime: `NODE_ENV`, `API_PORT`, `LOG_LEVEL`, `PUBLIC_APP_URL`, `CORS_ORIGINS`, `ENABLE_QUEUES`.
 - Database: `DATABASE_URL` (migrations/owner), `APP_DATABASE_URL` (runtime role, Phase 1).
 - Redis: `REDIS_URL`.
-- Auth (Phase 1): JWT secrets/TTLs, `COOKIE_SECRET`, `ADMIN_BOOTSTRAP_TOKEN`.
+- Auth: `JWT_ACCESS_SECRET`, `JWT_ACCESS_TTL_SECONDS`, `JWT_REFRESH_TTL_SECONDS`,
+  `AUTH_ISSUER`, `AUTH_AUDIENCE`, `COOKIE_SECRET`, `COOKIE_SECURE`, `ENCRYPTION_MASTER_KEY`,
+  `ADMIN_BOOTSTRAP_TOKEN`, `BREACH_CHECK_ENABLED`, Argon2 parameters.
+- Set `COOKIE_SECURE=true` behind HTTPS; only local smoke stacks should use `false`.
 - Encryption: `ENCRYPTION_MASTER_KEY` (dev) / KMS key reference (prod).
 - Object storage: `S3_*`.
 - Email: `SMTP_*`, `MAIL_FROM`.
@@ -98,8 +101,14 @@ Production boot fails fast if secrets are missing, are development placeholders,
   4. remove old columns in a later release.
 - Never edit an applied migration. Restore from backup if a migration fails in production.
 - RLS/trigger migrations are part of the same release as the tables they protect.
-- Runtime role: the API must not connect as the schema owner or a superuser. Phase 1 adds
-  `APP_DATABASE_URL` with a non-owner role and the Prisma tenant extension.
+- Runtime role: the API must not connect as the schema owner or a superuser. Set `APP_DATABASE_URL`
+  to a dedicated role and create it with
+  `pnpm --filter @nis2/api prisma:setup-runtime-role` (LOGIN, NOSUPERUSER, NOBYPASSRLS, DML grants).
+  Application code sets `app.organization_id`/`app.user_id` per transaction and RLS enforces tenant
+  isolation.
+- Administrator bootstrap is CLI-only:
+  `ADMIN_EMAIL=... ADMIN_PASSWORD=... pnpm --filter @nis2/api admin:bootstrap`, with
+  `ADMIN_BOOTSTRAP_TOKEN` present in the environment. The admin enrols TOTP on first login.
 
 ## 6. Kubernetes target (Phase 9)
 

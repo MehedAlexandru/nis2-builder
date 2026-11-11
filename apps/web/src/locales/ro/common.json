@@ -8,7 +8,11 @@
     "primaryLabel": "Principală",
     "home": "Acasă",
     "design": "Sistem de design",
-    "signIn": "Autentificare"
+    "signIn": "Autentificare",
+    "register": "Creează cont",
+    "dashboard": "Panou",
+    "organizations": "Organizații",
+    "sessions": "Sesiuni"
   },
   "actions": {
     "startClassification": "Începe clasificarea",
@@ -60,6 +64,191 @@
       "api": "API NestJS cu Prisma, Redis și verificări de stare"
     },
     "disclaimerTitle": "Notă juridică"
+  },
+  "auth": {
+    "logout": "Deconectare",
+    "noActiveOrganization": "Nicio organizație selectată",
+    "roles": {
+      "owner": "Proprietar",
+      "member": "Membru"
+    },
+    "scopeMode": {
+      "mandatory": "NIS2 obligatoriu",
+      "voluntary": "Bune practici"
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Parolă",
+      "newPassword": "Parolă nouă",
+      "confirmPassword": "Confirmă parola",
+      "passwordHint": "Cel puțin 12 caractere. Lungimea contează mai mult decât simbolurile.",
+      "givenName": "Prenume",
+      "familyName": "Nume",
+      "organizationName": "Numele organizației",
+      "country": "Țară"
+    },
+    "errors": {
+      "generic": "Ceva a mers greșit. Încearcă din nou.",
+      "INVALID_CREDENTIALS": "Email sau parolă incorectă.",
+      "EMAIL_NOT_VERIFIED": "Confirmă adresa de email înainte de autentificare.",
+      "ACCOUNT_LOCKED": "Prea multe încercări. Încearcă mai târziu.",
+      "RATE_LIMITED": "Prea multe încercări. Încearcă mai târziu.",
+      "PASSWORD_BREACHED": "Această parolă apare în scurgeri de date cunoscute. Alege alta.",
+      "PASSWORD_TOO_SHORT": "Parola este prea scurtă.",
+      "VALIDATION_ERROR": "Verifică formularul și încearcă din nou.",
+      "CSRF_INVALID": "Sesiunea a expirat. Reîncarcă pagina și încearcă din nou.",
+      "MFA_INVALID_CODE": "Cod invalid. Verifică aplicația de autentificare.",
+      "MFA_SETUP_EXPIRED": "Configurarea MFA a expirat. Începe din nou.",
+      "INVALID_TOKEN": "Acest link este invalid sau a expirat.",
+      "INVALID_INVITE": "Această invitație este invalidă sau a expirat.",
+      "ACCOUNT_EXISTS": "Există deja un cont pentru acest email.",
+      "FORBIDDEN": "Nu ai permisiunea pentru această acțiune.",
+      "OWNER_REQUIRED": "Doar un proprietar poate face această acțiune.",
+      "LAST_OWNER": "Organizația trebuie să păstreze cel puțin un proprietar.",
+      "ALREADY_MEMBER": "Această persoană este deja membru."
+    },
+    "login": {
+      "title": "Autentificare",
+      "description": "Continuă-ți spațiul de lucru pentru conformitatea NIS2.",
+      "submit": "Autentifică-te",
+      "submitting": "Se autentifică…",
+      "noAccount": "Nu ai cont?",
+      "createAccount": "Creează unul",
+      "forgotPassword": "Ai uitat parola?",
+      "resendVerification": "Retrimite emailul de confirmare"
+    },
+    "register": {
+      "title": "Creează spațiul de lucru",
+      "description": "Începe prin a crea organizația. Poți invita colegi după confirmarea emailului.",
+      "submit": "Creează cont",
+      "submitting": "Se creează contul…",
+      "haveAccount": "Ai deja cont?",
+      "checkEmailTitle": "Verifică emailul",
+      "checkEmailBody": "Dacă {{email}} este nou, am trimis un link de confirmare. Expiră în 24 de ore.",
+      "backToLogin": "Înapoi la autentificare"
+    },
+    "verify": {
+      "title": "Confirmă adresa de email",
+      "description": "Confirmă adresa pentru a activa contul.",
+      "resend": "Retrimite emailul de confirmare",
+      "working": "Se confirmă emailul…",
+      "success": "Email confirmat. Te poți autentifica.",
+      "error": "Linkul de confirmare este invalid sau a expirat.",
+      "resent": "Dacă contul necesită confirmare, a fost trimis un mesaj nou."
+    },
+    "forgot": {
+      "title": "Resetează parola",
+      "description": "Introdu emailul și vom trimite un link de resetare dacă contul există.",
+      "submit": "Trimite linkul de resetare",
+      "sent": "Dacă contul există, a fost trimis un mesaj de resetare."
+    },
+    "reset": {
+      "title": "Alege o parolă nouă",
+      "description": "Setează o parolă nouă pentru cont.",
+      "submit": "Actualizează parola",
+      "mismatch": "Parolele nu coincid.",
+      "invalidLink": "Linkul de resetare este invalid. Solicită unul nou."
+    },
+    "invite": {
+      "title": "Acceptă invitația",
+      "description": "Creează contul pentru a te alătura organizației.",
+      "submit": "Acceptă invitația",
+      "invalidLink": "Linkul invitației este invalid sau a expirat."
+    },
+    "mfa": {
+      "challengeTitle": "Verificare în doi pași",
+      "challengeDescription": "Introdu codul de 6 cifre din aplicația de autentificare.",
+      "codeLabel": "Cod de autentificare",
+      "codeHint": "Poți folosi și un cod de recuperare.",
+      "verify": "Verifică",
+      "missingChallenge": "Acest pas de verificare a expirat. Autentifică-te din nou.",
+      "setupTitle": "Configurează autentificarea în doi pași",
+      "setupDescription": "Administratorii trebuie să folosească TOTP. Adaugă secretul în aplicație, apoi confirmă un cod.",
+      "missingSetup": "Acest pas de configurare a expirat. Autentifică-te din nou.",
+      "setupInstructions": "Adaugă acest secret în aplicația de autentificare (sau folosește URI-ul otpauth), apoi introdu codul generat.",
+      "secretTitle": "Secret",
+      "secretHint": "Păstrează secretul privat. Salvează codurile de recuperare; sunt afișate o singură dată.",
+      "recoveryCodesTitle": "Coduri de recuperare",
+      "recoveryCodesHint": "Fiecare cod poate fi folosit o dată dacă pierzi accesul la aplicație.",
+      "preparing": "Se pregătește secretul MFA…",
+      "activateCodeLabel": "Cod din aplicația de autentificare",
+      "activate": "Activează MFA"
+    },
+    "dashboard": {
+      "welcome": "Bun venit, {{name}}",
+      "title": "Spațiu de conformitate",
+      "subtitle": "Stadiul de pregătire NIS2 al organizației tale, pe scurt.",
+      "manageOrganizations": "Gestionează organizațiile",
+      "overallProgress": "Progres general de conformitate",
+      "selectOrganizationTitle": "Selectează o organizație",
+      "selectOrganizationBody": "Alege organizația în care lucrezi.",
+      "noOrganizationBody": "Creează prima organizație pentru a începe.",
+      "modulesTitle": "Module",
+      "modules": {
+        "classification": {
+          "title": "Clasificarea entității",
+          "description": "Stabilește dacă NIS2 se aplică și dacă ești entitate esențială sau importantă."
+        },
+        "documents": {
+          "title": "Centrul de documentație",
+          "description": "Construiește documentele necesare cu versionare și exporturi profesionale."
+        },
+        "audit": {
+          "title": "Audit de securitate",
+          "description": "Cartografiază rețeaua, evaluează dispozitivele și urmărește constatările."
+        }
+      },
+      "phases": {
+        "classification": "Etapa 2",
+        "documents": "Etapa 3",
+        "audit": "Etapa 5"
+      },
+      "nextActionsTitle": "Următoarele acțiuni recomandate",
+      "actions": {
+        "profile": {
+          "title": "Completează profilul",
+          "description": "Verifică numele, limba și fusul orar."
+        },
+        "security": {
+          "title": "Activează MFA",
+          "description": "Adaugă un al doilea factor pentru cont (obligatoriu pentru administratori)."
+        },
+        "organization": {
+          "title": "Invită colegi",
+          "description": "Proprietarii pot invita membri ai echipei."
+        },
+        "invite": {
+          "title": "Începe clasificarea",
+          "description": "Disponibil în Etapa 2."
+        }
+      }
+    },
+    "organizations": {
+      "title": "Organizații",
+      "subtitle": "Un utilizator poate aparține mai multor organizații. Datele sunt mereu limitate la o organizație.",
+      "yourOrganizations": "Organizațiile tale",
+      "empty": "Nu ești membru al niciunei organizații încă.",
+      "active": "Activă",
+      "current": "Curentă",
+      "select": "Comută la această organizație",
+      "createTitle": "Creează o altă organizație",
+      "createSubmit": "Creează organizația",
+      "status": {
+        "active": "Activă",
+        "suspended": "Suspendată"
+      }
+    },
+    "sessions": {
+      "title": "Sesiuni active",
+      "subtitle": "Verifică dispozitivele autentificate în cont și revocă ce nu recunoști.",
+      "loading": "Se încarcă sesiunile…",
+      "empty": "Nu există sesiuni active.",
+      "unknownDevice": "Dispozitiv necunoscut",
+      "lastSeen": "Ultima activitate",
+      "thisDevice": "Acest dispozitiv",
+      "revoke": "Revocă",
+      "started": "Începută"
+    }
   },
   "design": {
     "title": "Sistem de design",

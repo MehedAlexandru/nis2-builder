@@ -2,10 +2,12 @@ import { Controller, Get, Header, NotFoundException, Res } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config';
 import { ApiOkResponse, ApiServiceUnavailableResponse, ApiTags } from '@nestjs/swagger';
 import type { FastifyReply } from 'fastify';
+import { Public } from '../../common/auth/auth.decorators';
 import type { AppEnv } from '../../config/env';
 import { HealthService, type LivenessResult, type ReadinessResult } from './health.service';
 import { MetricsService } from './metrics.service';
 
+@Public()
 @ApiTags('platform')
 @Controller()
 export class HealthController {

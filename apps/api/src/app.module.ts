@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { CommonModule } from './common/common.module';
 import { validateEnv } from './config/env';
 import { AdminModule } from './modules/admin/admin.module';
 import { AgentsModule } from './modules/agents/agents.module';
@@ -32,6 +33,7 @@ const queuesEnabled = process.env.ENABLE_QUEUES !== 'false';
     }),
     PrismaModule,
     RedisModule,
+    CommonModule,
     ...(queuesEnabled ? [QueueModule] : []),
     PlatformModule,
     AuthModule,

@@ -35,6 +35,9 @@ async function bootstrap(): Promise<void> {
 
   app.useLogger(new PinoNestLogger(logger));
   app.useGlobalFilters(new AllExceptionsFilter(logger));
+  app.setGlobalPrefix('api', {
+    exclude: ['healthz', 'readyz', 'metrics', 'docs', 'docs-json'],
+  });
 
   const config = app.get(ConfigService<AppEnv, true>);
   const isProduction = config.get('NODE_ENV', { infer: true }) === 'production';

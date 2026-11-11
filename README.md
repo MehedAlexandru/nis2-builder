@@ -5,10 +5,25 @@ documentation, audit your IT environment and track progress — in English and R
 
 > **Legal notice:** This tool supports compliance preparation and does not constitute legal advice.
 
-**Status: Phase 0 complete.** Authentication, classification and the document engine follow in the
-next phases. The scanner agent is a verified skeleton; active discovery lands in Phase 6.
+**Status: Phase 1 complete.** Registration, email verification, login, MFA, sessions, organizations,
+roles, audit logging and tenant-scoped RLS are live. Classification and the document engine follow in
+the next phases. The scanner agent is a verified skeleton; active discovery lands in Phase 6.
 
 ---
+
+## What Phase 1 adds
+
+- Registration with email verification, password reset and a breached-password check.
+- Argon2id passwords, rotating refresh tokens with reuse detection, session listing/revocation and
+  CSRF protection.
+- TOTP MFA with recovery codes; administrators must enrol before receiving an access token.
+- Organizations, memberships, owner-only invitations, organization switching and member management.
+- User-scoped RLS discovery path, Prisma tenant transactions, runtime DB role bootstrap script.
+- Append-only audit entries for authentication, account, organization and admin-access events.
+- Protected web shell with dashboard, organizations and sessions pages (English/Romanian).
+- GDPR self-service JSON export and account deletion with last-owner protection.
+
+See [`docs/phase-1-report.md`](docs/phase-1-report.md) for the verification evidence and known gaps.
 
 ## What Phase 0 delivers
 
@@ -55,7 +70,17 @@ Run migrations and the demo seed once the stack is healthy:
 ```bash
 docker compose exec api pnpm --filter @nis2/api prisma:migrate:deploy
 docker compose exec api pnpm --filter @nis2/api prisma:seed
+
+# First platform administrator (never through the UI). MFA enrolment follows at login.
+# ADMIN_BOOTSTRAP_TOKEN comes from .env; pass the email and a strong password explicitly.
+docker compose exec api sh -lc \
+  'ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD="change-me-now-please" pnpm --filter @nis2/api admin:bootstrap'
 ```
+
+The demo seed creates `owner@demo.local` / `Demo!Passw0rd123` (override with
+`DEMO_OWNER_PASSWORD`). Email verification and reset links are captured by Mailpit at
+http://localhost:8025. Use `pnpm db:setup-runtime-role` to create the least-privilege PostgreSQL
+runtime role and point `APP_DATABASE_URL` at it.
 
 ## Local development without Docker for the app
 
@@ -83,22 +108,24 @@ pnpm dev:worker     # optional, in a second terminal
 
 ## Commands
 
-| Command                  | Purpose                                                |
-| ------------------------ | ------------------------------------------------------ |
-| `pnpm dev`               | Run shared watch, API and web                          |
-| `pnpm dev:worker`        | Run the BullMQ worker                                  |
-| `pnpm build`             | Build all packages (Turbo, dependency-aware)           |
-| `pnpm lint`              | ESLint across web, API and shared                      |
-| `pnpm typecheck`         | Strict TypeScript for all packages                     |
-| `pnpm test`              | Vitest (web/shared) + Jest (API)                       |
-| `pnpm test:go`           | Go tests for the scanner agent                         |
-| `pnpm format`            | Prettier write                                         |
-| `pnpm openapi:generate`  | Regenerate and commit the OpenAPI contract             |
-| `pnpm db:migrate`        | `prisma migrate dev` with the root `.env`              |
-| `pnpm db:migrate:deploy` | Apply migrations in CI/staging/production              |
-| `pnpm db:seed`           | Seed the Romania pack metadata and a demo organization |
-| `pnpm db:reset`          | Drop, recreate, migrate and re-seed the local database |
-| `pnpm secrets:check`     | gitleaks staged-file scan (CI enforces)                |
+| Command                      | Purpose                                                          |
+| ---------------------------- | ---------------------------------------------------------------- |
+| `pnpm dev`                   | Run shared watch, API and web                                    |
+| `pnpm dev:worker`            | Run the BullMQ worker                                            |
+| `pnpm build`                 | Build all packages (Turbo, dependency-aware)                     |
+| `pnpm lint`                  | ESLint across web, API and shared                                |
+| `pnpm typecheck`             | Strict TypeScript for all packages                               |
+| `pnpm test`                  | Vitest (web/shared) + Jest (API)                                 |
+| `pnpm test:go`               | Go tests for the scanner agent                                   |
+| `pnpm format`                | Prettier write                                                   |
+| `pnpm openapi:generate`      | Regenerate and commit the OpenAPI contract                       |
+| `pnpm db:migrate`            | `prisma migrate dev` with the root `.env`                        |
+| `pnpm db:migrate:deploy`     | Apply migrations in CI/staging/production                        |
+| `pnpm db:seed`               | Seed the Romania pack metadata, demo organization and demo owner |
+| `pnpm db:setup-runtime-role` | Create/update the least-privilege runtime DB role                |
+| `pnpm admin:bootstrap`       | Create the first ADMIN from `ADMIN_*` environment variables      |
+| `pnpm db:reset`              | Drop, recreate, migrate and re-seed the local database           |
+| `pnpm secrets:check`         | gitleaks staged-file scan (CI enforces)                          |
 
 ## Repository layout
 
@@ -148,8 +175,8 @@ See [`docs/security.md`](docs/security.md) and [`SECURITY.md`](SECURITY.md).
 | Phase | Scope                                                               | Status   |
 | ----- | ------------------------------------------------------------------- | -------- |
 | 0     | Architecture, scaffold, tokens, i18n, API shell, data model, RLS    | **Done** |
-| 1     | Auth, organizations, roles, MFA, audit log, runtime RLS, dashboards | Next     |
-| 2     | Classification wizard, rules engine, result PDF                     | Planned  |
+| 1     | Auth, organizations, roles, MFA, audit log, runtime RLS, dashboards | **Done** |
+| 2     | Classification wizard, rules engine, result PDF                     | Next     |
 | 3     | Document template engine, revisions, diff/restore, approvals        | Planned  |
 | 4     | DOCX/PDF pipeline, ZIP and compliance summary                       | Planned  |
 | 5     | Network canvas, devices, assessments, Nmap/CSV import               | Planned  |

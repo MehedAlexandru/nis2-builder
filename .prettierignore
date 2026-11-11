@@ -6,3 +6,7 @@ pnpm-lock.yaml
 apps/scanner-agent/bin/
 docs/openapi/openapi.json
 deploy/data/
+
+# Local planning/transcript files, not part of the committed source
+prompt.md
+session.md

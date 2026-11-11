@@ -22,6 +22,8 @@
     "db:migrate": "dotenv -e .env -- pnpm --filter @nis2/api prisma:migrate",
     "db:migrate:deploy": "dotenv -e .env -- pnpm --filter @nis2/api prisma:migrate:deploy",
     "db:seed": "dotenv -e .env -- pnpm --filter @nis2/api prisma:seed",
+    "db:setup-runtime-role": "dotenv -e .env -- pnpm --filter @nis2/api prisma:setup-runtime-role",
+    "admin:bootstrap": "dotenv -e .env -- pnpm --filter @nis2/api admin:bootstrap",
     "db:reset": "dotenv -e .env -- pnpm --filter @nis2/api exec prisma migrate reset --force",
     "secrets:check": "sh scripts/check-secrets.sh",
     "prepare": "husky",

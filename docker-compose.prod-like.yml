@@ -30,7 +30,7 @@ services:
       retries: 20
 
   minio:
-    image: minio/minio:latest
+    image: pgsty/silo:RELEASE.2026-11-09T00-00-00Z
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${S3_ACCESS_KEY:-minioadmin}
@@ -86,6 +86,7 @@ services:
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-prod-like-smoke-test-access-secret-change-me}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-prod-like-smoke-test-refresh-secret-change-me}
       COOKIE_SECRET: ${COOKIE_SECRET:-prod-like-smoke-test-cookie-secret-change-me}
+      COOKIE_SECURE: 'false'
       ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY:-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
     depends_on:
       postgres:
