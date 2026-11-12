@@ -121,7 +121,7 @@ attachment`.
   API endpoints. Bucket listings/public policies are not exposed.
 - DOCX/PDF rendering consumes template data and user text only; no user HTML is executed and no
   shell/Chromium process is spawned.
-- Nmap XML/CSV imports are parsed with size/depth limits and never executed.
+- Nmap XML/CSV imports are size-bounded JSON text and are parsed, never executed.
 
 ## 9. Logging, audit and monitoring
 
@@ -156,6 +156,24 @@ attachment`.
 - Attachment fields are placeholders in Phase 3; upload, MIME/size validation, malware scanning and
   encrypted S3 storage are required before they are enabled in Phase 4.
 
+## 10b. Network mapper controls
+
+- Every audit/device/zone/connection call requires an authenticated organization membership and
+  runs inside a tenant transaction with `app.organization_id`; RLS remains the second barrier.
+- Audit ids, device ids and zone ids are re-checked against the selected audit. Layout saves reject
+  devices or zones from another audit; connection creation rejects cross-audit devices.
+- Nmap XML and CSV imports are parsed as text (2.5 MB maximum), never executed and never written to
+  disk. The parser uses `fast-xml-parser` with the default non-executable mode and a small quoted-CSV
+  parser.
+- The API recomputes required-field completeness before accepting `informationComplete=true`; the
+  client-calculated percentage is advisory only.
+- Device, assessment, zone, connection, import, merge and layout changes are written to the
+  append-only audit log.
+- Attachments, SNMP credentials and malware scanning are still deferred; the UI shows a notice rather
+  than pretending those fields are supported.
+- The canvas export is generated client-side from already-authorized data and does not bypass API
+  authorization.
+
 ## 11. Supply chain and CI
 
 - Lockfile committed; Dependabot weekly.
@@ -175,7 +193,7 @@ attachment`.
 - [ ] Tests: cross-tenant negative test and role-escalation test.
 - [ ] i18n: both languages.
 
-## 13. Known gaps after Phase 4 (tracked)
+## 13. Known gaps after Phase 5 (tracked)
 
 1. DB-backed authorization/RLS integration tests in CI (non-superuser role, cross-tenant matrix).
 2. Instant access-token revocation: sessions kill refresh tokens immediately; access tokens expire
@@ -193,3 +211,6 @@ attachment`.
 10. Export artifact retention/cleanup and object lifecycle rules are not implemented yet.
 11. PDF visual regression and LibreOffice-headless export tests are still Phase 9 work; current
     renderer tests validate OOXML/PDF structure, styles and embedded content.
+12. Network imports, layouts and assessment enforcement have unit/smoke coverage but no DB-backed
+    cross-tenant integration test or Playwright E2E yet.
+13. Scan diffing arrives with the Phase 6 agent.

@@ -7,9 +7,12 @@ import {
   classify,
   documentStatusFromProgress,
   documentTemplateSchema,
+  evaluateDeviceCompleteness,
   getClassificationPack,
   getDocumentTemplate,
   getDocumentTemplates,
+  type DeviceAssessmentData,
+  type DeviceType,
   type DocumentPayload,
 } from '@nis2/shared';
 
@@ -347,6 +350,348 @@ async function main(): Promise<void> {
         createdById: owner.id,
       },
     });
+  }
+
+  // A seeded network baseline so the Phase 5 canvas is immediately explorable.
+  // Re-seeding never overwrites a user's layout, devices or assessments.
+  const existingAudit = await prisma.audit.findFirst({
+    where: { organizationId: organization.id, name: 'Demo network baseline' },
+  });
+  if (!existingAudit) {
+    const audit = await prisma.audit.create({
+      data: {
+        organizationId: organization.id,
+        name: 'Demo network baseline',
+        period: '2026-Q4',
+        scope: 'Head-office LAN, server VLAN, DMZ, guest Wi-Fi and cloud services.',
+        methodology:
+          'Inventory walkthrough with sample Nmap import, device interviews and configuration review.',
+        auditorName: 'Demo Owner',
+        limitations: 'Sample data for product demonstration; no live scan was performed.',
+        createdById: owner.id,
+      },
+    });
+
+    const zoneDefinitions = [
+      { name: 'LAN', color: '#2563EB', bounds: { x: 0, y: 0, width: 620, height: 440 } },
+      { name: 'DMZ', color: '#D97706', bounds: { x: 660, y: 0, width: 620, height: 440 } },
+      { name: 'Guest', color: '#059669', bounds: { x: 0, y: 480, width: 620, height: 440 } },
+      {
+        name: 'Server VLAN',
+        color: '#7C3AED',
+        bounds: { x: 660, y: 480, width: 620, height: 440 },
+      },
+      { name: 'Cloud', color: '#0891B2', bounds: { x: 1320, y: 0, width: 620, height: 920 } },
+    ];
+    const zones = new Map<string, string>();
+    for (const zone of zoneDefinitions) {
+      const created = await prisma.zone.create({
+        data: {
+          organizationId: organization.id,
+          auditId: audit.id,
+          name: zone.name,
+          color: zone.color,
+          bounds: zone.bounds as Prisma.InputJsonValue,
+        },
+      });
+      zones.set(zone.name, created.id);
+    }
+
+    const demoDevices: Array<{
+      key: string;
+      name: string;
+      type: DeviceType;
+      zone: string;
+      position: { x: number; y: number };
+      ipAddresses: string[];
+      macAddress?: string;
+      vendor?: string;
+      model?: string;
+      criticality: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+      ownerLabel?: string;
+      assessment: DeviceAssessmentData;
+      complete: boolean;
+      notes?: string;
+    }> = [
+      {
+        key: 'firewall',
+        name: 'Edge firewall',
+        type: 'FIREWALL',
+        zone: 'DMZ',
+        position: { x: 760, y: 100 },
+        ipAddresses: ['192.0.2.1'],
+        macAddress: 'AA:BB:CC:DD:EE:01',
+        vendor: 'Fortinet',
+        model: 'FortiGate 60F',
+        criticality: 'CRITICAL',
+        ownerLabel: 'IT',
+        complete: true,
+        assessment: {
+          os: 'FortiOS 7.4',
+          autoUpdate: true,
+          adminAccountCount: 2,
+          defaultCredentialsChanged: true,
+          firewallReviewed: true,
+          logsEnabled: true,
+          centralLogging: true,
+          internetExposed: true,
+          physicalAccessControlled: true,
+          physicalLocation: 'Server room rack 1',
+        },
+        notes: 'Primary internet edge with IPS and TLS inspection.',
+      },
+      {
+        key: 'router',
+        name: 'Core router',
+        type: 'ROUTER',
+        zone: 'DMZ',
+        position: { x: 760, y: 250 },
+        ipAddresses: ['192.0.2.2'],
+        macAddress: 'AA:BB:CC:DD:EE:02',
+        vendor: 'Cisco',
+        model: 'ISR 1111',
+        criticality: 'HIGH',
+        ownerLabel: 'IT',
+        complete: true,
+        assessment: {
+          os: 'IOS XE 17.12',
+          autoUpdate: false,
+          adminAccountCount: 3,
+          defaultCredentialsChanged: true,
+          firewallReviewed: true,
+          logsEnabled: true,
+          centralLogging: true,
+          physicalAccessControlled: true,
+        },
+      },
+      {
+        key: 'switch',
+        name: 'Access switch',
+        type: 'SWITCH',
+        zone: 'LAN',
+        position: { x: 80, y: 100 },
+        ipAddresses: ['192.0.2.10'],
+        macAddress: 'AA:BB:CC:DD:EE:03',
+        vendor: 'HPE',
+        model: 'Aruba 2930F',
+        criticality: 'HIGH',
+        ownerLabel: 'IT',
+        complete: true,
+        assessment: {
+          os: 'ArubaOS-S 16.11',
+          adminAccountCount: 2,
+          defaultCredentialsChanged: true,
+          logsEnabled: true,
+          centralLogging: true,
+          physicalAccessControlled: true,
+        },
+      },
+      {
+        key: 'erp',
+        name: 'ERP server',
+        type: 'SERVER',
+        zone: 'Server VLAN',
+        position: { x: 760, y: 580 },
+        ipAddresses: ['192.0.2.20'],
+        macAddress: 'AA:BB:CC:DD:EE:04',
+        vendor: 'Dell',
+        model: 'PowerEdge R740',
+        criticality: 'CRITICAL',
+        ownerLabel: 'Finance IT',
+        complete: true,
+        assessment: {
+          os: 'Windows Server 2012 R2',
+          osVersion: '6.3',
+          endOfSupportDate: '2023-10-10',
+          lastPatchDate: '2026-08-01',
+          autoUpdate: true,
+          antivirusPresent: true,
+          antivirusProduct: 'Defender',
+          licenseExpiryDate: '2026-10-01',
+          backupExists: true,
+          backupMethod: 'Veeam to NAS',
+          lastBackupDate: '2026-11-11',
+          logsEnabled: true,
+          centralLogging: true,
+          diskEncryption: true,
+        },
+        notes: 'Legacy ERP host; migration project planned for next year.',
+      },
+      {
+        key: 'workstation',
+        name: 'Finance workstation',
+        type: 'WORKSTATION',
+        zone: 'LAN',
+        position: { x: 300, y: 100 },
+        ipAddresses: ['192.0.2.30'],
+        macAddress: 'AA:BB:CC:DD:EE:05',
+        vendor: 'Dell',
+        model: 'OptiPlex 7010',
+        criticality: 'MEDIUM',
+        ownerLabel: 'Finance',
+        complete: true,
+        assessment: {
+          os: 'Windows 11 Pro',
+          autoUpdate: true,
+          antivirusPresent: true,
+          realTimeProtection: true,
+          backupExists: true,
+          backupMethod: 'OneDrive Known Folder Move',
+          diskEncryption: true,
+          logsEnabled: false,
+        },
+      },
+      {
+        key: 'laptop',
+        name: 'Sales laptop',
+        type: 'LAPTOP',
+        zone: 'LAN',
+        position: { x: 80, y: 280 },
+        ipAddresses: ['192.0.2.31'],
+        vendor: 'Lenovo',
+        criticality: 'MEDIUM',
+        ownerLabel: 'Sales',
+        complete: false,
+        assessment: {
+          os: 'Windows 11 Pro',
+          antivirusPresent: true,
+          diskEncryption: true,
+        },
+        notes: 'Assessment still in progress; backup and update fields are missing.',
+      },
+      {
+        key: 'printer',
+        name: 'Reception printer',
+        type: 'PRINTER',
+        zone: 'Guest',
+        position: { x: 80, y: 580 },
+        ipAddresses: ['192.0.2.40'],
+        macAddress: 'AA:BB:CC:DD:EE:06',
+        vendor: 'HP',
+        model: 'LaserJet Pro',
+        criticality: 'LOW',
+        complete: true,
+        assessment: {
+          autoUpdate: true,
+          defaultCredentialsChanged: true,
+          internetExposed: false,
+          physicalAccessControlled: true,
+        },
+      },
+      {
+        key: 'camera',
+        name: 'Entrance camera',
+        type: 'IP_CAMERA',
+        zone: 'DMZ',
+        position: { x: 760, y: 360 },
+        ipAddresses: ['192.0.2.50'],
+        macAddress: 'AA:BB:CC:DD:EE:07',
+        vendor: 'Hikvision',
+        criticality: 'HIGH',
+        ownerLabel: 'Facilities',
+        complete: true,
+        assessment: {
+          autoUpdate: false,
+          defaultCredentialsChanged: false,
+          internetExposed: true,
+          physicalAccessControlled: true,
+        },
+        notes: 'Vendor default password still active after installation.',
+      },
+      {
+        key: 'cloud',
+        name: 'Microsoft 365',
+        type: 'CLOUD_SERVICE',
+        zone: 'Cloud',
+        position: { x: 1420, y: 100 },
+        ipAddresses: ['203.0.113.10'],
+        vendor: 'Microsoft',
+        criticality: 'HIGH',
+        ownerLabel: 'IT',
+        complete: true,
+        assessment: {
+          mfaEnabled: true,
+          mfaType: 'Authenticator app',
+          backupExists: true,
+          backupMethod: 'Vendor geo-redundant',
+          encryptionAtRest: true,
+          encryptionInTransit: true,
+          logsEnabled: true,
+          centralLogging: true,
+        },
+      },
+    ];
+
+    const createdDevices = new Map<string, string>();
+    for (const device of demoDevices) {
+      const computed = evaluateDeviceCompleteness({
+        type: device.type,
+        name: device.name,
+        ipAddresses: device.ipAddresses,
+        macAddress: device.macAddress ?? null,
+        criticality: device.criticality,
+        ownerLabel: device.ownerLabel ?? null,
+        assessment: device.assessment,
+      });
+      const informationComplete = device.complete && computed.informationCompleteAllowed;
+      const created = await prisma.device.create({
+        data: {
+          organizationId: organization.id,
+          auditId: audit.id,
+          zoneId: zones.get(device.zone) ?? null,
+          name: device.name,
+          type: device.type,
+          vendor: device.vendor ?? null,
+          model: device.model ?? null,
+          criticality: device.criticality,
+          ipAddresses: device.ipAddresses,
+          macAddress: device.macAddress ?? null,
+          ownerLabel: device.ownerLabel ?? null,
+          source: 'MANUAL',
+          position: device.position as Prisma.InputJsonValue,
+          notes: device.notes ?? null,
+          completeness: computed.percentage,
+          informationComplete,
+          assessment: {
+            create: {
+              organizationId: organization.id,
+              data: device.assessment as Prisma.InputJsonValue,
+              completeness: computed.percentage,
+              informationComplete,
+              assessedById: owner.id,
+            },
+          },
+        },
+      });
+      createdDevices.set(device.key, created.id);
+    }
+
+    const links: Array<[string, string]> = [
+      ['firewall', 'router'],
+      ['router', 'switch'],
+      ['switch', 'erp'],
+      ['switch', 'workstation'],
+      ['switch', 'laptop'],
+      ['router', 'camera'],
+      ['router', 'cloud'],
+      ['switch', 'printer'],
+    ];
+    for (const [sourceKey, targetKey] of links) {
+      const sourceDeviceId = createdDevices.get(sourceKey);
+      const targetDeviceId = createdDevices.get(targetKey);
+      if (!sourceDeviceId || !targetDeviceId) continue;
+      await prisma.connection.create({
+        data: {
+          organizationId: organization.id,
+          auditId: audit.id,
+          sourceDeviceId,
+          targetDeviceId,
+          type: sourceKey === 'router' && targetKey === 'cloud' ? 'VPN' : 'WIRED',
+          speedMbps: 1000,
+          vlan: targetKey === 'erp' ? 20 : undefined,
+        },
+      });
+    }
   }
 
   console.log(`[seed] demo organization ready: ${organization.name} (${organization.id})`);

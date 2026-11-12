@@ -15,7 +15,7 @@ const modules = [
     to: '/classification',
   },
   { key: 'documents', icon: FileText, phase: 'auth.dashboard.phases.documents', to: '/documents' },
-  { key: 'audit', icon: Network, phase: 'auth.dashboard.phases.audit', to: null },
+  { key: 'audit', icon: Network, phase: 'auth.dashboard.phases.audit', to: '/network' },
 ] as const;
 
 export function DashboardPage() {

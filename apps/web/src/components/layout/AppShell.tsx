@@ -6,6 +6,7 @@ import {
   Building2,
   FileText,
   MonitorSmartphone,
+  Network,
   ShieldCheck,
   X,
 } from 'lucide-react';
@@ -13,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Logo } from '@/components/brand/Logo';
+import { DropdownMenu } from '@/components/layout/DropdownMenu';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/Button';
@@ -30,6 +32,14 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
   cn(navLinkClass({ isActive }), 'w-full justify-start px-3 py-2.5');
 
+const navButtonClass = (active: boolean) =>
+  cn(
+    'inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium transition-colors',
+    active
+      ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/15 dark:text-primary-200'
+      : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+  );
+
 export function AppShell() {
   const { t } = useTranslation();
   const { status, user, activeOrganization, logout } = useAuth();
@@ -37,6 +47,43 @@ export function AppShell() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const year = new Date().getFullYear();
   const authenticated = status === 'authenticated';
+  const complianceActive = ['/dashboard', '/classification', '/documents', '/network'].some(
+    (path) => location.pathname === path || location.pathname.startsWith(`${path}/`),
+  );
+  const manageActive = ['/organizations', '/sessions'].some(
+    (path) => location.pathname === path || location.pathname.startsWith(`${path}/`),
+  );
+  const initials = `${user?.givenName?.[0] ?? ''}${user?.familyName?.[0] ?? ''}`.toUpperCase();
+  const complianceItems = [
+    {
+      key: 'dashboard',
+      label: t('nav.dashboard'),
+      icon: LayoutDashboard,
+      to: '/dashboard',
+    },
+    {
+      key: 'classification',
+      label: t('nav.classification'),
+      icon: ShieldCheck,
+      to: '/classification',
+    },
+    { key: 'documents', label: t('nav.documents'), icon: FileText, to: '/documents' },
+    { key: 'network', label: t('nav.network'), icon: Network, to: '/network' },
+  ];
+  const manageItems = [
+    {
+      key: 'organizations',
+      label: t('nav.organizations'),
+      icon: Building2,
+      to: '/organizations',
+    },
+    {
+      key: 'sessions',
+      label: t('nav.sessions'),
+      icon: MonitorSmartphone,
+      to: '/sessions',
+    },
+  ];
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -72,61 +119,74 @@ export function AppShell() {
             </NavLink>
             {authenticated ? (
               <>
-                <NavLink to="/dashboard" className={navLinkClass}>
-                  <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
-                  {t('nav.dashboard')}
-                </NavLink>
-                <NavLink to="/classification" className={navLinkClass}>
-                  <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-                  {t('nav.classification')}
-                </NavLink>
-                <NavLink to="/documents" className={navLinkClass}>
-                  <FileText className="h-4 w-4" aria-hidden="true" />
-                  {t('nav.documents')}
-                </NavLink>
-                <NavLink to="/organizations" className={navLinkClass}>
-                  <Building2 className="h-4 w-4" aria-hidden="true" />
-                  {t('nav.organizations')}
-                </NavLink>
-                <NavLink
-                  to="/sessions"
-                  className={({ isActive }) =>
-                    cn(navLinkClass({ isActive }), 'hidden xl:inline-flex')
-                  }
-                >
-                  <MonitorSmartphone className="h-4 w-4" aria-hidden="true" />
-                  {t('nav.sessions')}
-                </NavLink>
+                <DropdownMenu
+                  label={t('nav.compliance')}
+                  trigger={t('nav.compliance')}
+                  items={complianceItems}
+                  triggerClassName={navButtonClass(complianceActive)}
+                />
+                <DropdownMenu
+                  label={t('nav.manage')}
+                  trigger={t('nav.manage')}
+                  items={manageItems}
+                  triggerClassName={navButtonClass(manageActive)}
+                />
               </>
             ) : null}
           </nav>
 
           <div className="ml-auto flex shrink-0 items-center gap-2">
-            <LanguageSwitcher />
-            <div className="hidden md:block">
-              <ThemeToggle />
-            </div>
-            {authenticated ? (
+            {!authenticated ? (
               <>
-                <div className="hidden text-right xl:block">
-                  <p className="text-sm font-medium leading-tight">
-                    {user?.givenName} {user?.familyName}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {activeOrganization?.name ?? t('auth.noActiveOrganization')}
-                  </p>
+                <LanguageSwitcher />
+                <div className="hidden md:block">
+                  <ThemeToggle />
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="hidden lg:inline-flex"
-                  onClick={() => void logout()}
-                  aria-label={t('auth.logout')}
-                >
-                  <LogOut className="h-4 w-4" aria-hidden="true" />
-                  <span className="ml-1.5 hidden xl:inline">{t('auth.logout')}</span>
-                </Button>
               </>
+            ) : null}
+            {authenticated ? (
+              <div className="hidden lg:block">
+                <DropdownMenu
+                  label={t('nav.account')}
+                  align="right"
+                  triggerClassName="inline-flex items-center gap-2 rounded-full border border-border bg-card py-1 pl-1.5 pr-2 text-sm font-medium transition-colors hover:bg-muted"
+                  trigger={
+                    <>
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-600 text-xs font-semibold text-primary-foreground">
+                        {initials || 'U'}
+                      </span>
+                      <span className="hidden max-w-36 truncate xl:inline">
+                        {user?.givenName} {user?.familyName}
+                      </span>
+                    </>
+                  }
+                  header={
+                    <div>
+                      <p className="text-sm font-semibold">
+                        {user?.givenName} {user?.familyName}
+                      </p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {activeOrganization?.name ?? t('auth.noActiveOrganization')}
+                      </p>
+                    </div>
+                  }
+                  footer={
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <LanguageSwitcher />
+                      <ThemeToggle />
+                    </div>
+                  }
+                  items={[
+                    {
+                      key: 'logout',
+                      label: t('auth.logout'),
+                      icon: LogOut,
+                      danger: true,
+                      onSelect: () => void logout(),
+                    },
+                  ]}
+                />
+              </div>
             ) : (
               <>
                 <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
@@ -177,6 +237,10 @@ export function AppShell() {
                       <FileText className="h-4 w-4" aria-hidden="true" />
                       {t('nav.documents')}
                     </NavLink>
+                    <NavLink to="/network" className={mobileNavLinkClass}>
+                      <Network className="h-4 w-4" aria-hidden="true" />
+                      {t('nav.network')}
+                    </NavLink>
                     <NavLink to="/organizations" className={mobileNavLinkClass}>
                       <Building2 className="h-4 w-4" aria-hidden="true" />
                       {t('nav.organizations')}
@@ -201,9 +265,10 @@ export function AppShell() {
                           {activeOrganization?.name ?? t('auth.noActiveOrganization')}
                         </p>
                       </div>
-                      <div className="md:hidden">
-                        <ThemeToggle />
-                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <LanguageSwitcher />
+                      <ThemeToggle />
                     </div>
                     <Button
                       variant="outline"

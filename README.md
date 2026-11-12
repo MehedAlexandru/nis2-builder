@@ -5,12 +5,30 @@ documentation, audit your IT environment and track progress — in English and R
 
 > **Legal notice:** This tool supports compliance preparation and does not constitute legal advice.
 
-**Status: Phase 4 complete.** Registration, MFA, organizations, tenant-scoped RLS, the
-data-driven NIS2 classification wizard and the full documentation centre are live. Documents now
-export as professionally styled DOCX and PDF, with a compliance summary and a complete ZIP bundle.
-The scanner agent is a verified skeleton; active discovery lands in Phase 6.
+**Status: Phase 5 complete.** Registration, MFA, organizations, tenant-scoped RLS, the data-driven
+NIS2 classification wizard, the documentation centre and the network mapper are live. Devices can be
+added manually, imported from Nmap XML/CSV, assessed against type-specific requirements and arranged
+on a persistent React Flow canvas. The scanner agent is a verified skeleton; active discovery lands
+in Phase 6.
 
 ---
+
+## What Phase 5 adds
+
+- Dated audit snapshots with a seeded demo baseline, five default zones and persisted layout.
+- React Flow network canvas: drag-and-drop devices, connections with type/speed/VLAN, coloured
+  zones with add/edit/delete and resize controls, snap-to-grid, minimap, zoom/pan, auto-fit, PNG
+  export and layout undo/redo.
+- Manual device palette for all 15 device types, a type-aware details panel and a completeness
+  badge that turns green only when every required field is filled.
+- Weighted completeness plus risk indicators: expired/missing AV, EOL OS, stale patches, missing or
+  untested backups, missing MFA on remote access, default credentials, internet exposure, missing
+  logging/encryption and expiring licences.
+- Nmap XML and CSV import with deduplication by MAC/IP, preserved manual names/notes/layout and a
+  downloadable CSV template; duplicate merge keeps connections and finding links.
+- All reads/writes are tenant-scoped through the existing RLS model and recorded in the audit log.
+
+See [`docs/phase-5-report.md`](docs/phase-5-report.md) for verification evidence and known gaps.
 
 ## What Phase 4 adds
 
@@ -135,7 +153,8 @@ docker compose exec api sh -lc \
 ```
 
 The demo seed creates `owner@demo.local` / `Demo!Passw0rd123` (override with
-`DEMO_OWNER_PASSWORD`). Email verification and reset links are captured by Mailpit at
+`DEMO_OWNER_PASSWORD`), a completed classification, sample documents and a network baseline with
+nine devices. Email verification and reset links are captured by Mailpit at
 http://localhost:8025. Use `pnpm db:setup-runtime-role` to create the least-privilege PostgreSQL
 runtime role and point `APP_DATABASE_URL` at it.
 

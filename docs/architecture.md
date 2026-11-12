@@ -36,7 +36,7 @@ flowchart LR
   A -. BullMQ .-> K[Worker<br/>same codebase]
   K --> P
   K --> S
-  K --> PDF[Chromium PDF renderer<br/>Phase 4]
+  K --> PDF[PDFKit renderer<br/>Phase 4]
   AG[Scanner Agent<br/>customer LAN] -->|outbound HTTPS only| A
   ADM[Platform admin] --> W
 ```
@@ -52,7 +52,7 @@ deployable is the Scanner Agent.
 | A2  | NestJS 11 on the Fastify adapter                       | Nest DI/modules fit the domain; Fastify gives perf and schema-based validation | Some middleware assumes Express; use Fastify-native plugins (helmet, cors, cookie)                |
 | A3  | Prisma 6                                               | Type-safe client, migrations, JSONB support                                    | RLS and triggers are raw SQL migrations; runtime role separation in Phase 1                       |
 | A4  | Go Scanner Agent                                       | Static binary, tiny distroless image, easy cross-compile, strong concurrency   | A second language in the repo; CI builds/tests it                                                 |
-| A5  | Playwright/Chromium for PDF                            | Reuses the Chromium stack already needed for E2E; no second renderer           | Phase 4 adds a dedicated PDF worker image with bundled fonts                                      |
+| A5  | PDFKit for PDF                                         | Deterministic server-side PDF without a Chromium sidecar; same model as DOCX   | Embed DejaVu/Arial fonts; add Chromium later only if visual parity demands it                     |
 | A6  | One canonical content model → DOCX + PDF               | "Identical look" cannot come from two independent template files               | Build an intermediate representation (headings, tables, callouts, matrices) and two renderers     |
 | A7  | Rules/templates/jurisdictions as versioned JSON        | Legal content must be reviewable without code changes                          | Seeds + admin review workflow; Zod validation at load time                                        |
 | A8  | pnpm workspaces + Turborepo                            | Fast, disk-efficient, dependency-aware builds                                  | Turborepo telemetry can be disabled in CI                                                         |
@@ -155,8 +155,8 @@ flowchart LR
   T[Document template JSON] --> E[Form engine + canonical content model]
   P[Company profile, assets, suppliers, risks] --> E
   E --> D[DOCX renderer]
-  E --> H[HTML renderer]
-  H --> C[Chromium print-to-PDF]
+  E --> H[PDFKit renderer]
+  H --> C[PDF with embedded fonts]
   D --> X[.docx]
   C --> Y[.pdf]
 ```
@@ -165,10 +165,11 @@ flowchart LR
   export layout and legal references.
 - The canonical content model contains headings, paragraphs, lists, tables, callouts, RACI and
   risk matrices, revision history, signature blocks and page-break hints.
-- The DOCX renderer maps tokens to real Word styles and colors; the HTML renderer maps the same
-  tokens to CSS variables. Both use primary-600 table headers, primary-50 zebra rows and the fixed
-  severity colors.
-- Exports are queued jobs (BullMQ) written to S3/MinIO with short-lived download URLs.
+- The DOCX renderer maps tokens to real Word styles and colors; the PDFKit renderer maps the same
+  tokens to embedded-font PDF primitives. Both use primary-600 table headers, primary-50 zebra rows
+  and the fixed severity colors.
+- Exports are queued jobs (BullMQ) written to private S3/MinIO and streamed through authenticated,
+  tenant-scoped API downloads.
 
 ## 9. Scanner Agent
 

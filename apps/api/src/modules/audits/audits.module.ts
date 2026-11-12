@@ -1,8 +1,14 @@
 import { Module } from '@nestjs/common';
+import { AuditsController } from './audits.controller';
+import { AuditsService } from './audits.service';
 
 /**
- * Phases 5–7 — dated audit snapshots, device inventory, assessments, zones,
- * connections, imports and audit lifecycle.
+ * Phase 5 - dated audit snapshots, the React Flow network map, manual device
+ * inventory, assessments, zones, connections and Nmap/CSV imports.
  */
-@Module({})
+@Module({
+  controllers: [AuditsController],
+  providers: [AuditsService],
+  exports: [AuditsService],
+})
 export class AuditsModule {}

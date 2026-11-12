@@ -208,6 +208,26 @@ Still required: DB-backed integration tests in CI that run as the non-superuser 
 Every revision stores the template version so a later template change cannot silently reinterpret
 historical data.
 
+## 6a. Phase 5 network mapper
+
+Phase 5 adds **no schema migration**. It uses the existing `audits`, `zones`, `devices`,
+`device_assessments` and `connections` tables and their Phase 0 RLS policies.
+
+- `devices.position` stores `{x, y}` absolute canvas coordinates; `zones.bounds` stores
+  `{x, y, width, height}`. Both are validated before save.
+- `device_assessments.data` is the posture object (software, protection, access, backup, network,
+  data, logging, physical). The shared `deviceAssessmentDataSchema` rejects unknown keys.
+- Required fields are type-specific and computed by
+  `packages/shared/src/network/completeness.ts`. The result is denormalized to
+  `devices.completeness` and `devices.informationComplete` for cheap list rendering; the API
+  recomputes before accepting "complete".
+- Risk indicators are derived, not stored. They can change when a licence/patch/backup date passes.
+- `devices.macAddress` is normalized to `AA:BB:CC:DD:EE:FF`. Import matching uses the indexed MAC
+  plus the `ipAddresses` array.
+- `connections` are audit-scoped and validated to reference two devices in the same audit. Duplicate
+  pairs are rejected in either direction.
+- `zones` are unique by `(auditId, name)`. Deleting a zone sets its devices' `zoneId` to null.
+
 ## 7. Field-level encryption map (Phase 1+)
 
 Envelope encryption: a per-organization data key (AES-256-GCM) wrapped by a KEK in KMS/Vault.

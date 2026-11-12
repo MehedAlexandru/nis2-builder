@@ -993,6 +993,462 @@
         ]
       }
     },
+    "/audits": {
+      "get": {
+        "operationId": "AuditsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      },
+      "post": {
+        "operationId": "AuditsController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/audits/import-template.csv": {
+      "get": {
+        "operationId": "AuditsController_template",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/audits/{auditId}": {
+      "get": {
+        "operationId": "AuditsController_map",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      },
+      "patch": {
+        "operationId": "AuditsController_update",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/audits/{auditId}/duplicates": {
+      "get": {
+        "operationId": "AuditsController_duplicates",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/audits/{auditId}/devices": {
+      "post": {
+        "operationId": "AuditsController_createDevice",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/audits/{auditId}/devices/{deviceId}": {
+      "patch": {
+        "operationId": "AuditsController_updateDevice",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      },
+      "delete": {
+        "operationId": "AuditsController_deleteDevice",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/audits/{auditId}/devices/{deviceId}/assessment": {
+      "put": {
+        "operationId": "AuditsController_saveAssessment",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/audits/{auditId}/import": {
+      "post": {
+        "operationId": "AuditsController_importDevices",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/audits/{auditId}/merge": {
+      "post": {
+        "operationId": "AuditsController_merge",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/audits/{auditId}/layout": {
+      "put": {
+        "operationId": "AuditsController_saveLayout",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/audits/{auditId}/zones": {
+      "post": {
+        "operationId": "AuditsController_createZone",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/audits/{auditId}/zones/{zoneId}": {
+      "patch": {
+        "operationId": "AuditsController_updateZone",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "zoneId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      },
+      "delete": {
+        "operationId": "AuditsController_deleteZone",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "zoneId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/audits/{auditId}/connections": {
+      "post": {
+        "operationId": "AuditsController_createConnection",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/audits/{auditId}/connections/{connectionId}": {
+      "patch": {
+        "operationId": "AuditsController_updateConnection",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "connectionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      },
+      "delete": {
+        "operationId": "AuditsController_deleteConnection",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "connectionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      }
+    },
     "/exports": {
       "get": {
         "operationId": "ExportsController_list",

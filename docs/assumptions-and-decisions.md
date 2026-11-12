@@ -211,6 +211,27 @@
     disclaimer.
 65. **The DOCX TOC is a Word field and may prompt the user to update fields on open.** The PDF TOC is
     rendered with final page numbers; both list the same sections.
+66. **Device completeness is required-field based.** Each device type declares its own mandatory
+    posture fields (for example backups for servers but not printers). Optional answers still feed
+    risk indicators, so a device can be complete and still show an amber risk badge.
+67. **Phase 5 adds no database migration.** `audits`, `devices`, `device_assessments`, `zones`,
+    `connections` and finding links already exist from Phase 0 and are covered by the tenant RLS
+    policies. Posture answers remain JSONB validated by the shared Zod schema.
+68. **Canvas positions and zone bounds are absolute coordinates.** Zones are visual containers, not
+    React Flow parent nodes; moving a zone applies the delta to assigned devices. This avoids
+    fragile nested-coordinate conversions while preserving the visual grouping.
+69. **Nmap XML/CSV imports are sent as bounded JSON text (2.5 MB max), never executed.** The API
+    parses them with `fast-xml-parser` or a small CSV parser; imports do not write files, run tools or
+    scan the network.
+70. **Imports match existing devices by MAC or any IP and only fill blank discovery fields.** Manual
+    names, notes, positions and assessment answers win over imported values. Duplicates can be
+    merged explicitly.
+71. **Nmap device-type inference is conservative and editable.** It uses open ports and vendor text
+    only; the user confirms the type and completes the assessment in the details panel.
+72. **Canvas undo/redo covers layout changes; destructive actions require confirmation.** Device,
+    connection and zone deletions are explicit, audited API calls rather than undoable local edits.
+73. **PNG canvas export captures the current viewport.** Full-graph SVG rendering belongs to the
+    Phase 7 audit report pipeline.
 
 ## 5. Open decisions for later phases (not blocking)
 
@@ -230,3 +251,4 @@
 | 2026-11-11 | Phase 2 classification pack, rules engine and document applicability snapshot recorded.   |
 | 2026-11-11 | Phase 3 template catalogue, revisions, locks, versions and approval decisions recorded.   |
 | 2026-11-11 | Phase 4 queued exports, shared content model, PDFKit decision, private S3 and ZIP bundle. |
+| 2026-11-12 | Phase 5 network mapper, type-aware completeness, imports, merge and layout decisions.     |

@@ -16,9 +16,28 @@ import type {
   DocumentVersion,
   DocumentVersionInput,
   CreateBundleExportInput,
+  CreateConnectionInput,
+  CreateDeviceInput,
   CreateDocumentExportInput,
+  CreateNetworkAuditInput,
   CreateSummaryExportInput,
+  CreateZoneInput,
+  DeviceImportFormat,
+  DeviceImportResult,
+  DuplicateDeviceGroup,
   ExportJobSummary,
+  MergeDevicesInput,
+  NetworkAuditSummary,
+  NetworkConnection,
+  NetworkDevice,
+  NetworkMap,
+  NetworkZone,
+  SaveDeviceAssessmentInput,
+  SaveMapLayoutInput,
+  UpdateConnectionInput,
+  UpdateDeviceInput,
+  UpdateNetworkAuditInput,
+  UpdateZoneInput,
   LoginInput,
   LoginResponse,
   MfaSetupResponse,
@@ -276,6 +295,73 @@ export const documentsApi = {
       method: 'POST',
       ...jsonBody(input),
     }),
+};
+
+export const networkApi = {
+  list: () => request<NetworkAuditSummary[]>('/audits'),
+  create: (input: CreateNetworkAuditInput) =>
+    request<NetworkAuditSummary>('/audits', { method: 'POST', ...jsonBody(input) }),
+  update: (auditId: string, input: UpdateNetworkAuditInput) =>
+    request<NetworkAuditSummary>(`/audits/${auditId}`, {
+      method: 'PATCH',
+      ...jsonBody(input),
+    }),
+  map: (auditId: string) => request<NetworkMap>(`/audits/${auditId}`),
+  createDevice: (auditId: string, input: CreateDeviceInput) =>
+    request<NetworkDevice>(`/audits/${auditId}/devices`, {
+      method: 'POST',
+      ...jsonBody(input),
+    }),
+  updateDevice: (auditId: string, deviceId: string, input: UpdateDeviceInput) =>
+    request<NetworkDevice>(`/audits/${auditId}/devices/${deviceId}`, {
+      method: 'PATCH',
+      ...jsonBody(input),
+    }),
+  deleteDevice: (auditId: string, deviceId: string) =>
+    request<void>(`/audits/${auditId}/devices/${deviceId}`, { method: 'DELETE' }),
+  saveAssessment: (auditId: string, deviceId: string, input: SaveDeviceAssessmentInput) =>
+    request<NetworkDevice>(`/audits/${auditId}/devices/${deviceId}/assessment`, {
+      method: 'PUT',
+      ...jsonBody(input),
+    }),
+  importDevices: (auditId: string, format: DeviceImportFormat, content: string) =>
+    request<DeviceImportResult>(`/audits/${auditId}/import`, {
+      method: 'POST',
+      ...jsonBody({ format, content }),
+    }),
+  importTemplate: () => requestBlob('/audits/import-template.csv'),
+  duplicates: (auditId: string) => request<DuplicateDeviceGroup[]>(`/audits/${auditId}/duplicates`),
+  merge: (auditId: string, input: MergeDevicesInput) =>
+    request<NetworkDevice>(`/audits/${auditId}/merge`, {
+      method: 'POST',
+      ...jsonBody(input),
+    }),
+  saveLayout: (auditId: string, input: SaveMapLayoutInput) =>
+    request<void>(`/audits/${auditId}/layout`, { method: 'PUT', ...jsonBody(input) }),
+  createZone: (auditId: string, input: CreateZoneInput) =>
+    request<NetworkZone>(`/audits/${auditId}/zones`, {
+      method: 'POST',
+      ...jsonBody(input),
+    }),
+  updateZone: (auditId: string, zoneId: string, input: UpdateZoneInput) =>
+    request<NetworkZone>(`/audits/${auditId}/zones/${zoneId}`, {
+      method: 'PATCH',
+      ...jsonBody(input),
+    }),
+  deleteZone: (auditId: string, zoneId: string) =>
+    request<void>(`/audits/${auditId}/zones/${zoneId}`, { method: 'DELETE' }),
+  createConnection: (auditId: string, input: CreateConnectionInput) =>
+    request<NetworkConnection>(`/audits/${auditId}/connections`, {
+      method: 'POST',
+      ...jsonBody(input),
+    }),
+  updateConnection: (auditId: string, connectionId: string, input: UpdateConnectionInput) =>
+    request<NetworkConnection>(`/audits/${auditId}/connections/${connectionId}`, {
+      method: 'PATCH',
+      ...jsonBody(input),
+    }),
+  deleteConnection: (auditId: string, connectionId: string) =>
+    request<void>(`/audits/${auditId}/connections/${connectionId}`, { method: 'DELETE' }),
 };
 
 export const exportsApi = {

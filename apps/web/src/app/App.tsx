@@ -17,6 +17,7 @@ import { DocumentEditorPage } from '@/features/documents/DocumentEditorPage';
 import { DocumentsPage } from '@/features/documents/DocumentsPage';
 import { LandingPage } from '@/features/landing/LandingPage';
 import { NotFoundPage } from '@/features/landing/NotFoundPage';
+import { NetworkPage } from '@/features/network/NetworkPage';
 import { OrganizationsPage } from '@/features/organizations/OrganizationsPage';
 import { SessionsPage } from '@/features/sessions/SessionsPage';
 
@@ -72,6 +73,14 @@ export function App() {
             element={
               <ProtectedRoute>
                 <DocumentEditorPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="network"
+            element={
+              <ProtectedRoute>
+                <NetworkPage />
               </ProtectedRoute>
             }
           />
