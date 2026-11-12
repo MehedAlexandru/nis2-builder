@@ -1,0 +1,48 @@
+{
+  "name": "NIS2 Compass",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true,
+      "dockerDashComposeVersion": "v2"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "remoteUser": "vscode",
+  "forwardPorts": [5173, 3000, 8025, 9001],
+  "portsAttributes": {
+    "5173": {
+      "label": "NIS2 Compass web",
+      "onAutoForward": "notify"
+    },
+    "3000": {
+      "label": "NIS2 Compass API",
+      "onAutoForward": "silent"
+    },
+    "8025": {
+      "label": "Mailpit",
+      "onAutoForward": "silent"
+    },
+    "9001": {
+      "label": "MinIO console",
+      "onAutoForward": "silent"
+    }
+  },
+  "postCreateCommand": "bash -lc 'corepack enable && corepack prepare pnpm@10.34.9 --activate && pnpm install --frozen-lockfile'",
+  "postStartCommand": "bash -lc 'docker compose up -d postgres redis minio mailpit minio-init'",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "Prisma.prisma",
+        "bradlc.vscode-tailwindcss",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  }
+}

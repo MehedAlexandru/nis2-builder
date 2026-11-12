@@ -139,6 +139,23 @@ The demo seed creates `owner@demo.local` / `Demo!Passw0rd123` (override with
 http://localhost:8025. Use `pnpm db:setup-runtime-role` to create the least-privilege PostgreSQL
 runtime role and point `APP_DATABASE_URL` at it.
 
+## Temporary preview in GitHub Codespaces
+
+GitHub Pages cannot host the API, PostgreSQL, Redis, MinIO and export worker. For a temporary
+preview, open the repository in a Codespace and run:
+
+```bash
+bash scripts/preview-up.sh
+```
+
+The script builds the API/worker image, applies migrations, seeds the demo tenant, starts the stack
+and waits for the API health check. Then open the **Ports** panel, set port `5173` to **Public** and
+share the generated `https://<codespace>-5173.app.github.dev` URL.
+
+Keep ports `3000`, `5432`, `6379`, `9000`, `9001` and `8025` private. The preview ends when the
+Codespace stops, and anyone with the public URL can use the demo tenant, so do not upload real data.
+Use `bash scripts/preview-down.sh` to stop the stack.
+
 ## Local development without Docker for the app
 
 Prerequisites: Node.js 20.19+, pnpm 10, PostgreSQL 16, Redis 7. `docker run` is enough for the
