@@ -15,7 +15,7 @@ RUN mkdir -p /out \
   && cd /out && sha256sum nis2-scanner-agent-* > SHA256SUMS
 
 # Shared dependency layer.
-FROM node:20-alpine AS base
+FROM node:26-alpine AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 RUN corepack enable && corepack prepare pnpm@10.34.9 --activate \
@@ -45,7 +45,7 @@ RUN pnpm --filter @nis2/shared build && pnpm --filter @nis2/api build
 
 # Runtime. Phase 9 replaces this with a pruned, distroless-style image.
 # The worker uses the same image with `node apps/api/dist/worker.js`.
-FROM node:20-alpine AS runtime
+FROM node:26-alpine AS runtime
 ENV NODE_ENV=production
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
