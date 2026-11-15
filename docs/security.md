@@ -174,6 +174,26 @@ attachment`.
 - The canvas export is generated client-side from already-authorized data and does not bypass API
   authorization.
 
+## 10c. Scanner-agent controls
+
+- Enrollment tokens are 256-bit random values with a `nis2_agent_` prefix. The raw token is returned
+  once; only its SHA-256 hash is stored.
+- Token lookup uses a dedicated RLS policy keyed by `app.agent_token_hash` before the organization is
+  known. The API then sets `app.organization_id`; agent reads/writes remain tenant-isolated.
+- Agent endpoints are JWT-public but require the agent bearer token. CSRF is exempt only for
+  `/api/v1/agents/` because agents do not have browser cookies; no cookie-authenticated route is
+  exempted.
+- One queued/running scan per agent; stale running jobs fail after 30 minutes. Revocation fails
+  outstanding jobs and invalidates the token immediately.
+- Each scan requires UI consent and the agent `--i-authorize-scanning` flag. The API records
+  `SCAN_REQUESTED`, `SCAN_COMPLETED` and `SCAN_FAILED` in the append-only audit log.
+- Uploaded snapshots are size/shape validated (max 5000 devices, 200 ports/device, IP/MAC
+  validation); nothing is executed. Diff writes preserve manual fields and never auto-delete devices.
+- The agent is inventory-only: no exploitation, credential attacks, packet content inspection or
+  inbound listeners.
+- Agent credentials are bearer tokens over HTTPS. HMAC request signing or mTLS remains future
+  hardening; tokens must be treated as secrets.
+
 ## 11. Supply chain and CI
 
 - Lockfile committed; Dependabot weekly.
@@ -193,7 +213,7 @@ attachment`.
 - [ ] Tests: cross-tenant negative test and role-escalation test.
 - [ ] i18n: both languages.
 
-## 13. Known gaps after Phase 5 (tracked)
+## 13. Known gaps after Phase 6 (tracked)
 
 1. DB-backed authorization/RLS integration tests in CI (non-superuser role, cross-tenant matrix).
 2. Instant access-token revocation: sessions kill refresh tokens immediately; access tokens expire
@@ -213,4 +233,9 @@ attachment`.
     renderer tests validate OOXML/PDF structure, styles and embedded content.
 12. Network imports, layouts and assessment enforcement have unit/smoke coverage but no DB-backed
     cross-tenant integration test or Playwright E2E yet.
-13. Scan diffing arrives with the Phase 6 agent.
+13. Active raw ARP sweep and ICMP echo are not implemented; the agent uses TCP reachability plus
+    the OS ARP cache. mDNS/NetBIOS/SNMP enrichment is not active yet.
+14. Agent requests use bearer tokens over HTTPS; HMAC signing or mTLS remains future hardening.
+15. No automated Docker-network agent integration test yet; discovery/upload/config have unit tests
+    and the API/agent flow has a live smoke test.
+16. Scan job cancellation/retry and per-device diff accept/reject actions are not implemented.

@@ -120,6 +120,13 @@ enum ConnectionType {
   VPN
 }
 
+enum DeviceScanState {
+  UNCHANGED
+  NEW
+  CHANGED
+  MISSING
+}
+
 enum Severity {
   LOW
   MEDIUM
@@ -665,6 +672,9 @@ model Agent {
   version        String?
   platform       String?
   lastSeenAt     DateTime?
+  enrollmentExpiresAt DateTime?
+  enrolledAt     DateTime?
+  revokedAt      DateTime?
   createdById    String
   createdAt      DateTime    @default(now())
 
@@ -684,6 +694,7 @@ model ScanJob {
   params         Json?
   status         ScanJobStatus @default(QUEUED)
   resultSummary  Json?
+  errorMessage   String?
   startedAt      DateTime?
   finishedAt     DateTime?
   createdById    String
@@ -735,6 +746,7 @@ model Device {
   businessServices       String[]
   source                 DeviceSource @default(MANUAL)
   fingerprint            String?
+  scanState              DeviceScanState @default(UNCHANGED)
   position               Json?
   notes                  String?
   informationComplete    Boolean      @default(false)

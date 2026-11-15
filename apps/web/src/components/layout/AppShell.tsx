@@ -1,4 +1,5 @@
 import {
+  Bot,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -50,7 +51,7 @@ export function AppShell() {
   const complianceActive = ['/dashboard', '/classification', '/documents', '/network'].some(
     (path) => location.pathname === path || location.pathname.startsWith(`${path}/`),
   );
-  const manageActive = ['/organizations', '/sessions'].some(
+  const manageActive = ['/organizations', '/sessions', '/agents'].some(
     (path) => location.pathname === path || location.pathname.startsWith(`${path}/`),
   );
   const initials = `${user?.givenName?.[0] ?? ''}${user?.familyName?.[0] ?? ''}`.toUpperCase();
@@ -83,6 +84,7 @@ export function AppShell() {
       icon: MonitorSmartphone,
       to: '/sessions',
     },
+    { key: 'agents', label: t('nav.agents'), icon: Bot, to: '/agents' },
   ];
 
   useEffect(() => {
@@ -248,6 +250,10 @@ export function AppShell() {
                     <NavLink to="/sessions" className={mobileNavLinkClass}>
                       <MonitorSmartphone className="h-4 w-4" aria-hidden="true" />
                       {t('nav.sessions')}
+                    </NavLink>
+                    <NavLink to="/agents" className={mobileNavLinkClass}>
+                      <Bot className="h-4 w-4" aria-hidden="true" />
+                      {t('nav.agents')}
                     </NavLink>
                   </>
                 ) : null}

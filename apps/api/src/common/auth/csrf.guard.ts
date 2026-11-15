@@ -30,6 +30,7 @@ export class CsrfGuard implements CanActivate {
     if (SAFE_METHODS.has(method)) return true;
 
     const path = (request.url.split('?')[0] ?? '').replace(/\/$/, '');
+    if (path.startsWith('/api/v1/agents/')) return true;
     if (EXEMPT_SUFFIXES.some((suffix) => path.endsWith(suffix))) return true;
 
     const cookie = request.cookies?.[CSRF_COOKIE];

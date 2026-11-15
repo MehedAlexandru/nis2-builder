@@ -1449,6 +1449,200 @@
         ]
       }
     },
+    "/agents": {
+      "get": {
+        "operationId": "AgentsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/agents/enrollment": {
+      "post": {
+        "operationId": "AgentsController_createEnrollment",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/agents/{agentId}": {
+      "delete": {
+        "operationId": "AgentsController_revoke",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/agents/{agentId}/scans": {
+      "post": {
+        "operationId": "AgentsController_createScan",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/agents/download/{platform}": {
+      "get": {
+        "operationId": "AgentsController_download",
+        "parameters": [
+          {
+            "name": "platform",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/agents/scans": {
+      "get": {
+        "operationId": "AgentsController_scans",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/agents/scans/{jobId}": {
+      "get": {
+        "operationId": "AgentsController_scan",
+        "parameters": [
+          {
+            "name": "jobId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/v1/agents/heartbeat": {
+      "post": {
+        "operationId": "AgentIngestController_heartbeat",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "agent-ingest"
+        ]
+      }
+    },
+    "/v1/agents/jobs/{jobId}/results": {
+      "post": {
+        "operationId": "AgentIngestController_results",
+        "parameters": [
+          {
+            "name": "jobId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "agent-ingest"
+        ]
+      }
+    },
+    "/v1/agents/jobs/{jobId}/fail": {
+      "post": {
+        "operationId": "AgentIngestController_fail",
+        "parameters": [
+          {
+            "name": "jobId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "agent-ingest"
+        ]
+      }
+    },
     "/exports": {
       "get": {
         "operationId": "ExportsController_list",

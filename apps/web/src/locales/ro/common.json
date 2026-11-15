@@ -21,7 +21,8 @@
     "network": "Rețea",
     "compliance": "Conformitate",
     "manage": "Gestionare",
-    "account": "Cont"
+    "account": "Cont",
+    "agents": "Agenți"
   },
   "actions": {
     "startClassification": "Începe clasificarea",
@@ -915,6 +916,107 @@
       "updated": "Zonă actualizată.",
       "deleted": "Zonă ștearsă.",
       "edit": "Editează zona"
+    },
+    "scanStates": {
+      "UNCHANGED": "Nescombiate",
+      "NEW": "Nou",
+      "CHANGED": "Modificat",
+      "MISSING": "Lipsă"
+    }
+  },
+  "agents": {
+    "title": "Agenți scanner",
+    "subtitle": "Asociază un agent cu comunicație exclusiv outbound, solicită scanări autorizate și analizează diferențele de inventar fără a suprascrie aspectul sau notele.",
+    "refresh": "Reîmprospătează",
+    "createEnrollment": "Creează token de înrolare",
+    "loadError": "Agenții nu au putut fi încărcați.",
+    "noOrganization": "Selectează o organizație înainte de a gestiona agenții scanner.",
+    "safety": "Agenții fac doar cereri HTTPS outbound. Descoperirea este inventariere non-intruzivă: fără exploatare, atacuri de credențiale sau porturi inbound.",
+    "loading": "Se încarcă agenții...",
+    "emptyTitle": "Nu există agenți",
+    "emptySubtitle": "Creează un token de înrolare, rulează agentul în rețeaua țintă și menține-l online pentru scanări.",
+    "unknownPlatform": "Platformă necunoscută",
+    "status": {
+      "PENDING": "În așteptare",
+      "ACTIVE": "Activ",
+      "REVOKED": "Revocat"
+    },
+    "lastSeen": "Ultima conexiune",
+    "lastScan": "Ultima scanare finalizată",
+    "queuedScans": "Scanări în coadă",
+    "tokenExpires": "Tokenul expiră",
+    "requestScan": "Solicită scanare",
+    "revoke": "Revocă",
+    "revokeConfirm": "Revoci {{name}}? Scanările din coadă sau în curs vor fi anulate.",
+    "revoked": "Agent revocat.",
+    "revokeError": "Agentul nu a putut fi revocat.",
+    "pendingHint": "Pornește agentul cu acest token; primul heartbeat îl activează.",
+    "scansTitle": "Istoric scanări",
+    "scansSubtitle": "Scanări în coadă, în curs și finalizate, cu diferențele de inventar.",
+    "scansEmpty": "Nu au fost solicitate scanări.",
+    "table": {
+      "status": "Stare",
+      "agent": "Agent",
+      "audit": "Audit",
+      "created": "Creat",
+      "result": "Rezultat"
+    },
+    "viewDiff": "Vezi diferențele",
+    "enrollmentCreated": "Token de înrolare creat.",
+    "scanQueued": "Scanare în coadă. Agentul o va prelua la următorul heartbeat.",
+    "name": "Nume agent",
+    "tokenValidity": "Valabilitate token",
+    "minutes": "{{count}} minute",
+    "hours": "{{count}} ore",
+    "generateToken": "Generează token",
+    "enrollmentHelp": "Tokenul este afișat o singură dată. Păstrează-l în siguranță și transmite-l agentului ca NIS2_ENROLLMENT_TOKEN.",
+    "enrollmentError": "Tokenul de înrolare nu a putut fi creat.",
+    "tokenShownOnce": "Copiază tokenul acum. Nu va mai fi afișat; revocă agentul și creează alt token dacă îl pierzi.",
+    "token": "Token de înrolare",
+    "copied": "Copiat",
+    "copyToken": "Copiază tokenul",
+    "runCommand": "Rulează agentul",
+    "copyCommand": "Copiază comanda",
+    "scanHelp": "Agentul trebuie să fie online și activ. Lasă CIDR-urile goale pentru a scana un /24 în jurul fiecărei interfețe IPv4 locale.",
+    "noAudits": "Creează un audit de rețea înainte de a solicita o scanare.",
+    "audit": "Audit țintă",
+    "cidrs": "CIDR-uri",
+    "cidrsHint": "Separate prin virgulă, de exemplu 192.168.1.0/24. Gol înseamnă detectare automată.",
+    "topPorts": "Primele porturi TCP",
+    "rate": "Gazde pe secundă",
+    "consent": "Confirm că sunt autorizat să scanez această rețea. Scanarea este doar inventariere și non-intruzivă.",
+    "queueing": "Se pune în coadă...",
+    "queueScan": "Pune în coadă",
+    "scanError": "Scanarea nu a putut fi pusă în coadă.",
+    "scanStatus": {
+      "QUEUED": "În coadă",
+      "RUNNING": "În curs",
+      "COMPLETED": "Finalizată",
+      "FAILED": "Eșuată"
+    },
+    "diffTitle": "Diferențe scanare",
+    "diff": {
+      "created": "Noi",
+      "changed": "Modificate",
+      "missing": "Lipsă",
+      "unchanged": "Nescombiate",
+      "newDevices": "Dispozitive noi",
+      "changedDevices": "Dispozitive modificate",
+      "missingDevices": "Dispozitive lipsă",
+      "none": "Niciunul"
+    },
+    "downloadAgent": "Descarcă agentul",
+    "downloadTitle": "Descarcă agentul scanner",
+    "downloadHelp": "Descarcă binarul pentru mașina care va rula în rețeaua țintă. Tokenul de înrolare și comanda de rulare sunt generate separat.",
+    "downloadError": "Binarul agentului nu a putut fi descărcat.",
+    "downloading": "Se descarcă...",
+    "downloadNote": "Pe Linux/macOS rulează chmod +x pe fișierul descărcat înainte de pornire. Binarele sunt reconstruite cu acest deployment și pot fi blocate de browser sau de protecția endpointului; verifică sursa înainte de rulare.",
+    "platforms": {
+      "linuxAmd64": "Linux x64",
+      "linuxArm64": "Linux ARM64",
+      "windowsAmd64": "Windows x64",
+      "darwinAmd64": "macOS Intel",
+      "darwinArm64": "macOS Apple Silicon"
     }
   }
 }

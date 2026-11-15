@@ -21,7 +21,8 @@
     "network": "Network",
     "compliance": "Compliance",
     "manage": "Manage",
-    "account": "Account"
+    "account": "Account",
+    "agents": "Agents"
   },
   "actions": {
     "startClassification": "Start classification",
@@ -915,6 +916,107 @@
       "updated": "Zone updated.",
       "deleted": "Zone deleted.",
       "edit": "Edit zone"
+    },
+    "scanStates": {
+      "UNCHANGED": "Unchanged",
+      "NEW": "New",
+      "CHANGED": "Changed",
+      "MISSING": "Missing"
+    }
+  },
+  "agents": {
+    "title": "Scanner agents",
+    "subtitle": "Pair an outbound-only agent with this organization, request authorized scans and review inventory diffs without overwriting your layout or notes.",
+    "refresh": "Refresh",
+    "createEnrollment": "Create enrollment token",
+    "loadError": "Agents could not be loaded.",
+    "noOrganization": "Select an organization before managing scanner agents.",
+    "safety": "Agents only make outbound HTTPS requests. Discovery is non-intrusive inventory: no exploitation, credential attacks or inbound ports.",
+    "loading": "Loading agents...",
+    "emptyTitle": "No agents yet",
+    "emptySubtitle": "Create a one-time enrollment token, run the agent inside the target network and keep it online for scans.",
+    "unknownPlatform": "Platform unknown",
+    "status": {
+      "PENDING": "Pending enrollment",
+      "ACTIVE": "Active",
+      "REVOKED": "Revoked"
+    },
+    "lastSeen": "Last seen",
+    "lastScan": "Last completed scan",
+    "queuedScans": "Queued scans",
+    "tokenExpires": "Token expires",
+    "requestScan": "Request scan",
+    "revoke": "Revoke",
+    "revokeConfirm": "Revoke {{name}}? Queued or running scans will be cancelled.",
+    "revoked": "Agent revoked.",
+    "revokeError": "The agent could not be revoked.",
+    "pendingHint": "Start the agent with this token; the first heartbeat activates it.",
+    "scansTitle": "Scan history",
+    "scansSubtitle": "Queued, running and completed scans with their inventory diff.",
+    "scansEmpty": "No scans have been requested yet.",
+    "table": {
+      "status": "Status",
+      "agent": "Agent",
+      "audit": "Audit",
+      "created": "Created",
+      "result": "Result"
+    },
+    "viewDiff": "View diff",
+    "enrollmentCreated": "Enrollment token created.",
+    "scanQueued": "Scan queued. The agent will claim it on its next heartbeat.",
+    "name": "Agent name",
+    "tokenValidity": "Token validity",
+    "minutes": "{{count}} minutes",
+    "hours": "{{count}} hours",
+    "generateToken": "Generate token",
+    "enrollmentHelp": "The token is shown once. Store it securely and pass it to the agent as NIS2_ENROLLMENT_TOKEN.",
+    "enrollmentError": "The enrollment token could not be created.",
+    "tokenShownOnce": "Copy this token now. It will not be shown again; revoke the agent and create a new token if it is lost.",
+    "token": "Enrollment token",
+    "copied": "Copied",
+    "copyToken": "Copy token",
+    "runCommand": "Run the agent",
+    "copyCommand": "Copy command",
+    "scanHelp": "The agent must be online and active. Leave CIDRs empty to scan a /24 around each local IPv4 interface.",
+    "noAudits": "Create a network audit before requesting a scan.",
+    "audit": "Target audit",
+    "cidrs": "CIDRs",
+    "cidrsHint": "Comma-separated, for example 192.168.1.0/24. Empty means auto-detect.",
+    "topPorts": "Top TCP ports",
+    "rate": "Hosts per second",
+    "consent": "I confirm I am authorized to scan this network. The scan is inventory-only and non-intrusive.",
+    "queueing": "Queueing...",
+    "queueScan": "Queue scan",
+    "scanError": "The scan could not be queued.",
+    "scanStatus": {
+      "QUEUED": "Queued",
+      "RUNNING": "Running",
+      "COMPLETED": "Completed",
+      "FAILED": "Failed"
+    },
+    "diffTitle": "Scan diff",
+    "diff": {
+      "created": "New",
+      "changed": "Changed",
+      "missing": "Missing",
+      "unchanged": "Unchanged",
+      "newDevices": "New devices",
+      "changedDevices": "Changed devices",
+      "missingDevices": "Missing devices",
+      "none": "None"
+    },
+    "downloadAgent": "Download agent",
+    "downloadTitle": "Download the scanner agent",
+    "downloadHelp": "Download the binary for the machine that will run inside the target network. The enrollment token and run command are generated separately.",
+    "downloadError": "The agent binary could not be downloaded.",
+    "downloading": "Downloading...",
+    "downloadNote": "On Linux/macOS run chmod +x on the downloaded file before starting it. Binaries are rebuilt with this deployment and may be blocked by your browser or endpoint protection; verify the source before running.",
+    "platforms": {
+      "linuxAmd64": "Linux x64",
+      "linuxArm64": "Linux ARM64",
+      "windowsAmd64": "Windows x64",
+      "darwinAmd64": "macOS Intel",
+      "darwinArm64": "macOS Apple Silicon"
     }
   }
 }

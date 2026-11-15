@@ -1,5 +1,9 @@
 import type {
   AcceptInviteInput,
+  AgentDownloadPlatform,
+  AgentEnrollmentResponse,
+  AgentScanSummary,
+  AgentSummary,
   AuthResponse,
   AuthSession,
   ClassificationAnswers,
@@ -15,6 +19,8 @@ import type {
   DocumentSaveInput,
   DocumentVersion,
   DocumentVersionInput,
+  CreateAgentEnrollmentInput,
+  CreateAgentScanInput,
   CreateBundleExportInput,
   CreateConnectionInput,
   CreateDeviceInput,
@@ -295,6 +301,24 @@ export const documentsApi = {
       method: 'POST',
       ...jsonBody(input),
     }),
+};
+
+export const agentsApi = {
+  list: () => request<AgentSummary[]>('/agents'),
+  createEnrollment: (input: CreateAgentEnrollmentInput) =>
+    request<AgentEnrollmentResponse>('/agents/enrollment', {
+      method: 'POST',
+      ...jsonBody(input),
+    }),
+  revoke: (agentId: string) => request<void>(`/agents/${agentId}`, { method: 'DELETE' }),
+  createScan: (agentId: string, input: CreateAgentScanInput) =>
+    request<AgentScanSummary>(`/agents/${agentId}/scans`, {
+      method: 'POST',
+      ...jsonBody(input),
+    }),
+  scans: () => request<AgentScanSummary[]>('/agents/scans'),
+  scan: (jobId: string) => request<AgentScanSummary>(`/agents/scans/${jobId}`),
+  download: (platform: AgentDownloadPlatform) => requestBlob(`/agents/download/${platform}`),
 };
 
 export const networkApi = {

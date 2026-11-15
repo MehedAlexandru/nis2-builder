@@ -1,8 +1,15 @@
 import { Module } from '@nestjs/common';
+import { AgentIngestController } from './agent-ingest.controller';
+import { AgentsController } from './agents.controller';
+import { AgentsService } from './agents.service';
 
 /**
- * Phase 6 — one-time agent enrollment, signed scan ingestion and diff-based
- * rescans. Agents only push outbound HTTPS.
+ * Phase 6 - one-time agent enrollment, outbound heartbeat/job polling,
+ * signed scan result ingestion and diff-based rescans.
  */
-@Module({})
+@Module({
+  controllers: [AgentsController, AgentIngestController],
+  providers: [AgentsService],
+  exports: [AgentsService],
+})
 export class AgentsModule {}

@@ -232,6 +232,24 @@
     connection and zone deletions are explicit, audited API calls rather than undoable local edits.
 73. **PNG canvas export captures the current viewport.** Full-graph SVG rendering belongs to the
     Phase 7 audit report pipeline.
+74. **The one-time enrollment token becomes the long-lived agent bearer credential.** It is shown
+    once and stored as SHA-256; revocation is the kill switch. HMAC signing/mTLS is later hardening.
+75. **Agent token lookup has its own RLS policy.** `app.agent_token_hash` allows selecting the agent
+    before the organization is known; the API then sets `app.organization_id` for all scan writes.
+76. **Scans are per-agent jobs claimed on heartbeat.** One queued/running job per agent; running jobs
+    older than 30 minutes are failed so an agent restart cannot wedge the queue.
+77. **The agent uses TCP reachability plus the OS ARP cache.** It works without raw-socket
+    privileges. Active raw ARP sweep, ICMP echo and mDNS/NetBIOS/SNMP enrichment are explicitly
+    deferred; the UI and docs state the MAC/L2 limitation.
+78. **Scan diff state is persisted on devices.** `NEW`, `CHANGED`, `UNCHANGED`, `MISSING` describe
+    the latest completed scan for the audit. Missing devices are marked, never deleted, and manual
+    names, notes, zones, positions and assessment answers always win.
+79. **Consent is enforced twice.** The UI requires an authorization checkbox and the agent must be
+    started with `--i-authorize-scanning`; every scan is audit-logged.
+80. **The Go agent stays dependency-free beyond the standard library.** Rust/CGO/raw packet support
+    can be added later without changing the job contract.
+81. **The diff modal lists affected devices but does not accept/reject changes per device.** The
+    snapshot is applied immediately; users can edit or merge the resulting devices.
 
 ## 5. Open decisions for later phases (not blocking)
 
@@ -252,3 +270,4 @@
 | 2026-11-11 | Phase 3 template catalogue, revisions, locks, versions and approval decisions recorded.   |
 | 2026-11-11 | Phase 4 queued exports, shared content model, PDFKit decision, private S3 and ZIP bundle. |
 | 2026-11-12 | Phase 5 network mapper, type-aware completeness, imports, merge and layout decisions.     |
+| 2026-11-12 | Phase 6 agent enrollment, bearer-token RLS, heartbeat jobs and persisted scan diff state. |

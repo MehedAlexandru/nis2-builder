@@ -228,6 +228,37 @@ Phase 5 adds **no schema migration**. It uses the existing `audits`, `zones`, `d
   pairs are rejected in either direction.
 - `zones` are unique by `(auditId, name)`. Deleting a zone sets its devices' `zoneId` to null.
 
+## 6b. Phase 6 scanner agents and scan diffs
+
+Migration `0007_agent_scans` adds:
+
+- `agents.enrollmentExpiresAt`, `agents.enrolledAt`, `agents.revokedAt`. The raw enrollment token is
+  shown once; `agents.tokenHash` stores SHA-256 and is the agent bearer credential.
+- `scan_jobs.errorMessage` for explicit failure reporting.
+- `DeviceScanState` (`UNCHANGED`, `NEW`, `CHANGED`, `MISSING`) on `devices.scanState`.
+- RLS policy `agent_token_lookup` on `agents`, allowing a select by `app.agent_token_hash` before the
+  organization is known. Subsequent writes run with `app.organization_id` set.
+
+Scan jobs are organization-scoped and target one audit and one agent. The API claims a queued job on
+heartbeat, marks it `RUNNING`, and stores the diff summary in `scan_jobs.resultSummary`:
+
+```json
+{
+  "received": 2,
+  "created": 1,
+  "changed": 1,
+  "unchanged": 0,
+  "missing": 1,
+  "newDevices": [],
+  "changedDevices": [],
+  "missingDevices": []
+}
+```
+
+Devices are matched by normalized MAC first, then IP. Manual fields, positions, zones and assessment
+answers are preserved; missing devices are marked rather than deleted. Scan state describes the latest
+completed scan for the audit, not a historical finding.
+
 ## 7. Field-level encryption map (Phase 1+)
 
 Envelope encryption: a per-organization data key (AES-256-GCM) wrapped by a KEK in KMS/Vault.

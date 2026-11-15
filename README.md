@@ -5,13 +5,26 @@ documentation, audit your IT environment and track progress — in English and R
 
 > **Legal notice:** This tool supports compliance preparation and does not constitute legal advice.
 
-**Status: Phase 5 complete.** Registration, MFA, organizations, tenant-scoped RLS, the data-driven
-NIS2 classification wizard, the documentation centre and the network mapper are live. Devices can be
-added manually, imported from Nmap XML/CSV, assessed against type-specific requirements and arranged
-on a persistent React Flow canvas. The scanner agent is a verified skeleton; active discovery lands
-in Phase 6.
+**Status: Phase 6 complete.** Registration, MFA, organizations, tenant-scoped RLS, the data-driven
+NIS2 classification wizard, the documentation centre, the network mapper and the scanner agent are
+live. Agents enroll from the UI, poll queued scans over outbound HTTPS, upload inventory and produce
+new/changed/missing diffs without overwriting the map layout or notes.
 
 ---
+
+## What Phase 6 adds
+
+- Scanner-agent page under **Manage → Agents** with authenticated binary downloads for Linux, Windows
+  and macOS, one-time enrollment tokens, status, last seen, revoke and per-agent scan history.
+- Authorized scan jobs created from the UI; the agent claims them on its next heartbeat.
+- Go agent discovery via TCP reachability, reverse DNS, OS ARP-cache enrichment, MAC OUI vendor
+  lookup, top-port service labels and OS/type estimate. No exploitation or credential attacks.
+- Diff-based ingestion: new devices are created, changed devices keep manual fields, missing devices
+  are marked instead of deleted, and the canvas shows New/Changed/Missing badges.
+- Scan results are tenant-scoped, audit-logged and validated before any device is written.
+- Migration `0007_agent_scans` adds agent enrollment fields, scan job errors and device scan state.
+
+See [`docs/phase-6-report.md`](docs/phase-6-report.md) for verification evidence and known gaps.
 
 ## What Phase 5 adds
 

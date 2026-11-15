@@ -1214,6 +1214,7 @@ export class AuditsService {
       businessServices: device.businessServices,
       source: device.source,
       fingerprint: device.fingerprint,
+      scanState: device.scanState as NetworkDevice['scanState'],
       position,
       zoneId: device.zoneId,
       notes: device.notes,

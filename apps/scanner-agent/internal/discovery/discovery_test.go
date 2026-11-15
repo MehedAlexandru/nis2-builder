@@ -1,6 +1,10 @@
 package discovery
 
-import "testing"
+import (
+	"errors"
+	"strings"
+	"testing"
+)
 
 func TestVendorFromMAC(t *testing.T) {
 	cases := []struct {
@@ -21,8 +25,48 @@ func TestVendorFromMAC(t *testing.T) {
 	}
 }
 
-func TestLocalDiscoveryIsDisabled(t *testing.T) {
-	if _, err := (Local{}).Discover(t.Context(), Options{}); err != ErrNotImplemented {
-		t.Fatalf("expected ErrNotImplemented, got %v", err)
+func TestLocalDiscoveryRequiresAuthorization(t *testing.T) {
+	if _, err := (Local{}).Discover(t.Context(), Options{}); err != ErrNotAuthorized {
+		t.Fatalf("expected ErrNotAuthorized, got %v", err)
+	}
+}
+
+func TestExpandTargetsRejectsLargeRanges(t *testing.T) {
+	_, _, err := expandTargets([]string{"10.0.0.0/8"})
+	if !errors.Is(err, ErrTargetTooLarge) {
+		t.Fatalf("expected ErrTargetTooLarge, got %v", err)
+	}
+}
+
+func TestExpandTargetsSkipsNetworkAndBroadcast(t *testing.T) {
+	targets, _, err := expandTargets([]string{"192.0.2.0/30"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(targets) != 2 || targets[0].String() != "192.0.2.1" || targets[1].String() != "192.0.2.2" {
+		t.Fatalf("unexpected targets: %v", targets)
+	}
+}
+
+func TestInferTypeAndOS(t *testing.T) {
+	deviceType, _ := inferTypeAndOS("Hewlett Packard", []string{"9100/tcp (printer)", "631/tcp (ipp)"})
+	if deviceType != "PRINTER" {
+		t.Fatalf("expected printer, got %s", deviceType)
+	}
+	deviceType, osGuess := inferTypeAndOS("Dell", []string{"445/tcp (smb)", "3389/tcp (rdp)"})
+	if deviceType != "SERVER" || !strings.Contains(osGuess, "Windows") {
+		t.Fatalf("unexpected classification: %s %s", deviceType, osGuess)
+	}
+}
+
+func TestNormalizeMACAndARPLine(t *testing.T) {
+	if got := normalizeMAC("aa-bb-cc-dd-ee-01"); got != "AA:BB:CC:DD:EE:01" {
+		t.Fatalf("unexpected MAC: %s", got)
+	}
+	match := arpLinePattern.FindStringSubmatch(
+		"192.0.2.10          0x1          0x2          aa:bb:cc:dd:ee:01     eth0",
+	)
+	if len(match) != 3 {
+		t.Fatalf("expected ARP match, got %v", match)
 	}
 }

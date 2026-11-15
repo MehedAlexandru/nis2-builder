@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   auditStatusSchema,
   connectionTypeSchema,
+  deviceScanStateSchema,
   deviceSourceSchema,
   deviceTypeSchema,
   severitySchema,
@@ -215,6 +216,7 @@ export const networkDeviceSchema = z.object({
   businessServices: z.array(z.string()),
   source: deviceSourceSchema,
   fingerprint: z.string().nullable(),
+  scanState: deviceScanStateSchema,
   position: mapPositionSchema.nullable(),
   zoneId: z.string().uuid().nullable(),
   notes: z.string().nullable(),

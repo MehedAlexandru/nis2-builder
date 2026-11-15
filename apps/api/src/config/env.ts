@@ -40,6 +40,7 @@ const envSchema = z
     COOKIE_SECURE: booleanString(true),
     ENCRYPTION_MASTER_KEY: optionalSecret,
     ADMIN_BOOTSTRAP_TOKEN: z.string().min(32).optional(),
+    AGENT_BINARY_DIR: z.string().min(1).default('/opt/nis2-agent'),
     BREACH_CHECK_ENABLED: booleanString(true),
     BREACH_CHECK_TIMEOUT_MS: z.coerce.number().int().min(250).max(10_000).default(2_500),
     ARGON2_MEMORY_KIB: z.coerce.number().int().min(8_192).max(262_144).default(19_456),

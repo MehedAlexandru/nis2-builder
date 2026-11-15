@@ -449,6 +449,7 @@ function DeviceNode({ data, selected }: NodeProps<DeviceNodeData>) {
   const { device } = data;
   const complete = device.informationComplete;
   const risk = device.riskCodes.length > 0;
+  const scanState = device.scanState;
   return (
     <div
       className={cn(
@@ -456,6 +457,9 @@ function DeviceNode({ data, selected }: NodeProps<DeviceNodeData>) {
         selected ? 'border-primary-500 shadow-md' : 'border-border',
         complete && !risk && 'border-success-500/70',
         complete && risk && 'border-warning-500/70',
+        scanState === 'NEW' && 'border-primary-500',
+        scanState === 'CHANGED' && 'border-warning-500',
+        scanState === 'MISSING' && 'border-dashed border-danger-500 opacity-60',
       )}
       style={{ width: DEVICE_WIDTH, height: DEVICE_HEIGHT }}
     >
@@ -476,6 +480,20 @@ function DeviceNode({ data, selected }: NodeProps<DeviceNodeData>) {
           {device.macAddress ?? t('network.device.noMac')}
         </p>
       </div>
+      {scanState !== 'UNCHANGED' ? (
+        <span
+          className={cn(
+            'absolute -bottom-2 left-2 rounded-full border border-background px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white shadow-sm',
+            scanState === 'NEW'
+              ? 'bg-primary-600'
+              : scanState === 'CHANGED'
+                ? 'bg-warning-500'
+                : 'bg-danger-600',
+          )}
+        >
+          {t(`network.scanStates.${scanState}`)}
+        </span>
+      ) : null}
       <div
         className={cn(
           'absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full border-2 border-background px-1 text-[10px] font-bold text-white shadow-sm',

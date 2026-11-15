@@ -9,6 +9,7 @@ import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { RegisterPage } from '@/features/auth/RegisterPage';
 import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
 import { VerifyEmailPage } from '@/features/auth/VerifyEmailPage';
+import { AgentsPage } from '@/features/agents/AgentsPage';
 import { ClassificationPage } from '@/features/classification/ClassificationPage';
 import { ClassificationResultPage } from '@/features/classification/ClassificationResultPage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
@@ -81,6 +82,14 @@ export function App() {
             element={
               <ProtectedRoute>
                 <NetworkPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="agents"
+            element={
+              <ProtectedRoute>
+                <AgentsPage />
               </ProtectedRoute>
             }
           />

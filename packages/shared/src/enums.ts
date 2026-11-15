@@ -80,6 +80,15 @@ export type DeviceSource = z.infer<typeof deviceSourceSchema>;
 export const connectionTypeSchema = z.enum(['WIRED', 'WIRELESS', 'VPN']);
 export type ConnectionType = z.infer<typeof connectionTypeSchema>;
 
+export const deviceScanStateSchema = z.enum(['UNCHANGED', 'NEW', 'CHANGED', 'MISSING']);
+export type DeviceScanState = z.infer<typeof deviceScanStateSchema>;
+
+export const agentStatusSchema = z.enum(['PENDING', 'ACTIVE', 'REVOKED']);
+export type AgentStatus = z.infer<typeof agentStatusSchema>;
+
+export const scanJobStatusSchema = z.enum(['QUEUED', 'RUNNING', 'COMPLETED', 'FAILED']);
+export type ScanJobStatus = z.infer<typeof scanJobStatusSchema>;
+
 export const severitySchema = z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']);
 export type Severity = z.infer<typeof severitySchema>;
 
