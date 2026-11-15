@@ -23,7 +23,7 @@ CMD ["pnpm", "--filter", "@nis2/web", "dev", "--host", "0.0.0.0"]
 FROM base AS build
 RUN pnpm --filter @nis2/shared build && pnpm --filter @nis2/web build
 
-FROM nginxinc/nginx-unprivileged:1.27-alpine AS runtime
+FROM nginxinc/nginx-unprivileged:1.31-alpine AS runtime
 COPY deploy/docker/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/apps/web/dist /usr/share/nginx/html
 EXPOSE 8080
