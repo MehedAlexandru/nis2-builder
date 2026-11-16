@@ -1,5 +1,6 @@
 import {
   Bot,
+  ClipboardList,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -48,9 +49,13 @@ export function AppShell() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const year = new Date().getFullYear();
   const authenticated = status === 'authenticated';
-  const complianceActive = ['/dashboard', '/classification', '/documents', '/network'].some(
-    (path) => location.pathname === path || location.pathname.startsWith(`${path}/`),
-  );
+  const complianceActive = [
+    '/dashboard',
+    '/classification',
+    '/documents',
+    '/network',
+    '/findings',
+  ].some((path) => location.pathname === path || location.pathname.startsWith(`${path}/`));
   const manageActive = ['/organizations', '/sessions', '/agents'].some(
     (path) => location.pathname === path || location.pathname.startsWith(`${path}/`),
   );
@@ -70,6 +75,7 @@ export function AppShell() {
     },
     { key: 'documents', label: t('nav.documents'), icon: FileText, to: '/documents' },
     { key: 'network', label: t('nav.network'), icon: Network, to: '/network' },
+    { key: 'findings', label: t('nav.findings'), icon: ClipboardList, to: '/findings' },
   ];
   const manageItems = [
     {
@@ -242,6 +248,10 @@ export function AppShell() {
                     <NavLink to="/network" className={mobileNavLinkClass}>
                       <Network className="h-4 w-4" aria-hidden="true" />
                       {t('nav.network')}
+                    </NavLink>
+                    <NavLink to="/findings" className={mobileNavLinkClass}>
+                      <ClipboardList className="h-4 w-4" aria-hidden="true" />
+                      {t('nav.findings')}
                     </NavLink>
                     <NavLink to="/organizations" className={mobileNavLinkClass}>
                       <Building2 className="h-4 w-4" aria-hidden="true" />

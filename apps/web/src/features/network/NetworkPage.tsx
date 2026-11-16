@@ -2,12 +2,16 @@ import {
   AlertTriangle,
   CheckCircle2,
   Download,
+  FileText,
   Files,
+  GitCompareArrows,
   GitMerge,
+  Lock,
   Network as NetworkIcon,
   Pencil,
   Plus,
   RadioTower,
+  Unlock,
   Upload,
   X,
 } from 'lucide-react';
@@ -15,6 +19,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNo
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import type {
+  AuditComparison,
   CreateNetworkAuditInput,
   DeviceImportFormat,
   DeviceImportResult,
@@ -36,6 +41,7 @@ import { Progress } from '@/components/ui/Progress';
 import { useAuth } from '@/features/auth/auth-context';
 import { ApiClientError, networkApi } from '@/lib/api';
 import { downloadBlob } from '@/lib/download';
+import { useDocumentExport } from '@/features/documents/useDocumentExport';
 import { DevicePanel } from './DevicePanel';
 import { DeviceTypeIcon } from './device-visuals';
 import { NetworkCanvas } from './NetworkCanvas';
@@ -62,7 +68,7 @@ const selectClass =
   'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50';
 
 export function NetworkPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { activeOrganization, activeOrganizationId } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedAuditId = searchParams.get('audit');
@@ -80,6 +86,9 @@ export function NetworkPage() {
   const [showImport, setShowImport] = useState(false);
   const [showMerge, setShowMerge] = useState(false);
   const [addingType, setAddingType] = useState<DeviceType | null>(null);
+  const [comparison, setComparison] = useState<AuditComparison | null>(null);
+  const [compareLoading, setCompareLoading] = useState(false);
+  const { pending: reportPending, error: reportError, exportAuditReport } = useDocumentExport();
 
   const loadAudits = useCallback(async () => {
     if (!activeOrganizationId) {
@@ -252,6 +261,46 @@ export function NetworkPage() {
     setNotice(t('network.zone.deleted'));
   };
 
+  const toggleAuditStatus = async () => {
+    if (!selectedAuditId || !map) return;
+    try {
+      await networkApi.update(selectedAuditId, {
+        status: map.audit.status === 'CLOSED' ? 'IN_PROGRESS' : 'CLOSED',
+      });
+      await refreshCurrent();
+      setNotice(
+        t(
+          map.audit.status === 'CLOSED' ? 'network.lifecycle.reopened' : 'network.lifecycle.closed',
+        ),
+      );
+    } catch (caught) {
+      setError(caught instanceof ApiClientError ? caught.message : t('network.lifecycle.error'));
+    }
+  };
+
+  const openComparison = async () => {
+    if (!selectedAuditId) return;
+    setCompareLoading(true);
+    try {
+      setComparison(await networkApi.compare(selectedAuditId));
+    } catch (caught) {
+      setError(
+        caught instanceof ApiClientError ? caught.message : t('network.lifecycle.compareError'),
+      );
+    } finally {
+      setCompareLoading(false);
+    }
+  };
+
+  const downloadReport = async (format: 'DOCX' | 'PDF') => {
+    if (!selectedAuditId) return;
+    await exportAuditReport(selectedAuditId, format, i18n.language === 'ro' ? 'ro' : 'en');
+  };
+
+  useEffect(() => {
+    if (reportError) setError(reportError);
+  }, [reportError]);
+
   const downloadTemplate = async () => {
     try {
       const blob = await networkApi.importTemplate();
@@ -399,6 +448,43 @@ export function NetworkPage() {
                       {t('network.zone.edit')}
                     </Button>
                   ) : null}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => void openComparison()}
+                    disabled={compareLoading}
+                  >
+                    <GitCompareArrows className="mr-1.5 h-4 w-4" aria-hidden="true" />
+                    {t('network.lifecycle.compare')}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => void downloadReport('PDF')}
+                    disabled={Boolean(reportPending)}
+                  >
+                    <FileText className="mr-1.5 h-4 w-4" aria-hidden="true" />
+                    {t('network.lifecycle.exportPdf')}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => void downloadReport('DOCX')}
+                    disabled={Boolean(reportPending)}
+                  >
+                    <FileText className="mr-1.5 h-4 w-4" aria-hidden="true" />
+                    {t('network.lifecycle.exportDocx')}
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => void toggleAuditStatus()}>
+                    {map?.audit.status === 'CLOSED' ? (
+                      <Unlock className="mr-1.5 h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <Lock className="mr-1.5 h-4 w-4" aria-hidden="true" />
+                    )}
+                    {map?.audit.status === 'CLOSED'
+                      ? t('network.lifecycle.reopen')
+                      : t('network.lifecycle.close')}
+                  </Button>
                 </div>
               </div>
 
@@ -524,6 +610,63 @@ export function NetworkPage() {
         onMerge={mergeGroup}
         onCompleted={() => void refreshCurrent()}
       />
+      {comparison ? (
+        <Modal title={t('network.lifecycle.comparisonTitle')} onClose={() => setComparison(null)}>
+          <div className="space-y-4 p-5 text-sm">
+            <p className="text-muted-foreground">
+              {comparison.previousName
+                ? t('network.lifecycle.comparing', {
+                    current: comparison.currentName,
+                    previous: comparison.previousName,
+                  })
+                : t('network.lifecycle.noPrevious')}
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <MetricCard
+                label={t('network.lifecycle.deviceDelta')}
+                value={comparison.deviceDelta}
+                icon={<RadioTower className="h-5 w-5" aria-hidden="true" />}
+              />
+              <MetricCard
+                label={t('network.lifecycle.completenessDelta')}
+                value={comparison.completenessDelta}
+                icon={<CheckCircle2 className="h-5 w-5" aria-hidden="true" />}
+                tone="success"
+              />
+              <MetricCard
+                label={t('network.lifecycle.opened')}
+                value={comparison.findings.opened}
+                icon={<AlertTriangle className="h-5 w-5" aria-hidden="true" />}
+                tone="warning"
+              />
+              <MetricCard
+                label={t('network.lifecycle.closedFindings')}
+                value={comparison.findings.closed}
+                icon={<CheckCircle2 className="h-5 w-5" aria-hidden="true" />}
+                tone="success"
+              />
+            </div>
+            <dl className="grid gap-2 sm:grid-cols-2">
+              <div>
+                <dt className="text-xs text-muted-foreground">{t('network.lifecycle.carried')}</dt>
+                <dd className="font-semibold">{comparison.findings.carried}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted-foreground">
+                  {t('network.lifecycle.riskScore')}
+                </dt>
+                <dd className="font-semibold">
+                  {comparison.findings.riskScoreCurrent} (
+                  {comparison.findings.riskScoreCurrent - comparison.findings.riskScorePrevious >= 0
+                    ? '+'
+                    : ''}
+                  {comparison.findings.riskScoreCurrent - comparison.findings.riskScorePrevious})
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </Modal>
+      ) : null}
     </div>
   );
 }

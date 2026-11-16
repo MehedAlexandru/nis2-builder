@@ -250,6 +250,22 @@
     can be added later without changing the job contract.
 81. **The diff modal lists affected devices but does not accept/reject changes per device.** The
     snapshot is applied immediately; users can edit or merge the resulting devices.
+82. **Findings are a current remediation register linked to an audit, not immutable audit snapshots.**
+    Closing an audit records `closedAt` and a decision point; a later phase can add hard lock/sign-off
+    and immutable snapshots.
+83. **Automatic suggestions reuse the device risk engine.** The same `evaluateDeviceCompleteness`
+    result drives mapper badges and suggested findings, so the two views cannot disagree.
+84. **Dismissed suggestions are stored per audit/device/risk code.** A new device or changed risk
+    produces a new suggestion; confirmed suggestions become `AUTO:<riskCode>` findings and are
+    excluded from the suggestion list.
+85. **Risk acceptance is explicit.** `ACCEPTED_RISK` requires a justification and approver name; the
+    accepted decision is included in the report and remains visible on the finding.
+86. **Audit comparison matches by finding code, then normalized title.** This handles copied findings
+    across dated audits and reports opened/closed/carried/trend counts without deep field diffs.
+87. **The audit report diagram is generated server-side from saved coordinates.** `sharp` converts a
+    deterministic SVG to PNG shared by DOCX and PDF; exports work in the headless worker.
+88. **Audit reports are inventory-based compliance reports, not penetration tests.** The methodology,
+    limitations and disclaimer are printed in the report.
 
 ## 5. Open decisions for later phases (not blocking)
 
@@ -262,12 +278,13 @@
 
 ## 6. Change log
 
-| Date       | Change                                                                                    |
-| ---------- | ----------------------------------------------------------------------------------------- |
-| 2026-11-10 | Phase 0 decisions recorded; five blocking questions resolved.                             |
-| 2026-11-11 | Phase 1 decisions recorded (auth, sessions, MFA, RLS path, runtime role, dev MinIO fork). |
-| 2026-11-11 | Phase 2 classification pack, rules engine and document applicability snapshot recorded.   |
-| 2026-11-11 | Phase 3 template catalogue, revisions, locks, versions and approval decisions recorded.   |
-| 2026-11-11 | Phase 4 queued exports, shared content model, PDFKit decision, private S3 and ZIP bundle. |
-| 2026-11-12 | Phase 5 network mapper, type-aware completeness, imports, merge and layout decisions.     |
-| 2026-11-12 | Phase 6 agent enrollment, bearer-token RLS, heartbeat jobs and persisted scan diff state. |
+| Date       | Change                                                                                                          |
+| ---------- | --------------------------------------------------------------------------------------------------------------- |
+| 2026-11-10 | Phase 0 decisions recorded; five blocking questions resolved.                                                   |
+| 2026-11-11 | Phase 1 decisions recorded (auth, sessions, MFA, RLS path, runtime role, dev MinIO fork).                       |
+| 2026-11-11 | Phase 2 classification pack, rules engine and document applicability snapshot recorded.                         |
+| 2026-11-11 | Phase 3 template catalogue, revisions, locks, versions and approval decisions recorded.                         |
+| 2026-11-11 | Phase 4 queued exports, shared content model, PDFKit decision, private S3 and ZIP bundle.                       |
+| 2026-11-12 | Phase 5 network mapper, type-aware completeness, imports, merge and layout decisions.                           |
+| 2026-11-12 | Phase 6 agent enrollment, bearer-token RLS, heartbeat jobs and persisted scan diff state.                       |
+| 2026-11-16 | Phase 7 findings register, suggestion decisions, risk acceptance, audit comparison and generated audit reports. |

@@ -1,4 +1,5 @@
-import { AlertTriangle, CheckCircle2, FileWarning, Trash2, X } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, FileWarning, Plus, Trash2, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -423,6 +424,14 @@ export function DevicePanel({
               </ul>
             </div>
           ) : null}
+          <div>
+            <Button asChild variant="outline" size="sm">
+              <Link to={`/findings?audit=${auditId}&device=${device.id}`}>
+                <Plus className="mr-1.5 h-4 w-4" aria-hidden="true" />
+                {t('network.device.addFinding')}
+              </Link>
+            </Button>
+          </div>
           <label className="flex items-start gap-3 rounded-md border border-border p-3 text-sm">
             <input
               type="checkbox"

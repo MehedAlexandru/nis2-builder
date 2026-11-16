@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Req,
   Res,
 } from '@nestjs/common';
@@ -26,6 +27,7 @@ import {
   updateDeviceInputSchema,
   updateNetworkAuditSchema,
   updateZoneInputSchema,
+  type AuditComparison,
   type CreateConnectionInput,
   type CreateDeviceInput,
   type CreateNetworkAuditInput,
@@ -97,6 +99,15 @@ export class AuditsController {
     @Req() request: FastifyRequest,
   ): Promise<NetworkAuditSummary> {
     return this.audits.update(actorOf(auth, request), organizationOf(auth), auditId, body);
+  }
+
+  @Get(':auditId/compare')
+  compare(
+    @Param('auditId') auditId: string,
+    @CurrentAuth() auth: AccessTokenClaims,
+    @Query('previousAuditId') previousAuditId?: string,
+  ): Promise<AuditComparison> {
+    return this.audits.compare(actorOf(auth), organizationOf(auth), auditId, previousAuditId);
   }
 
   @Get(':auditId/duplicates')

@@ -9,9 +9,11 @@ import {
 import type { ExportJob, Prisma } from '@prisma/client';
 import type { Queue } from 'bullmq';
 import {
+  createAuditReportSchema,
   createBundleExportSchema,
   createDocumentExportSchema,
   createSummaryExportSchema,
+  type CreateAuditReportInput,
   type CreateBundleExportInput,
   type CreateDocumentExportInput,
   type CreateSummaryExportInput,
@@ -88,6 +90,27 @@ export class ExportsService {
     });
   }
 
+  async createAuditReport(
+    actor: ExportActor,
+    organizationId: string,
+    auditId: string,
+    input: CreateAuditReportInput,
+  ): Promise<ExportJobSummary> {
+    await this.requireMember(actor, organizationId);
+    const parsed = createAuditReportSchema.parse(input);
+    const audit = await this.tenantPrisma.runInTenant(organizationId, actor.userId, (tx) =>
+      tx.audit.findFirst({ where: { id: auditId, organizationId }, select: { id: true } }),
+    );
+    if (!audit) {
+      throw new NotFoundException({ code: 'NOT_FOUND', message: 'Audit not found' });
+    }
+    return this.createJob(actor, organizationId, 'AUDIT_REPORT', 'audit', auditId, {
+      locale: parsed.locale,
+      format: parsed.format,
+      previousAuditId: parsed.previousAuditId ?? null,
+    });
+  }
+
   async list(actor: ExportActor, organizationId: string): Promise<ExportJobSummary[]> {
     await this.requireMember(actor, organizationId);
     const rows = await this.tenantPrisma.runInTenant(organizationId, actor.userId, (tx) =>
@@ -140,7 +163,7 @@ export class ExportsService {
   private async createJob(
     actor: ExportActor,
     organizationId: string,
-    type: 'DOCX' | 'PDF' | 'ZIP' | 'COMPLIANCE_SUMMARY',
+    type: 'DOCX' | 'PDF' | 'ZIP' | 'COMPLIANCE_SUMMARY' | 'AUDIT_REPORT',
     entityType: string,
     entityId: string | null,
     metadata: Prisma.InputJsonValue,

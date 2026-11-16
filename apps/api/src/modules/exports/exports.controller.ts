@@ -11,9 +11,11 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import {
+  createAuditReportSchema,
   createBundleExportSchema,
   createDocumentExportSchema,
   createSummaryExportSchema,
+  type CreateAuditReportInput,
   type CreateBundleExportInput,
   type CreateDocumentExportInput,
   type CreateSummaryExportInput,
@@ -59,6 +61,22 @@ export class ExportsController {
     @Req() request: FastifyRequest,
   ): Promise<ExportJobSummary> {
     return this.exportsService.createBundle(actorOf(auth, request), organizationOf(auth), body);
+  }
+
+  @Post('audits/:auditId')
+  @HttpCode(202)
+  createAuditReport(
+    @Param('auditId') auditId: string,
+    @Body(new ZodValidationPipe(createAuditReportSchema)) body: CreateAuditReportInput,
+    @CurrentAuth() auth: AccessTokenClaims,
+    @Req() request: FastifyRequest,
+  ): Promise<ExportJobSummary> {
+    return this.exportsService.createAuditReport(
+      actorOf(auth, request),
+      organizationOf(auth),
+      auditId,
+      body,
+    );
   }
 
   @Post('compliance-summary')

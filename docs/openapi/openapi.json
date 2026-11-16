@@ -1077,6 +1077,37 @@
         ]
       }
     },
+    "/audits/{auditId}/compare": {
+      "get": {
+        "operationId": "AuditsController_compare",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "previousAuditId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "audits"
+        ]
+      }
+    },
     "/audits/{auditId}/duplicates": {
       "get": {
         "operationId": "AuditsController_duplicates",
@@ -1449,6 +1480,148 @@
         ]
       }
     },
+    "/findings": {
+      "get": {
+        "operationId": "FindingsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "findings"
+        ]
+      },
+      "post": {
+        "operationId": "FindingsController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "findings"
+        ]
+      }
+    },
+    "/findings/suggestions": {
+      "get": {
+        "operationId": "FindingsController_suggestions",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "findings"
+        ]
+      }
+    },
+    "/findings/suggestions/confirm": {
+      "post": {
+        "operationId": "FindingsController_confirmSuggestion",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "findings"
+        ]
+      }
+    },
+    "/findings/suggestions/dismiss": {
+      "post": {
+        "operationId": "FindingsController_dismissSuggestion",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "findings"
+        ]
+      }
+    },
+    "/findings/{findingId}": {
+      "get": {
+        "operationId": "FindingsController_get",
+        "parameters": [
+          {
+            "name": "findingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "findings"
+        ]
+      },
+      "patch": {
+        "operationId": "FindingsController_update",
+        "parameters": [
+          {
+            "name": "findingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "findings"
+        ]
+      },
+      "delete": {
+        "operationId": "FindingsController_remove",
+        "parameters": [
+          {
+            "name": "findingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "findings"
+        ]
+      }
+    },
     "/agents": {
       "get": {
         "operationId": "AgentsController_list",
@@ -1684,6 +1857,29 @@
       "post": {
         "operationId": "ExportsController_createBundle",
         "parameters": [],
+        "responses": {
+          "202": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "exports"
+        ]
+      }
+    },
+    "/exports/audits/{auditId}": {
+      "post": {
+        "operationId": "ExportsController_createAuditReport",
+        "parameters": [
+          {
+            "name": "auditId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "202": {
             "description": ""

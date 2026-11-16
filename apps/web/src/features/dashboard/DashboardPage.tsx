@@ -1,11 +1,24 @@
 import { FileText, Network, ShieldCheck, TriangleAlert } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import type { FindingCounts, Severity } from '@nis2/shared';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Badge } from '@/components/ui/Badge';
+import { Badge, SeverityBadge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Progress } from '@/components/ui/Progress';
 import { useAuth } from '@/features/auth/auth-context';
+import { findingsApi } from '@/lib/api';
+
+const SEVERITY_KEY: Record<
+  Severity,
+  'severity.low' | 'severity.medium' | 'severity.high' | 'severity.critical'
+> = {
+  LOW: 'severity.low',
+  MEDIUM: 'severity.medium',
+  HIGH: 'severity.high',
+  CRITICAL: 'severity.critical',
+};
 
 const modules = [
   {
@@ -20,7 +33,16 @@ const modules = [
 
 export function DashboardPage() {
   const { t } = useTranslation();
-  const { user, activeOrganization, organizations } = useAuth();
+  const { user, activeOrganization, organizations, activeOrganizationId } = useAuth();
+  const [findingCounts, setFindingCounts] = useState<FindingCounts | null>(null);
+
+  useEffect(() => {
+    if (!activeOrganizationId) return;
+    void findingsApi
+      .list()
+      .then((result) => setFindingCounts(result.counts))
+      .catch(() => setFindingCounts(null));
+  }, [activeOrganizationId]);
 
   return (
     <div className="container space-y-8 py-10">
@@ -76,6 +98,31 @@ export function DashboardPage() {
           </CardContent>
         </Card>
       )}
+
+      {activeOrganization && findingCounts ? (
+        <Card>
+          <CardHeader className="flex-row items-start justify-between gap-3 space-y-0">
+            <div>
+              <CardTitle>{t('findings.dashboardTitle')}</CardTitle>
+              <CardDescription>{t('findings.dashboardSubtitle')}</CardDescription>
+            </div>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/findings">{t('findings.openRegister')}</Link>
+            </Button>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-3">
+            <span className="rounded-md border border-border px-3 py-2 text-sm">
+              {t('findings.metrics.open')}: <strong>{findingCounts.open}</strong>
+            </span>
+            {(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'] as const).map((severity) => (
+              <span key={severity} className="flex items-center gap-2 text-sm">
+                <SeverityBadge severity={severity} label={t(SEVERITY_KEY[severity])} />
+                <strong>{findingCounts.bySeverity[severity]}</strong>
+              </span>
+            ))}
+          </CardContent>
+        </Card>
+      ) : null}
 
       <section aria-labelledby="modules-title" className="space-y-4">
         <h2 id="modules-title" className="text-xl font-semibold tracking-tight">

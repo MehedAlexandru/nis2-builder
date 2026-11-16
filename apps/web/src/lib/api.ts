@@ -4,6 +4,7 @@ import type {
   AgentEnrollmentResponse,
   AgentScanSummary,
   AgentSummary,
+  AuditComparison,
   AuthResponse,
   AuthSession,
   ClassificationAnswers,
@@ -24,7 +25,9 @@ import type {
   CreateBundleExportInput,
   CreateConnectionInput,
   CreateDeviceInput,
+  CreateAuditReportInput,
   CreateDocumentExportInput,
+  CreateFindingInput,
   CreateNetworkAuditInput,
   CreateSummaryExportInput,
   CreateZoneInput,
@@ -32,6 +35,11 @@ import type {
   DeviceImportResult,
   DuplicateDeviceGroup,
   ExportJobSummary,
+  FindingDetail,
+  FindingList,
+  FindingListQuery,
+  FindingSuggestionAction,
+  FindingSuggestionList,
   MergeDevicesInput,
   NetworkAuditSummary,
   NetworkConnection,
@@ -42,6 +50,7 @@ import type {
   SaveMapLayoutInput,
   UpdateConnectionInput,
   UpdateDeviceInput,
+  UpdateFindingInput,
   UpdateNetworkAuditInput,
   UpdateZoneInput,
   LoginInput,
@@ -331,6 +340,10 @@ export const networkApi = {
       ...jsonBody(input),
     }),
   map: (auditId: string) => request<NetworkMap>(`/audits/${auditId}`),
+  compare: (auditId: string, previousAuditId?: string) =>
+    request<AuditComparison>(
+      `/audits/${auditId}/compare${previousAuditId ? `?previousAuditId=${encodeURIComponent(previousAuditId)}` : ''}`,
+    ),
   createDevice: (auditId: string, input: CreateDeviceInput) =>
     request<NetworkDevice>(`/audits/${auditId}/devices`, {
       method: 'POST',
@@ -388,6 +401,32 @@ export const networkApi = {
     request<void>(`/audits/${auditId}/connections/${connectionId}`, { method: 'DELETE' }),
 };
 
+export const findingsApi = {
+  list: (query: FindingListQuery = {}) => {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(query)) {
+      if (value !== undefined && value !== '') params.set(key, String(value));
+    }
+    const suffix = params.toString();
+    return request<FindingList>(`/findings${suffix ? `?${suffix}` : ''}`);
+  },
+  get: (findingId: string) => request<FindingDetail>(`/findings/${findingId}`),
+  create: (input: CreateFindingInput) =>
+    request<FindingDetail>('/findings', { method: 'POST', ...jsonBody(input) }),
+  update: (findingId: string, input: UpdateFindingInput) =>
+    request<FindingDetail>(`/findings/${findingId}`, { method: 'PATCH', ...jsonBody(input) }),
+  remove: (findingId: string) => request<void>(`/findings/${findingId}`, { method: 'DELETE' }),
+  suggestions: (auditId: string) =>
+    request<FindingSuggestionList>(`/findings/suggestions?auditId=${encodeURIComponent(auditId)}`),
+  confirmSuggestion: (input: FindingSuggestionAction) =>
+    request<FindingDetail>('/findings/suggestions/confirm', {
+      method: 'POST',
+      ...jsonBody(input),
+    }),
+  dismissSuggestion: (input: FindingSuggestionAction) =>
+    request<void>('/findings/suggestions/dismiss', { method: 'POST', ...jsonBody(input) }),
+};
+
 export const exportsApi = {
   list: () => request<ExportJobSummary[]>('/exports'),
   get: (jobId: string) => request<ExportJobSummary>(`/exports/${jobId}`),
@@ -400,6 +439,11 @@ export const exportsApi = {
     request<ExportJobSummary>('/exports/all', { method: 'POST', ...jsonBody(input) }),
   createSummary: (input: CreateSummaryExportInput) =>
     request<ExportJobSummary>('/exports/compliance-summary', {
+      method: 'POST',
+      ...jsonBody(input),
+    }),
+  createAuditReport: (auditId: string, input: CreateAuditReportInput) =>
+    request<ExportJobSummary>(`/exports/audits/${auditId}`, {
       method: 'POST',
       ...jsonBody(input),
     }),

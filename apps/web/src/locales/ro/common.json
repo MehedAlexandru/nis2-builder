@@ -22,7 +22,8 @@
     "compliance": "Conformitate",
     "manage": "Gestionare",
     "account": "Cont",
-    "agents": "Agenți"
+    "agents": "Agenți",
+    "findings": "Constatări"
   },
   "actions": {
     "startClassification": "Începe clasificarea",
@@ -769,7 +770,8 @@
       "saving": "Se salvează...",
       "openPortsHint": "Separate prin virgulă, de ex. 443/tcp (https), 22/tcp (ssh)",
       "criticality": "Criticitate",
-      "identifier": "Adresă IP sau MAC"
+      "identifier": "Adresă IP sau MAC",
+      "addFinding": "Adaugă constatare pentru acest dispozitiv"
     },
     "types": {
       "ROUTER": "Router",
@@ -922,6 +924,26 @@
       "NEW": "Nou",
       "CHANGED": "Modificat",
       "MISSING": "Lipsă"
+    },
+    "lifecycle": {
+      "compare": "Compară auditurile",
+      "close": "Închide auditul",
+      "reopen": "Redeschide auditul",
+      "closed": "Auditul a fost închis. Instantaneul este acum dovadă read-only.",
+      "reopened": "Auditul a fost redeschis pentru lucru suplimentar.",
+      "error": "Starea auditului nu a putut fi schimbată.",
+      "compareError": "Comparația auditurilor nu a putut fi încărcată.",
+      "comparisonTitle": "Comparație audituri",
+      "comparing": "{{current}} comparat cu {{previous}}.",
+      "noPrevious": "Nu există un audit anterior pentru comparație.",
+      "deviceDelta": "Variație dispozitive",
+      "completenessDelta": "Variație completitudine",
+      "opened": "Constatări deschise",
+      "closedFindings": "Constatări închise",
+      "carried": "Reportate",
+      "riskScore": "Scor de risc deschis",
+      "exportPdf": "Audit PDF",
+      "exportDocx": "Audit DOCX"
     }
   },
   "agents": {
@@ -1017,6 +1039,118 @@
       "windowsAmd64": "Windows x64",
       "darwinAmd64": "macOS Intel",
       "darwinArm64": "macOS Apple Silicon"
+    }
+  },
+  "findings": {
+    "title": "Constatări și remediere",
+    "subtitle": "Urmăriți lacunele de securitate, confirmați sugestiile automate și arătați auditorilor cum sunt tratate riscurile.",
+    "noOrganization": "Selectați o organizație pentru registrul de constatări.",
+    "loadError": "Registrul de constatări nu a putut fi încărcat.",
+    "refresh": "Reîmprospătează",
+    "newFinding": "Constatare nouă",
+    "audit": "Audit",
+    "statusLabel": "Stare",
+    "severityLabel": "Severitate",
+    "search": "Căutare",
+    "searchPlaceholder": "Cod sau titlu",
+    "allStatuses": "Toate stările",
+    "allSeverities": "Toate severitățile",
+    "metrics": {
+      "total": "Total constatări",
+      "open": "Deschise",
+      "critical": "Critice",
+      "high": "Ridicate",
+      "overdue": "Restante"
+    },
+    "suggestionsTitle": "Sugestii automate",
+    "suggestionsSubtitle": "Derivate din datele de evaluare ale dispozitivelor din {{audit}}.",
+    "suggestionsEmpty": "Nu există sugestii noi. Datele actuale nu au riscuri neacoperite.",
+    "confirmSuggestion": "Confirmă",
+    "dismissSuggestion": "Respinge",
+    "suggestionConfirmed": "Sugestia a fost transformată într-o constatare.",
+    "suggestionError": "Sugestia nu a putut fi procesată.",
+    "registerTitle": "Registrul de remediere",
+    "registerSubtitle": "Constatări, responsabili, termene, acceptarea riscului și istoric.",
+    "empty": "Nicio constatare nu corespunde filtrelor curente.",
+    "loading": "Se încarcă constatările...",
+    "table": {
+      "code": "ID",
+      "title": "Constatare",
+      "severity": "Severitate",
+      "status": "Stare",
+      "devices": "Dispozitive",
+      "owner": "Responsabil",
+      "due": "Termen",
+      "actions": "Acțiuni"
+    },
+    "edit": "Editează",
+    "updated": "Constatarea a fost actualizată.",
+    "created": "Constatarea a fost creată.",
+    "saveError": "Constatarea nu a putut fi salvată.",
+    "deleteConfirm": "Ștergeți „{{title}}”? Istoricul va fi eliminat.",
+    "deleted": "Constatarea a fost ștearsă.",
+    "deleteError": "Constatarea nu a putut fi ștearsă.",
+    "createTitle": "Creează constatare",
+    "editTitle": "Editează constatarea",
+    "noDescription": "Nu a fost înregistrată o descriere.",
+    "riskAcceptedTitle": "Risc acceptat",
+    "history": "Istoric modificări",
+    "noHistory": "Nu există modificări înregistrate.",
+    "unknownUser": "Utilizator necunoscut",
+    "dashboardTitle": "Constatări deschise",
+    "dashboardSubtitle": "Lacune de securitate care așteaptă un responsabil sau o decizie.",
+    "openRegister": "Deschide registrul",
+    "effort": {
+      "S": "Mic",
+      "M": "Mediu",
+      "L": "Mare"
+    },
+    "status": {
+      "OPEN": "Deschisă",
+      "IN_PROGRESS": "În lucru",
+      "MITIGATED": "Atenuată",
+      "ACCEPTED_RISK": "Risc acceptat",
+      "CLOSED": "Închisă"
+    },
+    "categories": {
+      "RISK_MANAGEMENT": "Managementul riscului",
+      "INCIDENT_HANDLING": "Gestionarea incidentelor",
+      "BUSINESS_CONTINUITY": "Continuitate și backup",
+      "SUPPLY_CHAIN": "Securitatea lanțului de aprovizionare",
+      "SECURE_DEVELOPMENT": "Dezvoltare și mentenanță sigură",
+      "EFFECTIVENESS": "Evaluarea eficacității",
+      "CYBER_HYGIENE": "Igienă cibernetică și instruire",
+      "CRYPTOGRAPHY": "Criptografie și criptare",
+      "ACCESS_CONTROL": "Control acces și gestionarea activelor",
+      "NETWORK_SECURITY": "Securitatea rețelei",
+      "LOGGING": "Jurnalizare și monitorizare",
+      "OTHER": "Altele"
+    },
+    "form": {
+      "title": "Titlu",
+      "audit": "Audit",
+      "organizationOnly": "La nivel de organizație (fără audit)",
+      "category": "Măsură NIS2",
+      "severity": "Severitate",
+      "status": "Stare",
+      "dueDate": "Termen",
+      "likelihood": "Probabilitate (1-5)",
+      "impact": "Impact (1-5)",
+      "effort": "Efort",
+      "cost": "Cost estimat (EUR)",
+      "description": "Descriere",
+      "evidence": "Dovezi",
+      "proposedSolution": "Soluție propusă",
+      "organizationWide": "Constatare la nivel de organizație",
+      "organizationWideHint": "Folosiți când nu este afectat un singur dispozitiv.",
+      "devices": "Dispozitive afectate",
+      "noDevices": "Adăugați dispozitive în audit înainte de a le asocia.",
+      "riskJustification": "Justificarea acceptării riscului",
+      "riskApprover": "Aprobator",
+      "note": "Notă de modificare",
+      "owner": "Responsabil",
+      "riskScore": "Scor de risc",
+      "unassigned": "Neatribuit"
     }
   }
 }

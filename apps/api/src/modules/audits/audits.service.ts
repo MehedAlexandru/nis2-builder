@@ -10,8 +10,11 @@ import {
   deviceAssessmentDataSchema,
   deviceRiskCodeSchema,
   evaluateDeviceCompleteness,
+  compareFindings,
   mapBoundsSchema,
   mapPositionSchema,
+  type AuditComparison,
+  type AuditComparisonFinding,
   type CreateConnectionInput,
   type CreateDeviceInput,
   type CreateNetworkAuditInput,
@@ -147,7 +150,12 @@ export class AuditsService {
           ...(input.methodology !== undefined ? { methodology: input.methodology } : {}),
           ...(input.auditorName !== undefined ? { auditorName: input.auditorName } : {}),
           ...(input.limitations !== undefined ? { limitations: input.limitations } : {}),
-          ...(input.status !== undefined ? { status: input.status } : {}),
+          ...(input.status !== undefined
+            ? {
+                status: input.status,
+                closedAt: input.status === 'CLOSED' ? new Date() : null,
+              }
+            : {}),
         },
         include: { devices: { include: { assessment: true } } },
       });
@@ -188,6 +196,85 @@ export class AuditsService {
         zones: audit.zones.map((zone) => this.toZone(zone)),
         connections: audit.connections.map((connection) => this.toConnection(connection)),
         generatedAt: new Date().toISOString(),
+      };
+    });
+  }
+
+  async compare(
+    actor: NetworkActor,
+    organizationId: string,
+    auditId: string,
+    previousAuditId?: string,
+  ): Promise<AuditComparison> {
+    await this.requireMember(actor, organizationId);
+    return this.tenantPrisma.runInTenant(organizationId, actor.userId, async (tx) => {
+      const current = await tx.audit.findFirst({
+        where: { id: auditId, organizationId },
+        include: { devices: { include: { assessment: true } } },
+      });
+      if (!current) throw this.notFound('Audit not found');
+      const previous = previousAuditId
+        ? await tx.audit.findFirst({
+            where: { id: previousAuditId, organizationId },
+            include: { devices: { include: { assessment: true } } },
+          })
+        : await tx.audit.findFirst({
+            where: {
+              organizationId,
+              id: { not: current.id },
+              createdAt: { lt: current.createdAt },
+            },
+            include: { devices: { include: { assessment: true } } },
+            orderBy: { createdAt: 'desc' },
+          });
+      if (previousAuditId && !previous) throw this.notFound('Previous audit not found');
+      const [currentFindings, previousFindings] = await Promise.all([
+        tx.finding.findMany({
+          where: { organizationId, auditId: current.id },
+          select: {
+            id: true,
+            code: true,
+            title: true,
+            severity: true,
+            status: true,
+            riskScore: true,
+          },
+        }),
+        previous
+          ? tx.finding.findMany({
+              where: { organizationId, auditId: previous.id },
+              select: {
+                id: true,
+                code: true,
+                title: true,
+                severity: true,
+                status: true,
+                riskScore: true,
+              },
+            })
+          : Promise.resolve([]),
+      ]);
+      const currentSummary = this.auditSummary(current);
+      const previousSummary = previous ? this.auditSummary(previous) : null;
+      return {
+        currentAuditId: current.id,
+        previousAuditId: previous?.id ?? null,
+        currentName: current.name,
+        previousName: previous?.name ?? null,
+        deviceDelta: currentSummary.deviceCount - (previousSummary?.deviceCount ?? 0),
+        completenessDelta:
+          currentSummary.averageCompleteness - (previousSummary?.averageCompleteness ?? 0),
+        riskDeviceDelta: currentSummary.riskCount - (previousSummary?.riskCount ?? 0),
+        findings: compareFindings(
+          currentFindings.map((finding) => ({
+            ...finding,
+            severity: finding.severity as AuditComparisonFinding['severity'],
+          })),
+          previousFindings.map((finding) => ({
+            ...finding,
+            severity: finding.severity as AuditComparisonFinding['severity'],
+          })),
+        ),
       };
     });
   }
@@ -1181,6 +1268,7 @@ export class AuditsService {
       completeCount: complete,
       riskCount: risk,
       averageCompleteness: average,
+      closedAt: audit.closedAt?.toISOString() ?? null,
       createdAt: audit.createdAt.toISOString(),
       updatedAt: audit.updatedAt.toISOString(),
     };

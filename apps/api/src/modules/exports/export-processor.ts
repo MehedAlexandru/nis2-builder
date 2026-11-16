@@ -4,8 +4,10 @@ import JSZip from 'jszip';
 import type { Logger } from 'pino';
 import type { ObjectStorage } from '../../common/storage/storage.service';
 import { buildComplianceModel, buildDocumentExportModel, type ExportLogo } from './export-model';
-import { renderComplianceDocx, renderDocumentDocx } from './export-docx';
-import { renderCompliancePdf, renderDocumentPdf } from './export-pdf';
+import { renderAuditReportDocx, renderComplianceDocx, renderDocumentDocx } from './export-docx';
+import { renderAuditReportPdf, renderCompliancePdf, renderDocumentPdf } from './export-pdf';
+import { buildAuditReportModel, type AuditWithReportRelations } from './audit-report-model';
+import { renderAuditDiagram } from './audit-diagram';
 
 export interface ExportJobData {
   exportJobId: string;
@@ -88,6 +90,32 @@ export async function processExportJob(
       content =
         format === 'DOCX' ? await renderComplianceDocx(model) : await renderCompliancePdf(model);
       filename = `nis2-compliance-summary-${dateStamp()}.${format === 'DOCX' ? 'docx' : 'pdf'}`;
+      contentType =
+        format === 'DOCX'
+          ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+          : 'application/pdf';
+    } else if (job.type === 'AUDIT_REPORT') {
+      if (!job.entityId) throw new Error('Audit report is missing the audit id');
+      const audit = await loadAudit(prisma, data.organizationId, job.entityId);
+      if (!audit) throw new Error('Audit not found for export');
+      const previousAuditId = exportString(job.entityIds, 'previousAuditId');
+      const previousAudit = previousAuditId
+        ? await loadAudit(prisma, data.organizationId, previousAuditId)
+        : null;
+      const networkDiagram = await renderAuditDiagram(audit);
+      const model = buildAuditReportModel({
+        organization,
+        profile,
+        audit,
+        previousAudit,
+        logo,
+        networkDiagram,
+        locale,
+      });
+      const format = exportFormat(job.entityIds);
+      content =
+        format === 'DOCX' ? await renderAuditReportDocx(model) : await renderAuditReportPdf(model);
+      filename = `network-audit-${safeFilename(audit.name)}-${dateStamp()}.${format === 'DOCX' ? 'docx' : 'pdf'}`;
       contentType =
         format === 'DOCX'
           ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
@@ -236,6 +264,34 @@ async function buildZip(
   };
 }
 
+async function loadAudit(
+  prisma: PrismaClient,
+  organizationId: string,
+  auditId: string,
+): Promise<AuditWithReportRelations | null> {
+  return withTenant(prisma, organizationId, (tx) =>
+    tx.audit.findFirst({
+      where: { id: auditId, organizationId },
+      include: {
+        zones: true,
+        connections: true,
+        devices: { include: { assessment: true, zone: true }, orderBy: { name: 'asc' } },
+        findings: {
+          include: {
+            owner: true,
+            devices: {
+              include: {
+                device: { select: { id: true, name: true, type: true, ipAddresses: true } },
+              },
+            },
+          },
+          orderBy: [{ severity: 'desc' }, { updatedAt: 'desc' }],
+        },
+      },
+    }),
+  );
+}
+
 async function loadDocument(
   prisma: PrismaClient,
   organizationId: string,
@@ -306,6 +362,14 @@ function exportLocale(value: Prisma.JsonValue | null): 'en' | 'ro' {
     if (locale === 'ro') return 'ro';
   }
   return 'en';
+}
+
+function exportString(value: Prisma.JsonValue | null, key: string): string | null {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    const entry = (value as Record<string, unknown>)[key];
+    if (typeof entry === 'string' && entry.length > 0) return entry;
+  }
+  return null;
 }
 
 function exportFormat(value: Prisma.JsonValue | null): 'DOCX' | 'PDF' {

@@ -230,6 +230,7 @@ model Organization {
   findings          Finding[]
   findingDevices    FindingDevice[]
   findingHistory    FindingHistory[]
+  findingSuggestionDecisions FindingSuggestionDecision[]
   riskEntries       RiskRegisterEntry[]
   suppliers         Supplier[]
   trainingRecords   TrainingRecord[]
@@ -658,6 +659,7 @@ model Audit {
   connections  Connection[]
   scanJobs     ScanJob[]
   findings     Finding[]
+  suggestionDecisions FindingSuggestionDecision[]
 
   @@index([organizationId, createdAt])
   @@map("audits")
@@ -761,6 +763,7 @@ model Device {
   zone            Zone?            @relation(fields: [zoneId], references: [id], onDelete: SetNull)
   assessment      DeviceAssessment?
   findings        FindingDevice[]
+  suggestionDecisions FindingSuggestionDecision[]
   connectionsFrom Connection[]     @relation("ConnectionSource")
   connectionsTo   Connection[]     @relation("ConnectionTarget")
 
@@ -880,6 +883,25 @@ model FindingHistory {
   @@index([findingId, createdAt])
   @@index([organizationId])
   @@map("finding_history")
+}
+
+model FindingSuggestionDecision {
+  id             String   @id @default(uuid(7))
+  organizationId String
+  auditId        String
+  deviceId       String
+  riskCode       String
+  status         String   @default("DISMISSED")
+  decidedById    String
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  audit        Audit        @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  device       Device       @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@unique([auditId, deviceId, riskCode])
+  @@index([organizationId, auditId])
+  @@map("finding_suggestion_decisions")
 }
 
 model RiskRegisterEntry {

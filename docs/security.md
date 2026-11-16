@@ -194,6 +194,26 @@ attachment`.
 - Agent credentials are bearer tokens over HTTPS. HMAC request signing or mTLS remains future
   hardening; tokens must be treated as secrets.
 
+## 10d. Findings and audit-report controls
+
+- Every findings call requires an organization membership and runs in a tenant transaction; the
+  finding, audit and linked devices are re-checked against the same organization.
+- Organization-wide findings cannot also link devices; linked devices must belong to the selected
+  audit, preventing cross-audit or cross-tenant references.
+- Automatic suggestions are generated only from the current tenant's device assessments. Dismissals
+  are stored in `finding_suggestion_decisions` with a tenant RLS policy.
+- Risk acceptance requires a justification and approver; the decision is immutable history plus a
+  current JSON state, visible to the customer and printed in reports.
+- Every create/update/delete and suggestion dismissal is written to the append-only audit log.
+- Audit comparison is read-only and tenant-scoped. Closing/reopening is tenant-scoped and audited via
+  the existing audit update action.
+- Audit report exports are queued jobs using the same authenticated, tenant-scoped download path as
+  other exports. The worker loads only the selected organization's audit.
+- Network diagrams are generated from stored coordinates with `sharp`; no user HTML, shell command or
+  Chromium process is executed. Input strings are XML-escaped before SVG generation.
+- The report includes the legal disclaimer and legal-review notice. It is an inventory-based report,
+  not a penetration test.
+
 ## 11. Supply chain and CI
 
 - Lockfile committed; Dependabot weekly.
@@ -213,7 +233,7 @@ attachment`.
 - [ ] Tests: cross-tenant negative test and role-escalation test.
 - [ ] i18n: both languages.
 
-## 13. Known gaps after Phase 6 (tracked)
+## 13. Known gaps after Phase 7 (tracked)
 
 1. DB-backed authorization/RLS integration tests in CI (non-superuser role, cross-tenant matrix).
 2. Instant access-token revocation: sessions kill refresh tokens immediately; access tokens expire
@@ -239,3 +259,9 @@ attachment`.
 15. No automated Docker-network agent integration test yet; discovery/upload/config have unit tests
     and the API/agent flow has a live smoke test.
 16. Scan job cancellation/retry and per-device diff accept/reject actions are not implemented.
+17. Findings evidence is still free text; attachment upload and malware scanning are deferred.
+18. Closing an audit records `closedAt` but does not hard-lock the map or create an immutable copy.
+19. Findings/audit report endpoints have unit and Docker smoke coverage but no DB-backed
+    cross-tenant authorization test yet.
+20. Audit report PDFs have no visual-regression golden files or LibreOffice-headless opening test.
+21. Risk-register rows are generated from findings, but there is no dedicated risk-register UI.

@@ -67,6 +67,14 @@ export function useDocumentExport() {
     [run],
   );
 
+  const exportAuditReport = useCallback(
+    (auditId: string, format: ExportFormat, locale: ExportLocale) =>
+      run(`audit-${auditId}-${format}`, () =>
+        exportsApi.createAuditReport(auditId, { format, locale }),
+      ),
+    [run],
+  );
+
   const downloadJob = useCallback(
     (job: ExportJobSummary) => run(`existing-${job.id}`, async () => job),
     [run],
@@ -80,6 +88,7 @@ export function useDocumentExport() {
     exportDocument,
     exportBundle,
     exportSummary,
+    exportAuditReport,
     downloadJob,
   };
 }

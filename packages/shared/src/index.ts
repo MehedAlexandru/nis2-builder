@@ -8,6 +8,7 @@ export * from './schemas/classification';
 export * from './schemas/documents';
 export * from './schemas/exports';
 export * from './schemas/network';
+export * from './schemas/findings';
 export * from './schemas/agents';
 export * from './data/jurisdictions';
 export * from './data/classification';

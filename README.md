@@ -5,12 +5,32 @@ documentation, audit your IT environment and track progress — in English and R
 
 > **Legal notice:** This tool supports compliance preparation and does not constitute legal advice.
 
-**Status: Phase 6 complete.** Registration, MFA, organizations, tenant-scoped RLS, the data-driven
-NIS2 classification wizard, the documentation centre, the network mapper and the scanner agent are
-live. Agents enroll from the UI, poll queued scans over outbound HTTPS, upload inventory and produce
-new/changed/missing diffs without overwriting the map layout or notes.
+**Status: Phase 7 complete.** Registration, MFA, organizations, tenant-scoped RLS, the data-driven
+NIS2 classification wizard, the documentation centre, the network mapper, the scanner agent and the
+findings/remediation register are live. Audits can be closed, compared and exported as professional
+DOCX/PDF reports with a generated network diagram.
 
 ---
+
+## What Phase 7 adds
+
+- Findings register with severity, NIS2 Art. 21 category, likelihood × impact score, affected
+  devices, evidence, proposed solution, effort, cost, owner, due date and full change history.
+- Status workflow including risk acceptance with justification and named approver; accepted risks
+  are visible in the report.
+- Automatic suggestions derived from device assessment risks (missing/expired endpoint protection,
+  EOL OS, stale patches, missing backups, untested restores, MFA gaps, default credentials, internet
+  exposure, logging and encryption gaps) with confirm/dismiss decisions persisted per device.
+- Findings feed the risk-register table and the dashboard summary.
+- Audit lifecycle: close/reopen a dated snapshot and compare it with the previous audit (device,
+  completeness and risk deltas; findings opened, closed, carried and still open).
+- Audit report export as DOCX or PDF: executive summary, scope/methodology, generated network
+  diagram, device inventory and per-device sheets, colour-coded findings, Art. 21 mapping,
+  remediation roadmap, heat map, previous-audit comparison and signature block.
+- **Device panel → Add finding for this device** opens the register with the device preselected.
+- Migration `0008_findings_phase7` adds persisted suggestion decisions and RLS coverage.
+
+See [`docs/phase-7-report.md`](docs/phase-7-report.md) for verification evidence and known gaps.
 
 ## What Phase 6 adds
 
@@ -285,10 +305,10 @@ See [`docs/security.md`](docs/security.md) and [`SECURITY.md`](SECURITY.md).
 | 2     | Classification wizard, rules engine, result PDF                     | **Done** |
 | 3     | Document template engine, revisions, diff/restore, approvals        | **Done** |
 | 4     | DOCX/PDF pipeline, ZIP and compliance summary                       | **Done** |
-| 5     | Network canvas, devices, assessments, Nmap/CSV import               | Next     |
-| 6     | Scanner Agent, enrollment, diff-based rescans                       | Planned  |
-| 7     | Findings register, auto-suggestions, audit lifecycle/report         | Planned  |
-| 8     | Admin dashboard, drill-down, reminders, notifications               | Planned  |
+| 5     | Network canvas, devices, assessments, Nmap/CSV import               | **Done** |
+| 6     | Scanner Agent, enrollment, diff-based rescans                       | **Done** |
+| 7     | Findings register, auto-suggestions, audit lifecycle/report         | **Done** |
+| 8     | Admin dashboard, drill-down, reminders, notifications               | Next     |
 | 9     | Helm, hardened images, CI/CD, observability, load/security testing  | Planned  |
 | —     | Stretch: incident register, AI assist, WebAuthn, more jurisdictions | Stretch  |
 

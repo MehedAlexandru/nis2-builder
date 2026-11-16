@@ -54,6 +54,7 @@ export const networkAuditSummarySchema = z.object({
   completeCount: z.number().int().nonnegative(),
   riskCount: z.number().int().nonnegative(),
   averageCompleteness: z.number().int().min(0).max(100),
+  closedAt: z.string().nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });

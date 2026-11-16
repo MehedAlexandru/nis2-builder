@@ -22,7 +22,8 @@
     "compliance": "Compliance",
     "manage": "Manage",
     "account": "Account",
-    "agents": "Agents"
+    "agents": "Agents",
+    "findings": "Findings"
   },
   "actions": {
     "startClassification": "Start classification",
@@ -769,7 +770,8 @@
       "saving": "Saving...",
       "openPortsHint": "Comma-separated, e.g. 443/tcp (https), 22/tcp (ssh)",
       "criticality": "Criticality",
-      "identifier": "IP or MAC address"
+      "identifier": "IP or MAC address",
+      "addFinding": "Add finding for this device"
     },
     "types": {
       "ROUTER": "Router",
@@ -922,6 +924,26 @@
       "NEW": "New",
       "CHANGED": "Changed",
       "MISSING": "Missing"
+    },
+    "lifecycle": {
+      "compare": "Compare audits",
+      "close": "Close audit",
+      "reopen": "Reopen audit",
+      "closed": "Audit closed. The snapshot is now read-only evidence.",
+      "reopened": "Audit reopened for further work.",
+      "error": "The audit status could not be changed.",
+      "compareError": "The audit comparison could not be loaded.",
+      "comparisonTitle": "Audit comparison",
+      "comparing": "{{current}} compared with {{previous}}.",
+      "noPrevious": "There is no earlier audit to compare with.",
+      "deviceDelta": "Device change",
+      "completenessDelta": "Completeness change",
+      "opened": "Findings opened",
+      "closedFindings": "Findings closed",
+      "carried": "Carried forward",
+      "riskScore": "Open risk score",
+      "exportPdf": "Audit PDF",
+      "exportDocx": "Audit DOCX"
     }
   },
   "agents": {
@@ -1017,6 +1039,118 @@
       "windowsAmd64": "Windows x64",
       "darwinAmd64": "macOS Intel",
       "darwinArm64": "macOS Apple Silicon"
+    }
+  },
+  "findings": {
+    "title": "Findings and remediation",
+    "subtitle": "Track security gaps, confirm automatic suggestions and show auditors how risks are treated.",
+    "noOrganization": "Select an organization to use the findings register.",
+    "loadError": "The findings register could not be loaded.",
+    "refresh": "Refresh",
+    "newFinding": "New finding",
+    "audit": "Audit",
+    "statusLabel": "Status",
+    "severityLabel": "Severity",
+    "search": "Search",
+    "searchPlaceholder": "Code or title",
+    "allStatuses": "All statuses",
+    "allSeverities": "All severities",
+    "metrics": {
+      "total": "Total findings",
+      "open": "Open",
+      "critical": "Critical",
+      "high": "High",
+      "overdue": "Overdue"
+    },
+    "suggestionsTitle": "Automatic suggestions",
+    "suggestionsSubtitle": "Derived from the device assessment data in {{audit}}.",
+    "suggestionsEmpty": "No new suggestions. The current device data has no unmatched risks.",
+    "confirmSuggestion": "Confirm",
+    "dismissSuggestion": "Dismiss",
+    "suggestionConfirmed": "Suggestion converted into a finding.",
+    "suggestionError": "The suggestion could not be processed.",
+    "registerTitle": "Remediation register",
+    "registerSubtitle": "Findings, owners, due dates, risk acceptance and change history.",
+    "empty": "No findings match the current filters.",
+    "loading": "Loading findings...",
+    "table": {
+      "code": "ID",
+      "title": "Finding",
+      "severity": "Severity",
+      "status": "Status",
+      "devices": "Devices",
+      "owner": "Owner",
+      "due": "Due",
+      "actions": "Actions"
+    },
+    "edit": "Edit",
+    "updated": "Finding updated.",
+    "created": "Finding created.",
+    "saveError": "The finding could not be saved.",
+    "deleteConfirm": "Delete \"{{title}}\"? The change history will also be removed.",
+    "deleted": "Finding deleted.",
+    "deleteError": "The finding could not be deleted.",
+    "createTitle": "Create finding",
+    "editTitle": "Edit finding",
+    "noDescription": "No description was recorded.",
+    "riskAcceptedTitle": "Risk accepted",
+    "history": "Change history",
+    "noHistory": "No changes recorded yet.",
+    "unknownUser": "Unknown user",
+    "dashboardTitle": "Open findings",
+    "dashboardSubtitle": "Security gaps that still need an owner or a decision.",
+    "openRegister": "Open register",
+    "effort": {
+      "S": "Small",
+      "M": "Medium",
+      "L": "Large"
+    },
+    "status": {
+      "OPEN": "Open",
+      "IN_PROGRESS": "In progress",
+      "MITIGATED": "Mitigated",
+      "ACCEPTED_RISK": "Accepted risk",
+      "CLOSED": "Closed"
+    },
+    "categories": {
+      "RISK_MANAGEMENT": "Risk management",
+      "INCIDENT_HANDLING": "Incident handling",
+      "BUSINESS_CONTINUITY": "Business continuity and backup",
+      "SUPPLY_CHAIN": "Supply chain security",
+      "SECURE_DEVELOPMENT": "Secure development and maintenance",
+      "EFFECTIVENESS": "Effectiveness assessment",
+      "CYBER_HYGIENE": "Cyber hygiene and training",
+      "CRYPTOGRAPHY": "Cryptography and encryption",
+      "ACCESS_CONTROL": "Access control and asset management",
+      "NETWORK_SECURITY": "Network security",
+      "LOGGING": "Logging and monitoring",
+      "OTHER": "Other"
+    },
+    "form": {
+      "title": "Title",
+      "audit": "Audit",
+      "organizationOnly": "Organization-wide (no audit)",
+      "category": "NIS2 measure",
+      "severity": "Severity",
+      "status": "Status",
+      "dueDate": "Due date",
+      "likelihood": "Likelihood (1-5)",
+      "impact": "Impact (1-5)",
+      "effort": "Effort",
+      "cost": "Estimated cost (EUR)",
+      "description": "Description",
+      "evidence": "Evidence",
+      "proposedSolution": "Proposed solution",
+      "organizationWide": "Organization-wide finding",
+      "organizationWideHint": "Use this when no single device is affected.",
+      "devices": "Affected devices",
+      "noDevices": "Add devices to the audit before linking them.",
+      "riskJustification": "Risk acceptance justification",
+      "riskApprover": "Approver",
+      "note": "Change note",
+      "owner": "Owner",
+      "riskScore": "Risk score",
+      "unassigned": "Unassigned"
     }
   }
 }

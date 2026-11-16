@@ -16,6 +16,7 @@ import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { DesignSystemPage } from '@/features/design/DesignSystemPage';
 import { DocumentEditorPage } from '@/features/documents/DocumentEditorPage';
 import { DocumentsPage } from '@/features/documents/DocumentsPage';
+import { FindingsPage } from '@/features/findings/FindingsPage';
 import { LandingPage } from '@/features/landing/LandingPage';
 import { NotFoundPage } from '@/features/landing/NotFoundPage';
 import { NetworkPage } from '@/features/network/NetworkPage';
@@ -82,6 +83,14 @@ export function App() {
             element={
               <ProtectedRoute>
                 <NetworkPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="findings"
+            element={
+              <ProtectedRoute>
+                <FindingsPage />
               </ProtectedRoute>
             }
           />

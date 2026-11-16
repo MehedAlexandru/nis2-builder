@@ -7,6 +7,7 @@ import type {
   ExportField,
   ExportRevisionRow,
 } from './export-model';
+import type { AuditReportModel } from './audit-report-model';
 
 const PAGE_MARGIN = 48;
 const PAGE_WIDTH = 595.28;
@@ -160,6 +161,162 @@ export async function renderCompliancePdf(model: ExportComplianceModel): Promise
 
     drawToc(doc, fonts, tocPage, entries);
     drawPageFurniture(doc, fonts, 'NIS2 compliance summary', model.organizationName);
+  });
+}
+
+export async function renderAuditReportPdf(model: AuditReportModel): Promise<Buffer> {
+  return drawPdf((doc, fonts) => {
+    drawAuditCover(doc, fonts, model);
+    doc.addPage();
+    const tocPage = currentPage(doc);
+    const entries: Array<{ title: string; page: number }> = [];
+    const section = (title: string) => {
+      doc.addPage();
+      entries.push({ title, page: currentPage(doc) });
+      drawHeading(doc, fonts, title, 1);
+    };
+
+    section('Executive summary');
+    drawMetaTable(doc, fonts, [
+      ['Audit', `${model.auditName} (${model.period})`],
+      ['Status', model.status],
+      ['Devices documented', String(model.deviceCount)],
+      ['Device information complete', `${model.completeCount} of ${model.deviceCount}`],
+      ['Average completeness', `${model.averageCompleteness}%`],
+      ['Devices with risks', String(model.riskDeviceCount)],
+      [
+        'Open findings',
+        `${model.openFindings} (${model.criticalFindings} critical, ${model.highFindings} high)`,
+      ],
+      ['Open risk score', String(model.riskScore)],
+    ]);
+    drawCallout(doc, fonts, model.legalReviewNotice, 'warning');
+    drawCallout(doc, fonts, model.disclaimer, 'info');
+
+    section('Scope and methodology');
+    drawMetaTable(doc, fonts, [
+      ['Scope', model.scope],
+      ['Methodology', model.methodology],
+      ['Auditor', model.auditorName],
+      ['Limitations', model.limitations],
+      ['Period', model.period],
+      ['Closed', model.closedAt ? formatDate(model.closedAt) : 'Not closed'],
+    ]);
+    if (model.comparisonSummary.length > 0) {
+      drawHeading(doc, fonts, 'Comparison with the previous audit', 2);
+      for (const item of model.comparisonSummary) drawBullet(doc, fonts, item);
+    }
+
+    section('Network diagram');
+    drawAuditDiagram(doc, fonts, model);
+
+    section('Device inventory');
+    drawTable(
+      doc,
+      fonts,
+      ['Device', 'Type', 'IP', 'Zone', 'Complete', 'Risks'],
+      model.devices.map((device) => [
+        device.name,
+        device.type,
+        device.ipAddresses,
+        device.zone,
+        `${device.completeness}%`,
+        device.risks,
+      ]),
+      [0.2, 0.12, 0.16, 0.12, 0.09, 0.31],
+    );
+
+    section('Per-device sheets');
+    for (const device of model.devices) {
+      ensureSpace(doc, 120);
+      drawHeading(doc, fonts, device.name, 2);
+      drawMetaTable(doc, fonts, [
+        ['Type', device.type],
+        ['IP addresses', device.ipAddresses],
+        ['MAC address', device.macAddress],
+        ['Zone', device.zone],
+        ['Criticality', device.criticality],
+        ['Completeness', `${device.completeness}%`],
+        ['Scan state', device.scanState],
+        ['Risk indicators', device.risks],
+      ]);
+    }
+
+    section('Findings and remediation');
+    if (model.findings.length === 0) {
+      drawParagraph(doc, fonts, 'No findings were recorded for this audit.');
+    } else {
+      drawFindingsTable(doc, fonts, model);
+    }
+
+    section('NIS2 Art. 21 mapping');
+    drawTable(
+      doc,
+      fonts,
+      ['Measure', 'Legal reference', 'Open findings', 'Highest severity'],
+      model.art21.map((row) => [
+        row.category,
+        row.legalReference,
+        String(row.count),
+        row.highestSeverity,
+      ]),
+      [0.42, 0.22, 0.16, 0.2],
+    );
+
+    section('Remediation roadmap');
+    for (const group of model.roadmap) {
+      drawHeading(doc, fonts, group.title, 2);
+      if (group.items.length === 0) {
+        drawParagraph(doc, fonts, 'No findings in this window.', { color: MUTED });
+      } else {
+        for (const item of group.items) drawBullet(doc, fonts, item);
+      }
+    }
+
+    section('Risk heat map');
+    drawHeatMap(doc, fonts, model);
+
+    section('Comparison with the previous audit');
+    if (!model.comparison) {
+      drawParagraph(doc, fonts, 'No previous audit was selected for comparison.');
+    } else {
+      drawMetaTable(doc, fonts, [
+        ['Previous audit', model.previousName ?? '—'],
+        ['Findings opened', String(model.comparison.findings.opened)],
+        ['Findings closed', String(model.comparison.findings.closed)],
+        ['Findings carried forward', String(model.comparison.findings.carried)],
+        ['Still open from previous', String(model.comparison.findings.stillOpen)],
+        [
+          'Risk score change',
+          String(
+            model.comparison.findings.riskScoreCurrent -
+              model.comparison.findings.riskScorePrevious,
+          ),
+        ],
+        ['Device change', String(model.comparison.deviceDelta)],
+        ['Completeness change', `${model.comparison.completenessDelta} points`],
+      ]);
+      for (const item of model.comparisonSummary) drawBullet(doc, fonts, item);
+    }
+
+    section('Signature and appendices');
+    drawParagraph(
+      doc,
+      fonts,
+      'This report was generated from the network inventory, device assessments and findings recorded in NIS2 Compass. It is an inventory-based assessment, not a penetration test.',
+      { color: MUTED },
+    );
+    drawTable(
+      doc,
+      fonts,
+      ['Role', 'Name', 'Date'],
+      model.signature.map((row) => [row.role, row.name, row.date]),
+      [0.28, 0.47, 0.25],
+    );
+    drawCallout(doc, fonts, model.disclaimer, 'info');
+
+    drawToc(doc, fonts, tocPage, entries);
+    drawPageFurniture(doc, fonts, 'Network security audit report', model.auditName);
   });
 }
 
@@ -382,6 +539,7 @@ function drawTable(
   headers: string[],
   rows: string[][],
   weights?: number[],
+  rowFills?: Array<string | null>,
 ): void {
   if (headers.length === 0) return;
   const normalized = headers.map((_, index) => weights?.[index] ?? 1 / headers.length);
@@ -434,8 +592,9 @@ function drawTable(
       drawHeader();
     }
     const top = doc.y;
-    if (rowIndex % 2 === 1) {
-      doc.rect(PAGE_MARGIN, top, CONTENT_WIDTH, height).fill(PRIMARY_LIGHT);
+    const rowFill = rowFills?.[rowIndex] ?? (rowIndex % 2 === 1 ? PRIMARY_LIGHT : null);
+    if (rowFill) {
+      doc.rect(PAGE_MARGIN, top, CONTENT_WIDTH, height).fill(rowFill);
     }
     let x = PAGE_MARGIN;
     row.forEach((cell, index) => {
@@ -643,4 +802,155 @@ function formatDate(value: string): string {
     month: '2-digit',
     day: '2-digit',
   }).format(date);
+}
+
+function drawAuditCover(doc: PDFKit.PDFDocument, fonts: FontSet, model: AuditReportModel): void {
+  doc.y = 90;
+  if (model.logo) {
+    try {
+      doc.image(model.logo.data, PAGE_WIDTH / 2 - 70, doc.y, { fit: [140, 64], align: 'center' });
+      doc.y += 90;
+    } catch {
+      doc.y += 10;
+    }
+  }
+  doc.font(fonts.bold).fontSize(22).fillColor(PRIMARY).text(model.legalName, { align: 'center' });
+  doc.moveDown(0.5);
+  doc.font(fonts.bold).fontSize(30).fillColor(TEXT).text('Network security audit', {
+    align: 'center',
+  });
+  doc.moveDown(0.3);
+  doc.font(fonts.bold).fontSize(18).fillColor(TEXT).text(model.auditName, { align: 'center' });
+  doc.moveDown(0.4);
+  doc.font(fonts.regular).fontSize(11).fillColor(MUTED).text(model.period, { align: 'center' });
+  doc.moveDown(2);
+  drawMetaTable(doc, fonts, [
+    ['Status', model.status],
+    ['Auditor', model.auditorName],
+    ['Generated', formatDate(model.generatedAt)],
+    ['Closed', model.closedAt ? formatDate(model.closedAt) : 'Not closed'],
+    ['Devices', String(model.deviceCount)],
+    ['Open findings', String(model.openFindings)],
+  ]);
+  doc.moveDown(2);
+  doc.font(fonts.regular).fontSize(9).fillColor(MUTED).text(model.organizationName, {
+    align: 'center',
+  });
+}
+
+function drawAuditDiagram(doc: PDFKit.PDFDocument, fonts: FontSet, model: AuditReportModel): void {
+  drawParagraph(
+    doc,
+    fonts,
+    'The diagram is generated from the documented zones, devices and connections. It reflects the saved map layout and is not a live network scan.',
+    { color: MUTED },
+  );
+  ensureSpace(doc, 80);
+  const maxWidth = CONTENT_WIDTH;
+  const maxHeight = 390;
+  const ratio = Math.min(
+    maxWidth / model.networkDiagram.width,
+    maxHeight / model.networkDiagram.height,
+    1,
+  );
+  const width = Math.round(model.networkDiagram.width * ratio);
+  const height = Math.round(model.networkDiagram.height * ratio);
+  const x = PAGE_MARGIN + (CONTENT_WIDTH - width) / 2;
+  const y = doc.y;
+  doc.image(model.networkDiagram.data, x, y, { width, height });
+  doc.y = y + height + 12;
+}
+
+function drawFindingsTable(doc: PDFKit.PDFDocument, fonts: FontSet, model: AuditReportModel): void {
+  const fills = model.findings.map((finding) =>
+    finding.severity === 'CRITICAL'
+      ? DANGER
+      : finding.severity === 'HIGH'
+        ? '#FFEDD5'
+        : finding.severity === 'MEDIUM'
+          ? WARNING
+          : SUCCESS,
+  );
+  drawParagraph(
+    doc,
+    fonts,
+    'Findings are sorted by severity and risk score. Colours indicate the severity band.',
+    { color: MUTED },
+  );
+  drawTable(
+    doc,
+    fonts,
+    ['Code', 'Finding', 'Severity', 'Status', 'Risk', 'Owner', 'Due'],
+    model.findings.map((finding) => [
+      finding.code,
+      finding.title,
+      finding.severity,
+      finding.status,
+      finding.riskScore,
+      finding.owner,
+      finding.dueDate,
+    ]),
+    [0.08, 0.31, 0.1, 0.12, 0.07, 0.17, 0.15],
+    fills,
+  );
+}
+
+function drawHeatMap(doc: PDFKit.PDFDocument, fonts: FontSet, model: AuditReportModel): void {
+  drawParagraph(
+    doc,
+    fonts,
+    'Likelihood and impact are taken from each finding; findings without a score use the severity default.',
+    { color: MUTED },
+  );
+  ensureSpace(doc, 360);
+  const cell = 52;
+  const startX = PAGE_MARGIN + 78;
+  const startY = doc.y + 28;
+  doc.font(fonts.bold).fontSize(9).fillColor(TEXT);
+  doc.text('Impact', PAGE_MARGIN, startY + 110, { width: 70, align: 'right' });
+  for (let likelihood = 1; likelihood <= 5; likelihood += 1) {
+    doc.text(String(likelihood), startX + (likelihood - 1) * cell, startY - 20, {
+      width: cell,
+      align: 'center',
+    });
+  }
+  doc.text('Likelihood', startX, startY + 5 * cell + 10, {
+    width: cell * 5,
+    align: 'center',
+  });
+  for (let impact = 5; impact >= 1; impact -= 1) {
+    const row = 5 - impact;
+    doc
+      .font(fonts.bold)
+      .fontSize(9)
+      .fillColor(TEXT)
+      .text(String(impact), startX - 24, startY + row * cell + 18, {
+        width: 20,
+        align: 'center',
+      });
+    for (let likelihood = 1; likelihood <= 5; likelihood += 1) {
+      const value = likelihood * impact;
+      const fill = value >= 15 ? DANGER : value >= 8 ? WARNING : SUCCESS;
+      const count =
+        model.heatMap.find((entry) => entry.likelihood === likelihood && entry.impact === impact)
+          ?.count ?? 0;
+      const x = startX + (likelihood - 1) * cell;
+      const y = startY + row * cell;
+      doc.rect(x, y, cell, cell).fill(fill).strokeColor('#FFFFFF').lineWidth(2).stroke();
+      doc
+        .font(fonts.bold)
+        .fontSize(13)
+        .fillColor(TEXT)
+        .text(String(value), x, y + 12, { width: cell, align: 'center' });
+      doc
+        .font(fonts.regular)
+        .fontSize(8)
+        .fillColor(MUTED)
+        .text(`${count} finding(s)`, x, y + 30, {
+          width: cell,
+          align: 'center',
+        });
+    }
+  }
+  doc.y = startY + 5 * cell + 36;
 }
